@@ -68,7 +68,11 @@ re-running the script costs nothing and prints the same numbers.
   24 completion tokens instead of 74–82, gateway list cost $0.0002 instead of
   $0.00037, same verdict. It is the right setting for the 18-cell matrix; it is not
   the right setting for the reference layer this calibration is measuring, because
-  the point of the hosted layer is that it deliberates on drift.
+  the point of the hosted layer is that it deliberates on drift. `judges.make()`
+  therefore leaves the thinking channel on: wiring the cheap setting into a run needs
+  a `judge.reasoning_effort` config key, and `ragqa/config.py` belongs to another
+  ticket, so the flag exists in code (`LLMJudge(..., reasoning_effort="none")`) while
+  every judge-enabled run pays the deliberating price until that key is added.
 
 **Reproduce.**
 
