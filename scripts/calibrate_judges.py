@@ -1,4 +1,4 @@
-﻿"""Reproduce the ticket-10 judge calibration from stored artifacts.
+"""Reproduce the ticket-10 judge calibration from stored artifacts.
 
 Three inputs, no notebook: the run directories (for the chunk text each claim
 cites), the hand-labelled claim set, and the gateway credentials in `.env`.
@@ -201,6 +201,7 @@ def spend(cache: Dict[str, Any]) -> Dict[str, int]:
         "calls": sum(1 for entry in entries if entry),
         "tokens_in": sum(int(entry.get("tokens_in", 0) or 0) for entry in entries),
         "tokens_out": sum(int(entry.get("tokens_out", 0) or 0) for entry in entries),
+        "nli_calls": sum(1 for entry in cache.values() if (entry.get("nli") or {}).get("score") is not None),
     }
 
 
@@ -383,7 +384,7 @@ def main(argv=None) -> int:
         "tokens_out": tokens_out,
         "usd": usd,
         "cny": usd * USD_TO_CNY,
-        "nli_calls": int(stats["nli_stats"].get("calls", 0)),
+        "nli_calls": usage["nli_calls"],
         "threshold": float(cfg["judge.nli_threshold"]),
         "prices_usd_per_mtok": {"in": price_in, "out": price_out},
     }
@@ -430,4 +431,5 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 

@@ -224,10 +224,16 @@ list price against $0.00037 with deliberation, a factor of 1.8, for the same ver
 on a claim that needs no deliberation.
 
 For a full run rather than a calibration sample, `configs/judge_smoke.yaml` runs the
-same two layers over the fixture corpus and generation stub, so the wiring is
-checkable end to end: that run writes `grounding.judge_confusion` into its
-`metrics.json` and a `judge` cost component into `system.cost_components`, exactly as
-a headline run does.
+same two layers over the fixture corpus with the generation stub, so the wiring is
+checkable end to end. Its run, `runs/judge-smoke-20261030T122905-b67fc09f`, writes
+`grounding.judge_confusion = {both_supported: 4, nli_only: 0, judge_only: 1,
+neither: 0}` into `metrics.json`, plus a `judge` entry in `system.cost_components`
+(1,963 tokens in, 747 out, $0.000743 / ¥0.0050 for 5 judge calls and 5 local NLI
+calls) and per-layer call counts in `models.json`. That run is also a useful
+counter-example: on stub claims, which are verbatim chunk fragments, the one
+disagreement runs `judge_only` — the hosted judge accepting what the NLI layer
+called neutral — so "NLI is the permissive one" is a property of the real claims
+above, not of the layers in general.
 
 ## What this does not establish
 
