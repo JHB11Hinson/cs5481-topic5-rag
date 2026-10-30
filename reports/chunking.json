@@ -1,0 +1,1058 @@
+{
+  "budget_tokens": 512,
+  "chunks_root": "D:\\DE Project\\wt\\exp\\data\\chunks",
+  "golden_path": "golden/v1.jsonl",
+  "pairs": [
+    {
+      "cache": {
+        "fixed": 65,
+        "recursive": 66
+      },
+      "context_mode": "contextual_prefix",
+      "fixed_run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 0,
+          "discordant": 7,
+          "method": "exact_binomial",
+          "p_value": 0.015625,
+          "pairs": 40,
+          "statistic": 5.142857,
+          "treatment_only": 7
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 2,
+          "method": "exact_binomial",
+          "p_value": 0.5,
+          "pairs": 40,
+          "statistic": 0.5,
+          "treatment_only": 2
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -5.0,
+          "fixed": 6,
+          "recursive": 1
+        },
+        "citation_precision": {
+          "delta": 0.0182,
+          "fixed": 0.9818,
+          "recursive": 1.0
+        },
+        "citation_recall": {
+          "delta": 0.175,
+          "fixed": 0.8,
+          "recursive": 0.975
+        },
+        "cny_per_1k_questions": {
+          "delta": -0.1842,
+          "fixed": 9.3053,
+          "recursive": 9.1211
+        },
+        "hit_at_10": {
+          "delta": 0.05,
+          "fixed": 0.825,
+          "recursive": 0.875
+        },
+        "latency_p95_ms": {
+          "delta": -16607.025,
+          "fixed": 32566.814,
+          "recursive": 15959.789
+        },
+        "mrr": {
+          "delta": 0.0865,
+          "fixed": 0.418,
+          "recursive": 0.5045
+        },
+        "ndcg_at_10": {
+          "delta": 0.0775,
+          "fixed": 0.5145,
+          "recursive": 0.592
+        },
+        "over_abstain_rate": {
+          "delta": -0.125,
+          "fixed": 0.15,
+          "recursive": 0.025
+        },
+        "span_hit_rate": {
+          "delta": 0.0182,
+          "fixed": 0.9818,
+          "recursive": 1.0
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3",
+      "retrieval_mode": "dense",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    },
+    {
+      "abstentions_delta": null,
+      "abstentions_fixed": null,
+      "abstentions_recursive": null,
+      "citation_discordant_fixed_only": null,
+      "citation_discordant_recursive_only": null,
+      "citation_p_value": null,
+      "citation_precision_delta": null,
+      "citation_precision_fixed": null,
+      "citation_precision_recursive": null,
+      "citation_recall_delta": null,
+      "citation_recall_fixed": null,
+      "citation_recall_recursive": null,
+      "cny_per_1k_questions_delta": null,
+      "cny_per_1k_questions_fixed": null,
+      "cny_per_1k_questions_recursive": null,
+      "context_mode": "late_chunking",
+      "fixed_chunks": null,
+      "fixed_llm_cache_misses": null,
+      "fixed_mean_tokens": null,
+      "fixed_mechanism_source": null,
+      "fixed_over_budget": null,
+      "fixed_over_budget_structural_share": null,
+      "fixed_over_budget_with_fence": null,
+      "fixed_over_budget_with_table": null,
+      "fixed_p95_tokens": null,
+      "fixed_parents": null,
+      "fixed_run_id": null,
+      "fixed_share_containing_code_fence": null,
+      "fixed_share_containing_table_row": null,
+      "fixed_share_ending_mid_sentence": null,
+      "fixed_share_over_budget": null,
+      "hit_at_10_delta": null,
+      "hit_at_10_fixed": null,
+      "hit_at_10_recursive": null,
+      "hit_discordant_fixed_only": null,
+      "hit_discordant_recursive_only": null,
+      "hit_p_value": null,
+      "latency_p95_ms_delta": null,
+      "latency_p95_ms_fixed": null,
+      "latency_p95_ms_recursive": null,
+      "missing": [
+        "fixed",
+        "recursive_parent_child"
+      ],
+      "mrr_delta": null,
+      "mrr_fixed": null,
+      "mrr_recursive": null,
+      "ndcg_at_10_delta": null,
+      "ndcg_at_10_fixed": null,
+      "ndcg_at_10_recursive": null,
+      "over_abstain_rate_delta": null,
+      "over_abstain_rate_fixed": null,
+      "over_abstain_rate_recursive": null,
+      "paired_items": null,
+      "recursive_chunks": null,
+      "recursive_llm_cache_misses": null,
+      "recursive_mean_tokens": null,
+      "recursive_mechanism_source": null,
+      "recursive_over_budget": null,
+      "recursive_over_budget_structural_share": null,
+      "recursive_over_budget_with_fence": null,
+      "recursive_over_budget_with_table": null,
+      "recursive_p95_tokens": null,
+      "recursive_parents": null,
+      "recursive_run_id": null,
+      "recursive_share_containing_code_fence": null,
+      "recursive_share_containing_table_row": null,
+      "recursive_share_ending_mid_sentence": null,
+      "recursive_share_over_budget": null,
+      "retrieval_mode": "dense",
+      "span_hit_rate_delta": null,
+      "span_hit_rate_fixed": null,
+      "span_hit_rate_recursive": null,
+      "status": "pending",
+      "table_fixed_hits": null,
+      "table_items": null,
+      "table_p_value": null,
+      "table_recursive_hits": null
+    },
+    {
+      "cache": {
+        "fixed": 3,
+        "recursive": 53
+      },
+      "context_mode": "plain",
+      "fixed_run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 3,
+          "discordant": 7,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 4
+        },
+        "retrieval_hit": {
+          "baseline_only": 2,
+          "discordant": 4,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.25,
+          "treatment_only": 2
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -2.0,
+          "fixed": 4,
+          "recursive": 2
+        },
+        "citation_precision": {
+          "delta": -0.0423,
+          "fixed": 1.0,
+          "recursive": 0.9577
+        },
+        "citation_recall": {
+          "delta": 0.025,
+          "fixed": 0.875,
+          "recursive": 0.9
+        },
+        "cny_per_1k_questions": {
+          "delta": 0.0597,
+          "fixed": 9.2745,
+          "recursive": 9.3342
+        },
+        "hit_at_10": {
+          "delta": 0.0,
+          "fixed": 0.85,
+          "recursive": 0.85
+        },
+        "latency_p95_ms": {
+          "delta": 27907.852,
+          "fixed": 21.252,
+          "recursive": 27929.104
+        },
+        "mrr": {
+          "delta": -0.0025,
+          "fixed": 0.4817,
+          "recursive": 0.4792
+        },
+        "ndcg_at_10": {
+          "delta": -0.0016,
+          "fixed": 0.5697,
+          "recursive": 0.5681
+        },
+        "over_abstain_rate": {
+          "delta": -0.05,
+          "fixed": 0.1,
+          "recursive": 0.05
+        },
+        "span_hit_rate": {
+          "delta": -0.0423,
+          "fixed": 1.0,
+          "recursive": 0.9577
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e",
+      "retrieval_mode": "dense",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    },
+    {
+      "cache": {
+        "fixed": 63,
+        "recursive": 60
+      },
+      "context_mode": "contextual_prefix",
+      "fixed_run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 0,
+          "discordant": 3,
+          "method": "exact_binomial",
+          "p_value": 0.25,
+          "pairs": 40,
+          "statistic": 1.333333,
+          "treatment_only": 3
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 1,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 1
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -1.0,
+          "fixed": 2,
+          "recursive": 1
+        },
+        "citation_precision": {
+          "delta": -0.0091,
+          "fixed": 0.9844,
+          "recursive": 0.9753
+        },
+        "citation_recall": {
+          "delta": 0.075,
+          "fixed": 0.9,
+          "recursive": 0.975
+        },
+        "cny_per_1k_questions": {
+          "delta": -0.534,
+          "fixed": 8.9954,
+          "recursive": 8.4614
+        },
+        "hit_at_10": {
+          "delta": 0.025,
+          "fixed": 0.875,
+          "recursive": 0.9
+        },
+        "latency_p95_ms": {
+          "delta": -32302.961,
+          "fixed": 48847.091,
+          "recursive": 16544.13
+        },
+        "mrr": {
+          "delta": 0.0695,
+          "fixed": 0.5737,
+          "recursive": 0.6432
+        },
+        "ndcg_at_10": {
+          "delta": 0.0581,
+          "fixed": 0.6503,
+          "recursive": 0.7084
+        },
+        "over_abstain_rate": {
+          "delta": -0.025,
+          "fixed": 0.05,
+          "recursive": 0.025
+        },
+        "span_hit_rate": {
+          "delta": -0.0091,
+          "fixed": 0.9844,
+          "recursive": 0.9753
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64",
+      "retrieval_mode": "hybrid",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    },
+    {
+      "abstentions_delta": null,
+      "abstentions_fixed": null,
+      "abstentions_recursive": null,
+      "citation_discordant_fixed_only": null,
+      "citation_discordant_recursive_only": null,
+      "citation_p_value": null,
+      "citation_precision_delta": null,
+      "citation_precision_fixed": null,
+      "citation_precision_recursive": null,
+      "citation_recall_delta": null,
+      "citation_recall_fixed": null,
+      "citation_recall_recursive": null,
+      "cny_per_1k_questions_delta": null,
+      "cny_per_1k_questions_fixed": null,
+      "cny_per_1k_questions_recursive": null,
+      "context_mode": "late_chunking",
+      "fixed_chunks": null,
+      "fixed_llm_cache_misses": null,
+      "fixed_mean_tokens": null,
+      "fixed_mechanism_source": null,
+      "fixed_over_budget": null,
+      "fixed_over_budget_structural_share": null,
+      "fixed_over_budget_with_fence": null,
+      "fixed_over_budget_with_table": null,
+      "fixed_p95_tokens": null,
+      "fixed_parents": null,
+      "fixed_run_id": null,
+      "fixed_share_containing_code_fence": null,
+      "fixed_share_containing_table_row": null,
+      "fixed_share_ending_mid_sentence": null,
+      "fixed_share_over_budget": null,
+      "hit_at_10_delta": null,
+      "hit_at_10_fixed": null,
+      "hit_at_10_recursive": null,
+      "hit_discordant_fixed_only": null,
+      "hit_discordant_recursive_only": null,
+      "hit_p_value": null,
+      "latency_p95_ms_delta": null,
+      "latency_p95_ms_fixed": null,
+      "latency_p95_ms_recursive": null,
+      "missing": [
+        "fixed",
+        "recursive_parent_child"
+      ],
+      "mrr_delta": null,
+      "mrr_fixed": null,
+      "mrr_recursive": null,
+      "ndcg_at_10_delta": null,
+      "ndcg_at_10_fixed": null,
+      "ndcg_at_10_recursive": null,
+      "over_abstain_rate_delta": null,
+      "over_abstain_rate_fixed": null,
+      "over_abstain_rate_recursive": null,
+      "paired_items": null,
+      "recursive_chunks": null,
+      "recursive_llm_cache_misses": null,
+      "recursive_mean_tokens": null,
+      "recursive_mechanism_source": null,
+      "recursive_over_budget": null,
+      "recursive_over_budget_structural_share": null,
+      "recursive_over_budget_with_fence": null,
+      "recursive_over_budget_with_table": null,
+      "recursive_p95_tokens": null,
+      "recursive_parents": null,
+      "recursive_run_id": null,
+      "recursive_share_containing_code_fence": null,
+      "recursive_share_containing_table_row": null,
+      "recursive_share_ending_mid_sentence": null,
+      "recursive_share_over_budget": null,
+      "retrieval_mode": "hybrid",
+      "span_hit_rate_delta": null,
+      "span_hit_rate_fixed": null,
+      "span_hit_rate_recursive": null,
+      "status": "pending",
+      "table_fixed_hits": null,
+      "table_items": null,
+      "table_p_value": null,
+      "table_recursive_hits": null
+    },
+    {
+      "cache": {
+        "fixed": 24,
+        "recursive": 18
+      },
+      "context_mode": "plain",
+      "fixed_run_id": "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 0,
+          "discordant": 2,
+          "method": "exact_binomial",
+          "p_value": 0.5,
+          "pairs": 40,
+          "statistic": 0.5,
+          "treatment_only": 2
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 0
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -2.0,
+          "fixed": 2,
+          "recursive": 0
+        },
+        "citation_precision": {
+          "delta": -0.0275,
+          "fixed": 0.9846,
+          "recursive": 0.9571
+        },
+        "citation_recall": {
+          "delta": 0.05,
+          "fixed": 0.95,
+          "recursive": 1.0
+        },
+        "cny_per_1k_questions": {
+          "delta": 0.0712,
+          "fixed": 8.4638,
+          "recursive": 8.535
+        },
+        "hit_at_10": {
+          "delta": 0.0,
+          "fixed": 0.9,
+          "recursive": 0.9
+        },
+        "latency_p95_ms": {
+          "delta": 517.73,
+          "fixed": 7502.514,
+          "recursive": 8020.244
+        },
+        "mrr": {
+          "delta": -0.0008,
+          "fixed": 0.6529,
+          "recursive": 0.6521
+        },
+        "ndcg_at_10": {
+          "delta": -0.0011,
+          "fixed": 0.7163,
+          "recursive": 0.7152
+        },
+        "over_abstain_rate": {
+          "delta": -0.05,
+          "fixed": 0.05,
+          "recursive": 0.0
+        },
+        "span_hit_rate": {
+          "delta": -0.0275,
+          "fixed": 0.9846,
+          "recursive": 0.9571
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e",
+      "retrieval_mode": "hybrid",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    },
+    {
+      "cache": {
+        "fixed": 53,
+        "recursive": 59
+      },
+      "context_mode": "contextual_prefix",
+      "fixed_run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 5,
+          "discordant": 6,
+          "method": "exact_binomial",
+          "p_value": 0.21875,
+          "pairs": 40,
+          "statistic": 1.5,
+          "treatment_only": 1
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 1,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 1
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": 1.0,
+          "fixed": 1,
+          "recursive": 2
+        },
+        "citation_precision": {
+          "delta": 0.0016,
+          "fixed": 0.95,
+          "recursive": 0.9516
+        },
+        "citation_recall": {
+          "delta": -0.1,
+          "fixed": 0.95,
+          "recursive": 0.85
+        },
+        "cny_per_1k_questions": {
+          "delta": 0.5212,
+          "fixed": 8.4302,
+          "recursive": 8.9514
+        },
+        "hit_at_10": {
+          "delta": 0.025,
+          "fixed": 0.875,
+          "recursive": 0.9
+        },
+        "latency_p95_ms": {
+          "delta": 27206.541,
+          "fixed": 11212.817,
+          "recursive": 38419.358
+        },
+        "mrr": {
+          "delta": -0.0304,
+          "fixed": 0.6184,
+          "recursive": 0.588
+        },
+        "ndcg_at_10": {
+          "delta": -0.0165,
+          "fixed": 0.6786,
+          "recursive": 0.6621
+        },
+        "over_abstain_rate": {
+          "delta": 0.025,
+          "fixed": 0.025,
+          "recursive": 0.05
+        },
+        "span_hit_rate": {
+          "delta": 0.0016,
+          "fixed": 0.95,
+          "recursive": 0.9516
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a",
+      "retrieval_mode": "rerank",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    },
+    {
+      "abstentions_delta": null,
+      "abstentions_fixed": null,
+      "abstentions_recursive": null,
+      "citation_discordant_fixed_only": null,
+      "citation_discordant_recursive_only": null,
+      "citation_p_value": null,
+      "citation_precision_delta": null,
+      "citation_precision_fixed": null,
+      "citation_precision_recursive": null,
+      "citation_recall_delta": null,
+      "citation_recall_fixed": null,
+      "citation_recall_recursive": null,
+      "cny_per_1k_questions_delta": null,
+      "cny_per_1k_questions_fixed": null,
+      "cny_per_1k_questions_recursive": null,
+      "context_mode": "late_chunking",
+      "fixed_chunks": null,
+      "fixed_llm_cache_misses": null,
+      "fixed_mean_tokens": null,
+      "fixed_mechanism_source": null,
+      "fixed_over_budget": null,
+      "fixed_over_budget_structural_share": null,
+      "fixed_over_budget_with_fence": null,
+      "fixed_over_budget_with_table": null,
+      "fixed_p95_tokens": null,
+      "fixed_parents": null,
+      "fixed_run_id": null,
+      "fixed_share_containing_code_fence": null,
+      "fixed_share_containing_table_row": null,
+      "fixed_share_ending_mid_sentence": null,
+      "fixed_share_over_budget": null,
+      "hit_at_10_delta": null,
+      "hit_at_10_fixed": null,
+      "hit_at_10_recursive": null,
+      "hit_discordant_fixed_only": null,
+      "hit_discordant_recursive_only": null,
+      "hit_p_value": null,
+      "latency_p95_ms_delta": null,
+      "latency_p95_ms_fixed": null,
+      "latency_p95_ms_recursive": null,
+      "missing": [
+        "fixed",
+        "recursive_parent_child"
+      ],
+      "mrr_delta": null,
+      "mrr_fixed": null,
+      "mrr_recursive": null,
+      "ndcg_at_10_delta": null,
+      "ndcg_at_10_fixed": null,
+      "ndcg_at_10_recursive": null,
+      "over_abstain_rate_delta": null,
+      "over_abstain_rate_fixed": null,
+      "over_abstain_rate_recursive": null,
+      "paired_items": null,
+      "recursive_chunks": null,
+      "recursive_llm_cache_misses": null,
+      "recursive_mean_tokens": null,
+      "recursive_mechanism_source": null,
+      "recursive_over_budget": null,
+      "recursive_over_budget_structural_share": null,
+      "recursive_over_budget_with_fence": null,
+      "recursive_over_budget_with_table": null,
+      "recursive_p95_tokens": null,
+      "recursive_parents": null,
+      "recursive_run_id": null,
+      "recursive_share_containing_code_fence": null,
+      "recursive_share_containing_table_row": null,
+      "recursive_share_ending_mid_sentence": null,
+      "recursive_share_over_budget": null,
+      "retrieval_mode": "rerank",
+      "span_hit_rate_delta": null,
+      "span_hit_rate_fixed": null,
+      "span_hit_rate_recursive": null,
+      "status": "pending",
+      "table_fixed_hits": null,
+      "table_items": null,
+      "table_p_value": null,
+      "table_recursive_hits": null
+    },
+    {
+      "cache": {
+        "fixed": 60,
+        "recursive": 65
+      },
+      "context_mode": "plain",
+      "fixed_run_id": "grid-fixed-rerank-plain-20261030T125648-57be667d",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 2,
+          "discordant": 5,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 3
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 0
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": 0.0,
+          "fixed": 1,
+          "recursive": 1
+        },
+        "citation_precision": {
+          "delta": 0.0794,
+          "fixed": 0.9206,
+          "recursive": 1.0
+        },
+        "citation_recall": {
+          "delta": 0.025,
+          "fixed": 0.875,
+          "recursive": 0.9
+        },
+        "cny_per_1k_questions": {
+          "delta": 0.7531,
+          "fixed": 8.7896,
+          "recursive": 9.5427
+        },
+        "hit_at_10": {
+          "delta": 0.0,
+          "fixed": 0.9,
+          "recursive": 0.9
+        },
+        "latency_p95_ms": {
+          "delta": 18287.064,
+          "fixed": 16211.554,
+          "recursive": 34498.618
+        },
+        "mrr": {
+          "delta": -0.0059,
+          "fixed": 0.6044,
+          "recursive": 0.5985
+        },
+        "ndcg_at_10": {
+          "delta": -0.0036,
+          "fixed": 0.6743,
+          "recursive": 0.6707
+        },
+        "over_abstain_rate": {
+          "delta": 0.0,
+          "fixed": 0.025,
+          "recursive": 0.025
+        },
+        "span_hit_rate": {
+          "delta": 0.0794,
+          "fixed": 0.9206,
+          "recursive": 1.0
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910",
+      "retrieval_mode": "rerank",
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
+    }
+  ],
+  "protocol": {
+    "mechanism": "ragqa.chunk.stats over the chunk set, at the pair's token budget",
+    "pairing": "same retrieval mode and context mode, chunk.strategy the only factor",
+    "test": "exact conditional McNemar on per-item outcomes (ragqa.baselines)"
+  },
+  "runs_root": "D:\\DE Project\\wt\\exp\\runs",
+  "verdict": "The largest movement in hit@10 across the 6 finished pair(s) is +0.0500 in `dense` / `contextual_prefix` (paired McNemar p = 0.5000). Atomicity itself did happen: 87% of the recursive chunks that exceed the budget carry a table row or a code fence, so the splitter kept them whole at the cost of the token budget, and the share of chunks ending mid-sentence falls from 0.5745 to 0.1865. The one thing chunk strategy does move is how often an answer carries a supported citation: 1 of 6 pairs shift significantly, the largest being +7 items in `dense/contextual_prefix` (p = 0.0156), and the sign is not the same in every pair \u2014 so the mechanism buys citation coverage rather than retrieval quality. The `table_content` items \u2014 the golden questions whose answer sits in a table \u2014 are retrieved by both strategies at the ceiling in every finished pair, so the paired test has no discordant pair to work with and cannot show an effect either way. On this corpus the atomic-table hypothesis is not testable on the questions it was meant to help: keeping tables whole did not change which of them were found."
+}
