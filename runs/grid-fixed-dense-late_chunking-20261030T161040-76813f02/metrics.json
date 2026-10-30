@@ -1,0 +1,97 @@
+{
+  "abstention": {
+    "abstained_answerable": 16,
+    "abstained_unanswerable": 20,
+    "abstention_recall_on_negatives": 1.0,
+    "over_abstain_rate": 0.4,
+    "under_abstain": 0
+  },
+  "citations": {
+    "citation_precision": 1.0,
+    "citation_recall": 0.6,
+    "claims": 48,
+    "containment_failures": {},
+    "span_hit_rate": 1.0,
+    "supported": 48
+  },
+  "grounding": {
+    "claims": 48,
+    "containment_pass": 48,
+    "containment_precision": 1.0,
+    "judge_judged": 0,
+    "judge_pass": 0,
+    "judge_precision": null,
+    "nli_judged": 0,
+    "nli_pass": 0,
+    "nli_precision": null,
+    "span_resolved": 48,
+    "span_resolved_rate": 1.0
+  },
+  "items": {
+    "answerable": 40,
+    "total": 60,
+    "unanswerable": 20
+  },
+  "retrieval": {
+    "hit_rate": 0.275,
+    "k": 10,
+    "misses": [
+      "A001",
+      "A003",
+      "A005",
+      "A008",
+      "A009",
+      "A010",
+      "A012",
+      "A013",
+      "A014",
+      "A015",
+      "A016",
+      "A021",
+      "A022",
+      "A024",
+      "A025",
+      "A027",
+      "A028",
+      "A029",
+      "A030",
+      "A031",
+      "A032",
+      "A033",
+      "A034",
+      "A035",
+      "A036",
+      "A037",
+      "A038",
+      "A039",
+      "A040"
+    ],
+    "mrr": 0.1468,
+    "ndcg_at_10": 0.1752,
+    "recall_at_k": 0.275
+  },
+  "system": {
+    "chunks_indexed": 2318,
+    "closed_book": false,
+    "context_mode": "late_chunking",
+    "cost_cny": 0.282805,
+    "cost_components": {
+      "generation": {
+        "tokens_in": 178824,
+        "tokens_out": 25960,
+        "usd": 0.0424
+      }
+    },
+    "cost_per_1k_questions_cny": 4.7134,
+    "cost_usd": 0.0424,
+    "effective_rate": 1.0,
+    "embedding_model": "BAAI/bge-m3",
+    "generation_calls": 60,
+    "generator_model": "deepseek-v4.1-flash",
+    "hops": 1,
+    "index_backend": "qdrant",
+    "index_bytes": 23966251,
+    "judge_enabled": false,
+    "long_context": false
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "abstention": {
+    "abstained_answerable": 3,
+    "abstained_unanswerable": 20,
+    "abstention_recall_on_negatives": 1.0,
+    "over_abstain_rate": 0.075,
+    "under_abstain": 0
+  },
+  "citations": {
+    "citation_precision": 0.9492,
+    "citation_recall": 0.85,
+    "claims": 59,
+    "containment_failures": {
+      "quote_not_in_chunk": 3
+    },
+    "span_hit_rate": 0.9492,
+    "supported": 56
+  },
+  "grounding": {
+    "claims": 59,
+    "containment_pass": 56,
+    "containment_precision": 0.9492,
+    "judge_judged": 0,
+    "judge_pass": 0,
+    "judge_precision": null,
+    "nli_judged": 0,
+    "nli_pass": 0,
+    "nli_precision": null,
+    "span_resolved": 56,
+    "span_resolved_rate": 0.9492
+  },
+  "items": {
+    "answerable": 40,
+    "total": 60,
+    "unanswerable": 20
+  },
+  "retrieval": {
+    "hit_rate": 0.875,
+    "k": 10,
+    "misses": [
+      "A015",
+      "A030",
+      "A031",
+      "A035",
+      "A038"
+    ],
+    "mrr": 0.618,
+    "ndcg_at_10": 0.6792,
+    "recall_at_k": 0.875
+  },
+  "system": {
+    "chunks_indexed": 2203,
+    "closed_book": false,
+    "context_mode": "late_chunking",
+    "cost_cny": 0.437415,
+    "cost_components": {
+      "generation": {
+        "tokens_in": 304728,
+        "tokens_out": 33117,
+        "usd": 0.065579
+      }
+    },
+    "cost_per_1k_questions_cny": 7.2902,
+    "cost_usd": 0.065579,
+    "effective_rate": 1.0,
+    "embedding_model": "BAAI/bge-m3",
+    "generation_calls": 60,
+    "generator_model": "deepseek-v4.1-flash",
+    "hops": 1,
+    "index_backend": "qdrant",
+    "index_bytes": 22774332,
+    "judge_enabled": false,
+    "long_context": false
+  }
+}

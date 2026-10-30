@@ -1,0 +1,7 @@
+{"class": "parse_failure", "detail": "", "item_id": "A027"}
+{"class": "parse_failure", "detail": "", "item_id": "A031"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A032"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A039"}
+{"class": "chunk_not_retrieved", "detail": "cited chunk was not in the context handed to the generator", "item_id": "A040"}
+{"class": "chunk_not_retrieved", "detail": "cited chunk was not in the context handed to the generator", "item_id": "A040"}
+{"class": "chunk_not_retrieved", "detail": "cited chunk was not in the context handed to the generator", "item_id": "A040"}

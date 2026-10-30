@@ -1,0 +1,13 @@
+{
+  "cache_hits": 2318,
+  "cache_misses": 0,
+  "chunks": 2318,
+  "mode": "contextual_prefix",
+  "model": "deepseek-v4.1-flash",
+  "prefix_max_chars": 0,
+  "prefix_p50_chars": 0,
+  "prompt_version": "v1@none",
+  "seconds": 0.97,
+  "tokens_in": 0,
+  "tokens_out": 0
+}

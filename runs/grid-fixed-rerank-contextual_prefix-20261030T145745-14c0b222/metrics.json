@@ -1,0 +1,81 @@
+{
+  "abstention": {
+    "abstained_answerable": 1,
+    "abstained_unanswerable": 20,
+    "abstention_recall_on_negatives": 1.0,
+    "over_abstain_rate": 0.025,
+    "under_abstain": 0
+  },
+  "citations": {
+    "citation_precision": 0.95,
+    "citation_recall": 0.95,
+    "claims": 80,
+    "containment_failures": {
+      "chunk_not_retrieved": 3,
+      "quote_not_in_chunk": 1
+    },
+    "span_hit_rate": 0.95,
+    "supported": 76
+  },
+  "grounding": {
+    "claims": 80,
+    "containment_pass": 76,
+    "containment_precision": 0.95,
+    "judge_judged": 0,
+    "judge_pass": 0,
+    "judge_precision": 0.0,
+    "nli_judged": 0,
+    "nli_pass": 0,
+    "nli_precision": 0.0,
+    "span_resolved": 76,
+    "span_resolved_rate": 0.95
+  },
+  "items": {
+    "answerable": 40,
+    "total": 60,
+    "unanswerable": 20
+  },
+  "retrieval": {
+    "hit_rate": 0.875,
+    "k": 10,
+    "misses": [
+      "A015",
+      "A030",
+      "A031",
+      "A035",
+      "A038"
+    ],
+    "mrr": 0.6184,
+    "ndcg_at_10": 0.6786,
+    "recall_at_k": 0.875
+  },
+  "system": {
+    "chunks_indexed": 2318,
+    "closed_book": false,
+    "context_mode": "contextual_prefix",
+    "cost_cny": 0.505812,
+    "cost_components": {
+      "generation": {
+        "tokens_in": 385995,
+        "tokens_out": 29891,
+        "usd": 0.075834
+      },
+      "prefix": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "usd": 0.0
+      }
+    },
+    "cost_per_1k_questions_cny": 8.4302,
+    "cost_usd": 0.075834,
+    "effective_rate": 1.0,
+    "embedding_model": "BAAI/bge-m3",
+    "generation_calls": 60,
+    "generator_model": "deepseek-v4.1-flash",
+    "hops": 1,
+    "index_backend": "qdrant",
+    "index_bytes": 23966255,
+    "judge_enabled": false,
+    "long_context": false
+  }
+}

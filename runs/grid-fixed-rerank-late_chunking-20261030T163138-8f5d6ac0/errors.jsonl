@@ -1,0 +1,2 @@
+{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"For Vault on Consul, the default per-entry storage limit is 512 KiB, and Consul enforces that limit rather than Vault.\", \"chunk_id\": \"c-bca12f9ba03d2c84\", \"qu", "item_id": "A031"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A038"}
