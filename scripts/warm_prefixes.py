@@ -76,7 +76,7 @@ def main(argv=None) -> int:
         handle.write("\n")
 
     print(
-        "hits={h} misses={m} tokens_in={i} tokens_out={o} p50={p} chars cost=¥{c}".format(
+        "hits={h} misses={m} tokens_in={i} tokens_out={o} p50={p} chars cost_cny={c}".format(
             h=summary["cache_hits"],
             m=summary["cache_misses"],
             i=summary["tokens_in"],

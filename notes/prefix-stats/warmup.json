@@ -1,0 +1,17 @@
+{
+  "cache_hits": 1300,
+  "cache_misses": 903,
+  "chunk_set": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+  "chunks": 2203,
+  "corpus_snapshot": "vault-1.21.x-1817bdfe",
+  "cost_cny": 0.37298,
+  "cost_usd": 0.055919,
+  "hit_rate": 0.5901,
+  "model": "deepseek-v4.1-flash",
+  "prefix_max_chars": 370,
+  "prefix_p50_chars": 205,
+  "prompt_version": "v1@none",
+  "seconds": 323.984,
+  "tokens_in": 336389,
+  "tokens_out": 36405
+}
