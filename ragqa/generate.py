@@ -302,6 +302,7 @@ def make(cfg):
             temperature=float(cfg["llm.temperature"]),
             session_header=cfg["llm.session_header"],
             session_id=cfg["llm.session_id"],
+            reasoning_effort=cfg["llm.reasoning_effort"],
         )
         return LLMGenerator(
             client,
