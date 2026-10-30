@@ -57,6 +57,7 @@ judge:
   llm_model: ''
   nli_model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
   nli_threshold: 0.5
+  reasoning_effort: ''
 llm:
   base_url: ''
   cache_path: data/cache/llm.sqlite
