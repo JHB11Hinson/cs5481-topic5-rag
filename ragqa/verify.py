@@ -61,6 +61,7 @@ def check_claims(
                 "claim_id": claim.get("claim_id", ""),
                 "chunk_id": chunk_id,
                 "supported": error_class == "",
+                "containment_ok": error_class == "",
                 "error_class": error_class,
                 "detail": detail,
                 "span_start": span[0] if span[0] >= 0 else None,

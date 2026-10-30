@@ -1,0 +1,263 @@
+{
+  "protocol": {
+    "grid": {
+      "min": 0.2,
+      "max": 0.9,
+      "points": 18,
+      "nominal_step": 0.05,
+      "actual_step": 0.041176,
+      "note": "the ticket fixes the interval [0.2, 0.9] and 18 points; at a 0.05 step that interval holds 15 points, so the step is flattened to 0.0412 rather than moving either endpoint"
+    },
+    "positive": "an answerable golden item: it should be answered",
+    "negative": "a near-miss golden item: it should be abstained on",
+    "decision": "answer iff transform(top_score) >= t, matching generate.py, which abstains when score < threshold",
+    "working_point_rule": "maximise F1 of the answer class subject to over_abstain_rate_on_answerable <= 0.05; if infeasible at every t, choose the smallest over-abstain rate and break ties on F1; ties always go to the largest t",
+    "budget": 0.05,
+    "dedupe": "one row per golden item_id per mode; when a mode has several runs the newest supersedes the older",
+    "score": "top score = max over retrieved[] score, the quantity generate.abstain_score_threshold is compared against"
+  },
+  "runs_root": "D:\\DE Project\\Project\\runs",
+  "unrouted_runs": [],
+  "sources": {
+    "hybrid": {
+      "real-hybrid-20261030T091924-f1742d4e": {
+        "items_in_run": 20,
+        "rows_retained": 0
+      },
+      "real-hybrid-20261030T092148-08d22872": {
+        "items_in_run": 20,
+        "rows_retained": 20
+      }
+    },
+    "rerank": {
+      "real-rerank-20261030T092425-8d738820": {
+        "items_in_run": 20,
+        "rows_retained": 0
+      },
+      "real-rerank-20261030T093154-2ebd65d2": {
+        "items_in_run": 20,
+        "rows_retained": 0
+      },
+      "real-rerank-20261030T095541-a6eb2d5e": {
+        "items_in_run": 20,
+        "rows_retained": 20
+      }
+    },
+    "llm": {
+      "real-llm-20261030T112955-6dba1b8f": {
+        "items_in_run": 20,
+        "rows_retained": 0
+      },
+      "real-llm-20261030T113427-6dba1b8f": {
+        "items_in_run": 20,
+        "rows_retained": 0
+      },
+      "real-llm-20261030T113604-a5c0a3e4": {
+        "items_in_run": 20,
+        "rows_retained": 20
+      }
+    }
+  },
+  "modes": {
+    "hybrid": {
+      "t": 0.4059,
+      "raw_threshold": 0.030432,
+      "precision": 0.555556,
+      "recall": 1.0,
+      "f1": 0.714286,
+      "over_abstain_rate_on_answerable": 0.0,
+      "under_abstain_rate_on_near_miss": 0.8,
+      "answerable_answered": 10,
+      "answerable_total": 10,
+      "near_miss_answered": 8,
+      "near_miss_total": 10,
+      "constraint_feasible": true,
+      "budget": 0.05,
+      "config_write_back": {
+        "key": "generate.abstain_score_threshold",
+        "value": 0.030432,
+        "mode": "hybrid"
+      },
+      "curve": {
+        "precision_at_t_min": 0.526316,
+        "precision_at_t_max": 0.0,
+        "best_f1": 0.714286,
+        "best_f1_t": 0.3647,
+        "f1_at_t_min": 0.689655,
+        "f1_at_t_max": 0.0,
+        "points": 18
+      },
+      "transform": {
+        "kind": "zscore-normal-cdf",
+        "fitted_mean": 0.031268,
+        "fitted_stdev": 0.00351,
+        "fitted_count": 20,
+        "raw_low": 0.016393,
+        "raw_high": 0.032787,
+        "forward": "p = Phi((score - mean) / stdev)",
+        "inverse": "raw = mean + stdev * Phi^-1(p)"
+      },
+      "grid_support": {
+        "observed_raw_low": 0.016393,
+        "observed_raw_high": 0.032787,
+        "t_raw_above_observed_high": [
+          0.6941,
+          0.7353,
+          0.7765,
+          0.8176,
+          0.8588,
+          0.9
+        ],
+        "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
+      },
+      "scale": "RRF fused sum, ~1/(rrf_k + rank); with rrf_k=60 and k=10 the observed range is about [0.015, 0.035], so no threshold in [0.2, 0.9] is reachable raw",
+      "runs": [
+        "real-hybrid-20261030T091924-f1742d4e",
+        "real-hybrid-20261030T092148-08d22872"
+      ],
+      "items": {
+        "answerable": 10,
+        "near_miss": 10,
+        "total": 20
+      },
+      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.7143 at t=0.4059, which is the raw score 0.030432 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 8/10 near-misses (under-abstain 0.8000), so precision is 0.5556. t is on the normalized scale (zscore-normal-cdf): the RRF sum is an unbounded-ish reciprocal-rank artifact with no absolute meaning; its z-score against the run's own distribution is the only comparable quantity, and the inverse maps every t back to a raw sum. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.030432 may be written into `generate.abstain_score_threshold` for the hybrid mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
+      "artifacts": [
+        "hybrid-pr.csv",
+        "hybrid-pr.png",
+        "near-miss-examples.md"
+      ]
+    },
+    "rerank": {
+      "t": 0.4471,
+      "raw_threshold": 0.75925,
+      "precision": 0.714286,
+      "recall": 1.0,
+      "f1": 0.833334,
+      "over_abstain_rate_on_answerable": 0.0,
+      "under_abstain_rate_on_near_miss": 0.4,
+      "answerable_answered": 10,
+      "answerable_total": 10,
+      "near_miss_answered": 4,
+      "near_miss_total": 10,
+      "constraint_feasible": true,
+      "budget": 0.05,
+      "config_write_back": {
+        "key": "generate.abstain_score_threshold",
+        "value": 0.75925,
+        "mode": "rerank"
+      },
+      "curve": {
+        "precision_at_t_min": 0.625,
+        "precision_at_t_max": 0.0,
+        "best_f1": 0.857143,
+        "best_f1_t": 0.6529,
+        "f1_at_t_min": 0.769231,
+        "f1_at_t_max": 0.0,
+        "points": 18
+      },
+      "transform": {
+        "kind": "zscore-normal-cdf",
+        "fitted_mean": 0.793426,
+        "fitted_stdev": 0.256976,
+        "fitted_count": 20,
+        "raw_low": 0.101169,
+        "raw_high": 0.998754,
+        "forward": "p = Phi((score - mean) / stdev)",
+        "inverse": "raw = mean + stdev * Phi^-1(p)"
+      },
+      "grid_support": {
+        "observed_raw_low": 0.101169,
+        "observed_raw_high": 0.998754,
+        "t_raw_above_observed_high": [
+          0.8176,
+          0.8588,
+          0.9
+        ],
+        "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
+      },
+      "scale": "cross-encoder score in [0, 1], clustered high: answerable items in the runs on disk score 0.77-1.00 while near-misses reach 0.97",
+      "runs": [
+        "real-rerank-20261030T092425-8d738820",
+        "real-rerank-20261030T093154-2ebd65d2",
+        "real-rerank-20261030T095541-a6eb2d5e"
+      ],
+      "items": {
+        "answerable": 10,
+        "near_miss": 10,
+        "total": 20
+      },
+      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.8333 at t=0.4471, which is the raw score 0.75925 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 4/10 near-misses (under-abstain 0.4000), so precision is 0.7143. t is on the normalized scale (zscore-normal-cdf): the cross-encoder is calibrated towards the positive class, so its raw score is not a probability of answerability; the per-mode normal fit keeps the ordering and makes the sweep's t comparable with the other modes. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.75925 may be written into `generate.abstain_score_threshold` for the rerank mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
+      "artifacts": [
+        "rerank-pr.csv",
+        "rerank-pr.png",
+        "near-miss-examples.md"
+      ]
+    },
+    "llm": {
+      "t": 0.4471,
+      "raw_threshold": 0.75925,
+      "precision": 0.714286,
+      "recall": 1.0,
+      "f1": 0.833334,
+      "over_abstain_rate_on_answerable": 0.0,
+      "under_abstain_rate_on_near_miss": 0.4,
+      "answerable_answered": 10,
+      "answerable_total": 10,
+      "near_miss_answered": 4,
+      "near_miss_total": 10,
+      "constraint_feasible": true,
+      "budget": 0.05,
+      "config_write_back": {
+        "key": "generate.abstain_score_threshold",
+        "value": 0.75925,
+        "mode": "llm"
+      },
+      "curve": {
+        "precision_at_t_min": 0.625,
+        "precision_at_t_max": 0.0,
+        "best_f1": 0.857143,
+        "best_f1_t": 0.6529,
+        "f1_at_t_min": 0.769231,
+        "f1_at_t_max": 0.0,
+        "points": 18
+      },
+      "transform": {
+        "kind": "zscore-normal-cdf",
+        "fitted_mean": 0.793426,
+        "fitted_stdev": 0.256976,
+        "fitted_count": 20,
+        "raw_low": 0.101169,
+        "raw_high": 0.998754,
+        "forward": "p = Phi((score - mean) / stdev)",
+        "inverse": "raw = mean + stdev * Phi^-1(p)"
+      },
+      "grid_support": {
+        "observed_raw_low": 0.101169,
+        "observed_raw_high": 0.998754,
+        "t_raw_above_observed_high": [
+          0.8176,
+          0.8588,
+          0.9
+        ],
+        "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
+      },
+      "scale": "same cross-encoder score as rerank; generation is an LLM, but the abstain threshold is still compared against the retrieval score",
+      "runs": [
+        "real-llm-20261030T112955-6dba1b8f",
+        "real-llm-20261030T113427-6dba1b8f",
+        "real-llm-20261030T113604-a5c0a3e4"
+      ],
+      "items": {
+        "answerable": 10,
+        "near_miss": 10,
+        "total": 20
+      },
+      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.8333 at t=0.4471, which is the raw score 0.75925 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 4/10 near-misses (under-abstain 0.4000), so precision is 0.7143. t is on the normalized scale (zscore-normal-cdf): retrieval is rerank, so the scale is rerank's; the mode is swept separately because generation changes which items ultimately abstain and the score threshold has to leave room for that. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.75925 may be written into `generate.abstain_score_threshold` for the llm mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
+      "artifacts": [
+        "llm-pr.csv",
+        "llm-pr.png",
+        "near-miss-examples.md"
+      ]
+    }
+  }
+}

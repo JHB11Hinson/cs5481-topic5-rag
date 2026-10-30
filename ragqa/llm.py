@@ -105,6 +105,7 @@ class LLMClient:
         max_retries: int = 3,
         session_header: str = "",
         session_id: str = "",
+        reasoning_effort: str = "",
     ):
         env = load_env()
         self.base_url = (base_url or os.environ.get("LLM_BASE_URL") or env.get("LLM_BASE_URL", "")).rstrip("/")
@@ -122,6 +123,11 @@ class LLMClient:
         # lands on the wrong catalog and fails upstream (see docs/PROGRESS.md).
         self.session_header = (session_header or "").strip()
         self.session_id = session_id or str(uuid.uuid4())
+        # `reasoning_effort: none` turns off the model's thinking channel. That
+        # matters for mechanical calls: at the default effort a one-sentence prefix
+        # spends 163 reasoning tokens and can return empty content inside a small
+        # max_tokens budget. Generation keeps the default effort.
+        self.reasoning_effort = (reasoning_effort or "").strip()
         self.last_stats: Dict[str, int] = {"hits": 0, "misses": 0, "tokens_in": 0, "tokens_out": 0}
 
     def _headers(self) -> Dict[str, str]:
@@ -144,6 +150,7 @@ class LLMClient:
                 "max_tokens": max_tokens,
                 "json_mode": json_mode,
                 "temperature": self.temperature,
+                "reasoning_effort": self.reasoning_effort,
             },
             sort_keys=True,
             ensure_ascii=False,
@@ -173,6 +180,8 @@ class LLMClient:
         }
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
+        if self.reasoning_effort:
+            payload["reasoning_effort"] = self.reasoning_effort
 
         attempt = 0
         while True:

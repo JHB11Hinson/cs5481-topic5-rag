@@ -1,8 +1,21 @@
 """The single entry point: `python -m ragqa.run --config <path>`.
 
 Walks the whole pipeline for one configuration and writes one immutable run
-directory. Stages that are not implemented yet raise rather than silently
+directory. Stages that are not implemented raise rather than silently
 degrading, so a configuration can never quietly measure something else.
+
+The pipeline as wired here, in order:
+
+    documents -> chunks -> contextualization -> embeddings -> index
+              -> sparse index -> retrieval (1..N hops) -> generation
+              -> containment -> support judges -> metrics
+
+Contextualization is one factor with three levels (`ADR-0006`): `plain` indexes
+the chunk text, `contextual_prefix` indexes a generated sentence followed by the
+chunk, `late_chunking` indexes a vector pooled from whole-document token states.
+Only the dense representation differs for late chunking — the sparse branch always
+sees real words, so a prefix's tokens are searchable and a late-chunked vector's
+are not.
 """
 
 from __future__ import annotations
@@ -12,13 +25,14 @@ import hashlib
 import json
 import sys
 import time
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 from . import chunk as chunk_mod
 from . import config as config_mod
-from . import corpus, embed, evaluate, generate, golden, index, retrieve, verify
+from . import corpus, embed, evaluate, generate, golden, index, judges, retrieve, verify
+from . import agentic, context as context_mod
 from .contract import RunContract, git_state
-from .llm import LLMError
+from .llm import LLMClient, LLMError
 
 
 def _percentile(values: List[float], fraction: float) -> float:
@@ -28,12 +42,60 @@ def _percentile(values: List[float], fraction: float) -> float:
     return float(ordered[int(round(fraction * (len(ordered) - 1)))])
 
 
+def _file_digest(path: str) -> Dict[str, Any]:
+    """sha256 and size of one artifact, or a marker when it was never written."""
+    import os
+
+    if not os.path.exists(path):
+        return {"sha256": "", "bytes": 0}
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return {"sha256": digest.hexdigest(), "bytes": os.path.getsize(path)}
+
+
 def run_id_for(cfg: config_mod.Config) -> str:
     stamp = time.strftime("%Y%m%dT%H%M%S", time.gmtime())
     digest = hashlib.sha256(
         json.dumps(cfg.nested(), sort_keys=True).encode("utf-8")
     ).hexdigest()[:8]
     return f"{cfg['run.name']}-{stamp}-{digest}"
+
+
+def _llm_client(
+    cfg: config_mod.Config, suffix: str = "", reasoning_effort: str = ""
+) -> LLMClient:
+    return LLMClient(
+        base_url=cfg["llm.base_url"],
+        cache_path=cfg["llm.cache_path"] + suffix,
+        timeout=int(cfg["llm.timeout"]),
+        temperature=float(cfg["llm.temperature"]),
+        session_header=cfg["llm.session_header"],
+        session_id=cfg["llm.session_id"],
+        reasoning_effort=reasoning_effort,
+    )
+
+
+def _make_prefixer(cfg: config_mod.Config) -> context_mod.PrefixGenerator:
+    concurrency = max(1, int(cfg["context.prefix_concurrency"]))
+    effort = cfg["context.prefix_reasoning_effort"]
+    client = _llm_client(cfg, ".prefix", reasoning_effort=effort)
+    factory = None
+    if concurrency > 1:
+        factory = lambda: _llm_client(  # noqa: E731 - one handle per thread
+            cfg, ".prefix", reasoning_effort=effort
+        )
+    return context_mod.PrefixGenerator(
+        client=client,
+        model=cfg["context.prefix_model"],
+        cache_path=cfg["context.prefix_cache_path"],
+        max_tokens=int(cfg["context.prefix_max_tokens"]),
+        prompt_version=cfg["context.prefix_prompt_version"],
+        concurrency=concurrency,
+        client_factory=factory,
+        effort_salt=effort,
+    )
 
 
 def execute(cfg: config_mod.Config, out_root: str) -> Dict[str, Any]:
@@ -52,6 +114,7 @@ def execute(cfg: config_mod.Config, out_root: str) -> Dict[str, Any]:
 
 def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict[str, Any]:
     docs = corpus.load_documents(cfg["corpus.source"])
+    docs_by_id = {doc["doc_id"]: doc for doc in docs}
     snapshot = corpus.snapshot_identity(docs, cfg["corpus.snapshot_id"])
 
     started = time.perf_counter()
@@ -66,46 +129,109 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
     if not children:
         raise SystemExit("chunking produced no child chunks")
 
-    if cfg["context.mode"] == "late_chunking":
-        late = embed.LateChunkingEmbedder(
-            model_id=cfg["embed.model_id"] if cfg["embed.model_id"] != "stub-hashing" else "BAAI/bge-m3",
+    # ---- contextualization -------------------------------------------------
+    mode = cfg["context.mode"]
+    context_stats: Dict[str, Any] = {"mode": mode}
+    prefixer: Optional[context_mod.PrefixGenerator] = None
+    if mode == "contextual_prefix":
+        prefixer = _make_prefixer(cfg)
+        prefixer.generate(
+            children, docs_by_id, neighbours=int(cfg["context.prefix_neighbours"])
+        )
+        context_stats.update(prefixer.summary())
+        index_texts = [child["contextual_text"] for child in children]
+        context_mod.write_contextual_chunks(
+            str(contract.path / "chunks_contextual.jsonl"), children
+        )
+    else:
+        index_texts = [child["text"] for child in children]
+
+    # ---- embeddings --------------------------------------------------------
+    if mode == "late_chunking":
+        embedder = embed.LateChunkingEmbedder(
+            model_id=cfg["embed.model_id"]
+            if cfg["embed.model_id"] != "stub-hashing"
+            else "BAAI/bge-m3",
             device=cfg["embed.device"],
             max_seq_length=int(cfg["embed.late_max_seq_length"]),
+            window_tokens=int(cfg["context.window_tokens"]),
+            window_overlap=int(cfg["context.window_overlap"]),
             cache_path=cfg["embed.cache_path"],
         )
         by_doc: Dict[str, List[Dict[str, Any]]] = {}
         for child in children:
             by_doc.setdefault(child["doc_id"], []).append(child)
         vectors_by_id: Dict[str, List[float]] = {}
-        docs_by_id = {doc["doc_id"]: doc for doc in docs}
         for doc_id, doc_children in by_doc.items():
+            doc_children.sort(key=lambda c: c["char_start"])
             spans = [(c["char_start"], c["char_end"]) for c in doc_children]
-            vectors = late.encode_document(docs_by_id[doc_id]["text"], spans)
+            vectors = embedder.encode_document(docs_by_id[doc_id]["text"], spans)
             for child, vector in zip(doc_children, vectors):
                 vectors_by_id[child["chunk_id"]] = vector
-        embedder = late
-        embed_stats = dict(late.last_stats)
         ordered_vectors = [vectors_by_id[c["chunk_id"]] for c in children]
+        embed_stats = dict(getattr(embedder, "last_stats", {}))
+        context_stats.update(
+            {
+                "window_tokens": int(cfg["context.window_tokens"]),
+                "window_overlap": int(cfg["context.window_overlap"]),
+                "windows": embed_stats.get("windows", 0),
+                "documents_over_window": embed_stats.get("documents_over_window", 0),
+                "peak_vram_gb": round(embed_stats.get("peak_vram_bytes", 0) / 1e9, 2),
+            }
+        )
     else:
         embedder = embed.make(cfg)
-        ordered_vectors = embedder.embed([c["text"] for c in children])
+        ordered_vectors = embedder.embed(index_texts)
         embed_stats = dict(getattr(embedder, "last_stats", {}))
-    collection = f"{cfg['corpus.snapshot_id']}-{cfg['chunk.strategy']}-{cfg['context.mode']}".replace("/", "_")
+
+    collection = (
+        f"{cfg['corpus.snapshot_id']}-{cfg['chunk.strategy']}-{mode}"
+    ).replace("/", "_")
     store = index.make(cfg, collection)
     store.add([c["chunk_id"] for c in children], ordered_vectors)
     index_seconds = time.perf_counter() - started
 
     chunks_by_id = {c["chunk_id"]: c for c in chunks}
-    children_by_id = {c["chunk_id"]: c for c in children}
     sparse_index = None
     if cfg["retrieval.mode"] in ("hybrid", "rerank"):
         from .sparse import BM25Index
 
+        # The sparse branch indexes the same text the dense branch embedded, so a
+        # contextual prefix's tokens are searchable rather than merely adjacent.
         sparse_index = BM25Index()
-        sparse_index.add(
-            [c["chunk_id"] for c in children], [c["text"] for c in children]
-        )
+        sparse_index.add([c["chunk_id"] for c in children], index_texts)
+
     generator = generate.make(cfg)
+    judge_stack = judges.make(cfg)
+
+    hop_threshold = cfg["retrieval.trigger_threshold"]
+    if hop_threshold is None:
+        hop_threshold = cfg["generate.abstain_score_threshold"]
+    max_hops = int(cfg["retrieval.hops"])
+    rewriter = None
+    if max_hops > 1:
+        # Rewriting is mechanical: no thinking channel, so a hop costs tokens for
+        # queries rather than for deliberation.
+        rewriter = agentic.Rewriter(
+            _llm_client(cfg, ".rewrite", reasoning_effort="none"),
+            model=cfg["retrieval.hop_rewrite_model"] or cfg["llm.model_generate"],
+        )
+
+    def retrieve_for_query(query: str) -> List[Dict[str, Any]]:
+        query_vector = embedder.embed([query])[0]
+        return retrieve.retrieve(
+            store,
+            chunks_by_id,
+            query_vector,
+            cfg["retrieval.mode"],
+            int(cfg["retrieval.k"]),
+            query=query,
+            sparse=sparse_index,
+            reranker=cfg["retrieval.reranker"],
+            rerank_top=int(cfg["retrieval.rerank_top"]),
+            rerank_max_length=int(cfg["retrieval.rerank_max_length"]),
+            rrf_k=int(cfg["retrieval.rrf_k"]),
+        )
 
     items = golden.load(cfg["golden.items_path"], cfg["golden.limit"])
 
@@ -114,29 +240,48 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
     errors: List[Dict[str, Any]] = []
     per_item: List[Dict[str, Any]] = []
     latencies: List[float] = []
+    all_verdicts: List[Dict[str, Any]] = []
+    hop_counts: Dict[str, int] = {}
+
+    closed_book = bool(cfg["baseline.closed_book"])
+    long_context = bool(cfg["baseline.long_context"])
 
     for item in items:
         began = time.perf_counter()
-        query_vector = embedder.embed([item["question"]])[0]
-        retrieved = retrieve.retrieve(
-            store,
-            chunks_by_id,
-            query_vector,
-            cfg["retrieval.mode"],
+        retrieved, hop_meta = agentic.retrieve_with_hops(
+            retrieve_for_query,
+            item["question"],
             int(cfg["retrieval.k"]),
-            query=item["question"],
-            sparse=sparse_index,
-            reranker=cfg["retrieval.reranker"],
-            rerank_top=int(cfg["retrieval.rerank_top"]),
-            rerank_max_length=int(cfg["retrieval.rerank_max_length"]),
+            float(hop_threshold),
+            max_hops=max_hops,
+            rewriter=rewriter,
             rrf_k=int(cfg["retrieval.rrf_k"]),
         )
+        hop_counts[hop_meta["stop_reason"]] = hop_counts.get(hop_meta["stop_reason"], 0) + 1
+
+        prompt_hits = retrieved
+        extra_context = ""
+        if closed_book:
+            # Same generator, same prompt, empty retrieval block: the question is
+            # what the model knows on its own, not what the corpus holds.
+            prompt_hits = []
+        elif long_context:
+            # The whole source document of the top-ranked chunk, truncated to the
+            # configured window: what a long-context model would have to read.
+            top_doc_id = retrieved[0]["doc_id"] if retrieved else ""
+            if top_doc_id:
+                extra_context = docs_by_id[top_doc_id]["text"][
+                    : int(cfg["baseline.long_context_max_chars"])
+                ]
+            prompt_hits = []
+
         answer = generator.generate(
             item,
-            retrieved,
+            prompt_hits,
             float(cfg["generate.abstain_score_threshold"]),
             int(cfg["generate.max_claims"]),
             float(cfg["generate.min_claim_overlap"]),
+            extra_context=extra_context,
         )
         if answer.get("parse_failure"):
             errors.append(
@@ -147,6 +292,10 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                 }
             )
         verdicts = verify.check_claims(answer["claims"], retrieved)
+        if judge_stack is not None:
+            for claim, verdict in zip(answer["claims"], verdicts):
+                judge_stack.judge_claim(claim, verdict, retrieved)
+        all_verdicts.extend(verdicts)
         elapsed_ms = (time.perf_counter() - began) * 1000.0
         latencies.append(elapsed_ms)
 
@@ -163,6 +312,11 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                     "supported": verdict["supported"],
                     "error_class": verdict["error_class"],
                     "detail": verdict["detail"],
+                    "containment_ok": verdict.get("containment_ok", verdict["error_class"] == ""),
+                    "nli_supported": verdict.get("nli_supported"),
+                    "nli_score": verdict.get("nli_score"),
+                    "judge_supported": verdict.get("judge_supported"),
+                    "judge_reason": verdict.get("judge_reason", ""),
                 }
             )
         for verdict in verdicts:
@@ -187,6 +341,8 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                 "tokens_in": answer.get("tokens_in", 0),
                 "tokens_out": answer.get("tokens_out", 0),
                 "citation_chunk_ids": [c["chunk_id"] for c in answer["citations"]],
+                "hop_stop_reason": hop_meta["stop_reason"],
+                "hop_queries": hop_meta["queries"],
                 "retrieved": [
                     {
                         "chunk_id": hit["chunk_id"],
@@ -209,6 +365,8 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                 "retrieved": retrieved,
                 "quotes": [e.get("quote", "") for e in item.get("evidence", [])],
                 "latency_ms": elapsed_ms,
+                "hop_stop_reason": hop_meta["stop_reason"],
+                "hops": hop_meta["hops"],
             }
         )
 
@@ -216,15 +374,54 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
     gen_stats = dict(getattr(generator, "last_stats", {}) or {})
     price_in = float(cfg["llm.price_in_usd_per_mtok"])
     price_out = float(cfg["llm.price_out_usd_per_mtok"])
-    cost_usd = (
-        gen_stats.get("tokens_in", 0) / 1e6 * price_in
-        + gen_stats.get("tokens_out", 0) / 1e6 * price_out
-    )
+    judge_in = float(cfg["llm.price_judge_in_usd_per_mtok"]) or price_in
+    judge_out = float(cfg["llm.price_judge_out_usd_per_mtok"]) or price_out
+
+    components: Dict[str, Dict[str, float]] = {
+        "generation": {
+            "tokens_in": gen_stats.get("tokens_in", 0),
+            "tokens_out": gen_stats.get("tokens_out", 0),
+            "usd": gen_stats.get("tokens_in", 0) / 1e6 * price_in
+            + gen_stats.get("tokens_out", 0) / 1e6 * price_out,
+        }
+    }
+    if prefixer is not None:
+        summary = prefixer.summary()
+        components["prefix"] = {
+            "tokens_in": summary["tokens_in"],
+            "tokens_out": summary["tokens_out"],
+            "usd": summary["tokens_in"] / 1e6 * price_in
+            + summary["tokens_out"] / 1e6 * price_in,
+        }
+    if judge_stack is not None and judge_stack.llm is not None:
+        stats = judge_stack.llm.last_stats
+        components["judge"] = {
+            "tokens_in": stats["tokens_in"],
+            "tokens_out": stats["tokens_out"],
+            "usd": stats["tokens_in"] / 1e6 * judge_in
+            + stats["tokens_out"] / 1e6 * judge_out,
+        }
+    if rewriter is not None:
+        stats = rewriter.last_stats
+        components["rewrite"] = {
+            "tokens_in": stats["tokens_in"],
+            "tokens_out": stats["tokens_out"],
+            "usd": stats["tokens_in"] / 1e6 * price_in
+            + stats["tokens_out"] / 1e6 * price_in,
+        }
+
+    cost_usd = sum(component["usd"] for component in components.values())
     metrics["system"].update(
         {
             "cost_usd": round(cost_usd, 6),
             "cost_cny": round(cost_usd * 6.67, 6),
-            "cost_per_1k_questions_cny": round(cost_usd * 6.67 * (1000.0 / max(1, len(items))), 4),
+            "cost_per_1k_questions_cny": round(
+                cost_usd * 6.67 * (1000.0 / max(1, len(items))), 4
+            ),
+            "cost_components": {
+                name: {**values, "usd": round(values["usd"], 6)}
+                for name, values in components.items()
+            },
         }
     )
     metrics["system"].update(
@@ -235,15 +432,31 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
             "generation_calls": len(items),
             "embedding_model": embedder.model_id,
             "generator_model": generator.model_id,
+            "context_mode": mode,
+            "closed_book": closed_book,
+            "long_context": long_context,
+            "hops": max_hops,
+            "judge_enabled": judge_stack is not None,
         }
     )
+    metrics["grounding"] = evaluate.grounding_metrics(all_verdicts)
+    if judge_stack is not None:
+        metrics["grounding"]["judge_confusion"] = judges.confusion(all_verdicts)
 
     contract.write_json("config.json", cfg.nested())
-    contract.write_json("models.json", {
-        "embed": {"provider": cfg["embed.provider"], "id": embedder.model_id,
-                  "version": getattr(embedder, "model_version", "")},
-        "generate": {"provider": cfg["generate.provider"], "id": generator.model_id},
-    })
+    contract.write_json(
+        "models.json",
+        {
+            "embed": {
+                "provider": cfg["embed.provider"],
+                "id": embedder.model_id,
+                "version": getattr(embedder, "model_version", ""),
+                "context_mode": mode,
+            },
+            "generate": {"provider": cfg["generate.provider"], "id": generator.model_id},
+            "judge": (judge_stack.stats() if judge_stack is not None else None),
+        },
+    )
     contract.write_text(
         "git_sha.txt",
         json.dumps(git_state(), indent=2, sort_keys=True),
@@ -251,6 +464,18 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
     contract.write_json("corpus_snapshot.json", snapshot)
     contract.write_jsonl("chunks.jsonl", chunks)
     contract.write_json("chunk_stats.json", chunk_mod.stats(chunks))
+    contract.write_json("context_stats.json", context_stats)
+    contract.write_json(
+        "hop_stats.json",
+        {
+            "max_hops": max_hops,
+            "trigger_threshold": float(hop_threshold),
+            "stop_reasons": hop_counts,
+            "mean_hops": round(
+                sum(entry.get("hops", 1) for entry in per_item) / max(1, len(per_item)), 4
+            ),
+        },
+    )
     contract.write_jsonl("predictions.jsonl", predictions)
     contract.write_jsonl("citations.jsonl", citations)
     contract.write_jsonl("errors.jsonl", errors)
@@ -273,10 +498,35 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
             "llm_cache_misses": gen_stats.get("misses", 0),
             "llm_tokens_in": gen_stats.get("tokens_in", 0),
             "llm_tokens_out": gen_stats.get("tokens_out", 0),
+            "prefix_cache_hits": (prefixer.last_stats.get("hits", 0) if prefixer else 0),
+            "prefix_cache_misses": (prefixer.last_stats.get("misses", 0) if prefixer else 0),
             "note": "embedding cache: embeddings.sqlite; LLM cache: llm.sqlite",
         },
     )
     contract.write_json("metrics.json", metrics)
+
+    # Large, re-derivable artifacts stay out of git (ADR-0003, spec item 5). The
+    # checksums are committed so `scripts/fetch_artifacts.py` can rebuild a file and
+    # prove it is the same one the numbers came from, instead of asking a reader to
+    # trust a rebuild.
+    contract.write_json(
+        "artifacts.json",
+        {
+            "excluded_from_git": ["chunks.jsonl", "corpus_snapshot.json"],
+            "checksums": {
+                name: _file_digest(str(contract.path / name))
+                for name in ("chunks.jsonl", "corpus_snapshot.json")
+            },
+            "rebuild": "python scripts/fetch_artifacts.py --run <this directory>",
+        },
+    )
+
+    if prefixer is not None:
+        prefixer.close()
+    if judge_stack is not None:
+        judge_stack.close()
+    if rewriter is not None:
+        rewriter.close()
 
     return {
         "run_id": run_id,
