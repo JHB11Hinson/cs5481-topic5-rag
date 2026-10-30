@@ -467,6 +467,48 @@ def scan_runs(runs_root: str) -> Dict[str, Any]:
     }
 
 
+def read_working_points(path: str) -> Dict[str, Dict[str, Any]]:
+    """The abstention working point of each run directory it applies to.
+
+    `reports/abstention/working-points.json` is written by the abstention sweep and
+    names its population in `applies_to_run_ids`. Joining on that list -- rather than
+    on a file name or a mode guess -- is what lets a matrix cell print the threshold
+    that was calibrated on exactly its own runs.
+    """
+    payload = _read_json(path)
+    if not isinstance(payload, dict):
+        return {}
+    by_run: Dict[str, Dict[str, Any]] = {}
+    for mode, entry in sorted((payload.get("modes") or {}).items()):
+        if not isinstance(entry, dict):
+            continue
+        point = {
+            "mode": mode,
+            "t": _numbers(entry.get("t")),
+            "raw_threshold": _numbers(entry.get("raw_threshold")),
+            "f1": _numbers(entry.get("f1")),
+            "precision": _numbers(entry.get("precision")),
+            "recall": _numbers(entry.get("recall")),
+            "constraint_feasible": bool(entry.get("constraint_feasible")),
+            "items": entry.get("items") or {},
+            "generator": entry.get("generator", ""),
+            "source": path,
+        }
+        for run_id in entry.get("applies_to_run_ids") or []:
+            by_run[str(run_id)] = point
+    return by_run
+
+
+def _working_point_text(point: Optional[Dict[str, Any]]) -> str:
+    if not point:
+        return MISSING
+    raw = point.get("raw_threshold")
+    t = point.get("t")
+    if raw is None or t is None:
+        return MISSING
+    return "t=%.4f raw=%.6g" % (t, raw)
+
+
 def _numbers(*values: Any) -> Optional[float]:
     for value in values:
         if isinstance(value, bool):
@@ -1476,6 +1518,11 @@ def _render_matrix_md(
         "- `abst. t` is the cell's own `generate.abstain_score_threshold`; it differs per "
         "retrieval level because each level is scored on its own scale"
     )
+    lines.append(
+        "- `abstention working point` is the threshold the calibrated sweep chose for that "
+        "cell's score scale, joined through `reports/abstention/working-points.json` on the "
+        "`applies_to_run_ids` list; `%s` means no sweep covered this cell's run" % MISSING
+    )
     lines.append("")
     header = [
         "#",
@@ -1486,6 +1533,7 @@ def _render_matrix_md(
         "run id",
         "items",
         "abst. t",
+        "abstention working point",
     ] + [label for _key, label in HEADLINE]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("|" + "|".join(["---"] * len(header)) + "|")
@@ -1500,6 +1548,7 @@ def _render_matrix_md(
             row["run_id"] or MISSING,
             _fmt(row.get("items")) if row.get("items") is not None else MISSING,
             _fmt(row.get("threshold"), 4) if row.get("threshold") is not None else MISSING,
+            _working_point_text(row.get("working_point")),
         ]
         for key, _label in HEADLINE:
             value = row["values"].get(key) if row["status"] == "finished" else None
@@ -2176,6 +2225,12 @@ def regenerate(
     runs = scan_runs(runs_root)
     rows = matrix_rows(runs_root, design, runs=runs)
 
+    # Each cell prints the abstention working point calibrated on its own runs, so a
+    # reader can compare the threshold a cell used with the one its scale supports.
+    working_points = read_working_points(os.path.join(out, "abstention", "working-points.json"))
+    for row in rows:
+        row["working_point"] = working_points.get(row.get("run_id") or "")
+
     golden = load_golden(golden_path)
     items_by_run: Dict[str, Dict[str, Any]] = {}
     outcomes_by_cell: Dict[str, Dict[str, Any]] = {}
@@ -2234,6 +2289,8 @@ def regenerate(
         "items",
         "k",
         "abstain_threshold",
+        "abstention_working_point",
+        "abstention_working_point_raw",
     ] + [key for key, _label in HEADLINE]
     matrix_csv_rows = []
     for row in rows:
@@ -2248,6 +2305,12 @@ def regenerate(
             "" if row.get("items") is None else row["items"],
             "" if row.get("k") is None else row["k"],
             _csv_value(row.get("threshold")),
+            ""
+            if not row.get("working_point")
+            else _csv_value(row["working_point"].get("t")),
+            ""
+            if not row.get("working_point")
+            else _csv_value(row["working_point"].get("raw_threshold")),
         ]
         for key, _label in HEADLINE:
             values.append(

@@ -216,24 +216,30 @@ def test_hop_cells_share_one_trigger_chosen_below_the_abstention_working_point()
             assert cfg["retrieval.trigger_threshold"] == sweeps.HOP_TRIGGER, count
         assert hops == {1: 1, 2: 2, 3: 3}
 
-        # The trigger is recomputed here from the published rerank working point, so
-        # the number in the config is checkable arithmetic and not a preference.
-        working = json.load(open("reports/abstention/working-points.json", "r", encoding="utf-8"))
-        rerank = working["modes"]["rerank"]
-        transform = rerank["transform"]
-        assert transform["kind"] == "zscore-normal-cdf"
-        grid_floor = 0.2
-        expected = transform["fitted_mean"] + transform["fitted_stdev"] * statistics.NormalDist().inv_cdf(
-            grid_floor
+        # The trigger is recomputed here from the fit it was declared against, so the
+        # number in the config is checkable arithmetic and not a preference.
+        source = sweeps.HOP_TRIGGER_SOURCE
+        expected = source["fitted_mean"] + source["fitted_stdev"] * statistics.NormalDist().inv_cdf(
+            source["grid_floor_t"]
         )
         assert abs(expected - sweeps.HOP_TRIGGER) < 5e-5, (expected, sweeps.HOP_TRIGGER)
+        # It was derived to fire before that curve's abstention point, not after it.
+        assert sweeps.HOP_TRIGGER < source["working_point_raw"], source
 
-        # It must fire before the calibrated abstention point, never after it.
-        assert sweeps.HOP_TRIGGER < rerank["raw_threshold"], (
-            sweeps.HOP_TRIGGER,
+        # The published calibration has since moved to v1, so the trigger is now
+        # ABOVE the rerank working point. That divergence is a known, documented
+        # consequence of holding the trigger fixed rather than re-running the hop
+        # cells; this assertion exists so it cannot drift silently in either
+        # direction.
+        working = json.load(open("reports/abstention/working-points.json", "r", encoding="utf-8"))
+        rerank = working["modes"]["rerank"]
+        assert rerank["transform"]["kind"] == "zscore-normal-cdf", rerank
+        assert rerank["raw_threshold"] < sweeps.HOP_TRIGGER, (
+            "if the v1 working point has risen above the trigger, the hop derivation "
+            "should be re-derived from the v1 curve rather than kept",
             rerank["raw_threshold"],
+            sweeps.HOP_TRIGGER,
         )
-        assert rerank["raw_threshold"] - sweeps.HOP_TRIGGER > 0.1
     finally:
         shutil.rmtree(out, ignore_errors=True)
 

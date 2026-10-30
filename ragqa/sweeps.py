@@ -32,12 +32,15 @@ Three inherited rules this module enforces rather than documents:
 
 The hop trigger, in arithmetic
 ------------------------------
-The measured rerank working point is raw 0.75925 (`reports/abstention/working-points.json`,
-mode `rerank`, chosen on the 18-point curve in `reports/abstention/rerank-pr.csv`
-from the runs it names). That is the *abstention* point: at or above it the
-calibration says the round's evidence was sufficient, and it is the wrong number
-for a hop trigger, which has to fire before the system gives up rather than at the
-moment it does.
+The trigger was derived from the rerank abstention curve as it stood when these
+cells were declared: raw 0.75925 was that curve's working point. **It is no longer
+the one on disk.** The v1 re-sweep in `reports/abstention/working-points.json`
+(mode `rerank`, 40 answerable + 20 near-miss items of golden v1) puts the rerank
+working point at raw 0.426134, so the trigger below now sits *above* the abstention
+point instead of below it. The cells keep 0.5771 rather than being re-derived and
+re-run: the hop runs exist, its cell digests are how they resume, and re-emiting the
+parameter would orphan them mid-matrix. Read the hop curve as measured at that fixed
+trigger, and read the mismatch as the one thing this ticket did not re-derive.
 
 Below the working point the curve has its own resolution: 18 points over [0.2, 0.9]
 is one step of 0.0270 in raw score for this mode. The lowest point on that curve is
@@ -104,9 +107,26 @@ ITEM_LIMIT = ANSWERABLE_ITEMS
 #: already calls it with `reasoning_effort: "none"` (ADR-0014).
 HOP_REWRITE_MODEL = "deepseek-v4.1-flash"
 
-#: Raw cross-encoder score at the grid floor of the measured rerank curve
-#: (`reports/abstention/rerank-pr.csv`, t = 0.2). See the module docstring.
+#: Raw cross-encoder score at the grid floor of the rerank curve *as it stood when
+#: these cells were declared* (t = 0.2 of the v0 calibration). The v1 curve's floor
+#: is lower, so this number is now above the abstention working point -- see the
+#: module docstring; it is held fixed rather than re-derived, so the hop runs that
+#: exist stay the runs that were measured.
 HOP_TRIGGER = 0.5771
+
+#: The fit the trigger was derived from, kept so the number stays checkable after the
+#: published calibration moved on. `HOP_TRIGGER_SOURCE["fitted_mean"] + fitted_stdev *
+#: Phi^-1(grid_floor_t)` reproduces `HOP_TRIGGER`; the v1 curve in
+#: `reports/abstention/working-points.json` no longer does, and the module docstring
+#: records that divergence instead of hiding it.
+HOP_TRIGGER_SOURCE: Dict[str, Any] = {
+    "curve": "reports/abstention/rerank-pr.csv, v0 calibration (10 answerable + 10 near-miss)",
+    "working_point_raw": 0.75925,
+    "fitted_mean": 0.793426,
+    "fitted_stdev": 0.256976,
+    "grid_floor_t": 0.2,
+    "grid_floor_raw": 0.5771,
+}
 
 #: spec.md rows 2-4, restated so the projection is checked rather than narrated.
 SPEC_INVENTORY = {"k": 160, "chunk": 120, "hops": 120}
@@ -368,10 +388,12 @@ def _render(entry: Dict[str, Any], base: Dict[str, Any]) -> str:
     if entry["family"] == "hops":
         header += [
             "#",
-            "#   trigger   : retrieval.trigger_threshold = %s, a cross-encoder score read"
+            "#   trigger   : retrieval.trigger_threshold = %s, a cross-encoder score;"
             % HOP_TRIGGER,
-            "#               below the calibrated abstention point (0.75925); identical",
-            "#               in hops-1, hops-2 and hops-3 so only the cap differs.",
+            "#               derived against the v0 rerank calibration (working point",
+            "#               0.75925) and held fixed since, so it is now above the v1",
+            "#               working point (0.426134). Identical in hops-1, hops-2 and",
+            "#               hops-3 so only the cap differs.",
         ]
     if cfg["chunk.overlap"] * INVARIANTS["overlap_ratio"] != cfg["chunk.size"]:
         header.append("#   WARNING: overlap is not size/8 -- the chunk sweep is confounded")

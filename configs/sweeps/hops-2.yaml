@@ -8,9 +8,11 @@
 #   invariants: rerank_top = max(k, 12) (ADR-0011); same corpus, same golden
 #               set, same prices as the reference cell.
 #
-#   trigger   : retrieval.trigger_threshold = 0.5771, a cross-encoder score read
-#               below the calibrated abstention point (0.75925); identical
-#               in hops-1, hops-2 and hops-3 so only the cap differs.
+#   trigger   : retrieval.trigger_threshold = 0.5771, a cross-encoder score;
+#               derived against the v0 rerank calibration (working point
+#               0.75925) and held fixed since, so it is now above the v1
+#               working point (0.426134). Identical in hops-1, hops-2 and
+#               hops-3 so only the cap differs.
 baseline:
   closed_book: false
   long_context: false
