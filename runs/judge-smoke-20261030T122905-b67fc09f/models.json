@@ -1,0 +1,30 @@
+{
+  "embed": {
+    "context_mode": "plain",
+    "id": "stub-hashing",
+    "provider": "stub",
+    "version": "1"
+  },
+  "generate": {
+    "id": "stub-generator",
+    "provider": "stub"
+  },
+  "judge": {
+    "llm": {
+      "calls": 5,
+      "parse_failures": 0,
+      "supported": 5,
+      "tokens_in": 1963,
+      "tokens_out": 747
+    },
+    "nli": {
+      "calls": 5,
+      "entailed": 4,
+      "labels": [
+        "entailment",
+        "neutral",
+        "contradiction"
+      ]
+    }
+  }
+}

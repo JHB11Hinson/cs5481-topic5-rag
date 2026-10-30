@@ -1,0 +1,66 @@
+# Support judges switched on, over the fixture corpus (ticket 10).
+#
+# Same offline stub path as `smoke.yaml`, plus the two judge layers, so that a
+# full run writes `grounding.judge_confusion` into `metrics.json` and records what
+# the judge cost — the check that the metric is wired, not just the code that
+# computes it. Generation stays a stub: this run measures the judge layer only.
+run:
+  name: judge-smoke
+  out_root: runs
+
+corpus:
+  source: fixtures/smoke/docs.jsonl
+  snapshot_id: fixture-smoke-v1
+
+chunk:
+  strategy: fixed
+  size: 32
+  overlap: 8
+  parent_size: 64
+
+embed:
+  provider: stub
+  model_id: stub-hashing
+  dim: 256
+
+index:
+  backend: memory
+
+retrieval:
+  mode: dense
+  k: 3
+
+context:
+  mode: plain
+
+generate:
+  provider: stub
+  model_id: stub-generator
+  abstain_score_threshold: 0.15
+  min_claim_overlap: 0.12
+  max_claims: 2
+
+# The local NLI layer is free and always on when judges are enabled; the hosted
+# layer is the one whose calls are counted.
+judge:
+  enabled: true
+  nli_model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
+  nli_threshold: 0.5
+  llm_model: deepseek-v4-pro
+  llm_max_chars: 2000
+
+llm:
+  base_url: https://opencode.ai/zen/go/v1
+  session_header: x-opencode-session
+  model_generate: deepseek-v4.1-flash
+  model_judge: deepseek-v4-pro
+  cache_path: data/cache/llm.sqlite
+  timeout: 180
+  temperature: 0.0
+  max_tokens: 1600
+  price_in_usd_per_mtok: 0.15
+  price_out_usd_per_mtok: 0.60
+
+golden:
+  items_path: fixtures/smoke/golden.jsonl
+  limit: 5
