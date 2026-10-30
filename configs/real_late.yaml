@@ -1,0 +1,48 @@
+# Late chunking: whole-document encoding, per-chunk pooling (ticket 09).
+run:
+  name: real-late
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: recursive_parent_child
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: bge-m3
+  model_id: BAAI/bge-m3
+  device: cuda
+  batch_size: 8
+  max_seq_length: 1024        # chunk path only; the late path uses the key below
+  late_max_seq_length: 8192   # whole document, one forward pass, batch of one
+  cache_path: data/cache/embeddings.sqlite
+
+index:
+  backend: qdrant
+  path: data/index
+
+retrieval:
+  mode: hybrid
+  k: 10
+  rrf_k: 60
+  reranker: BAAI/bge-reranker-v2-m3
+  rerank_top: 12
+  rerank_max_length: 512
+
+context:
+  mode: late_chunking
+
+generate:
+  provider: stub
+  model_id: stub-generator
+  abstain_score_threshold: 0.01
+  min_claim_overlap: 0.12
+  max_claims: 2
+
+golden:
+  items_path: golden/v0.jsonl

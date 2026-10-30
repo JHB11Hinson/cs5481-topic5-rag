@@ -1,0 +1,32 @@
+{
+  "chars": 1571,
+  "digest": "ffafaf1b4fca6d6fc3124821d3daa33f0f1badade27ed60cba25d1532a466cda",
+  "docs": [
+    {
+      "chars": 392,
+      "doc_id": "engines/mergetree",
+      "sha256": "adda716ac208a96b05159aa92f657e1186a69639547d9364a4cb829a194ccd4d",
+      "url": "https://example.invalid/engines/mergetree"
+    },
+    {
+      "chars": 310,
+      "doc_id": "ingestion/pipeline",
+      "sha256": "339ad4f14fe14434de892c2e0b76cde20b16464b5bac85114f41d801777955e0",
+      "url": "https://example.invalid/ingestion/pipeline"
+    },
+    {
+      "chars": 624,
+      "doc_id": "operations/server-settings",
+      "sha256": "6c435de548b1184425267bb176ce4b3f92232e7505cf44d04300ee0b9761b913",
+      "url": "https://example.invalid/operations/server-settings"
+    },
+    {
+      "chars": 245,
+      "doc_id": "query/pipeline",
+      "sha256": "faee8cd2fbe20f696816e2b4cea9ea664b7d0c7ca2781c59179b19dde4acd4f8",
+      "url": "https://example.invalid/query/pipeline"
+    }
+  ],
+  "documents": 4,
+  "snapshot_id": "fixture-smoke-v1"
+}

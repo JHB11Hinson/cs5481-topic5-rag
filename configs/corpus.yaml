@@ -1,0 +1,40 @@
+# Chunking over the real corpus snapshot (ticket 03).
+# `python -m ragqa.chunk --config configs/corpus.yaml` builds both strategies.
+run:
+  name: corpus
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: fixed
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: stub
+  model_id: stub-hashing
+  dim: 256
+
+index:
+  backend: memory
+
+retrieval:
+  mode: dense
+  k: 5
+
+context:
+  mode: plain
+
+generate:
+  provider: stub
+  model_id: stub-generator
+  abstain_score_threshold: 0.2
+  min_claim_overlap: 0.12
+  max_claims: 2
+
+golden:
+  items_path: fixtures/smoke/golden.jsonl

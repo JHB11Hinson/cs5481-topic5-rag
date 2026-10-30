@@ -1,0 +1,66 @@
+{
+  "chunk": {
+    "overlap": 64,
+    "parent_size": 1024,
+    "size": 512,
+    "strategy": "recursive_parent_child"
+  },
+  "context": {
+    "mode": "plain"
+  },
+  "corpus": {
+    "snapshot_id": "vault-1.21.x-1817bdfe",
+    "source": "data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl"
+  },
+  "embed": {
+    "batch_size": 8,
+    "cache_path": "data/cache/embeddings.sqlite",
+    "device": "cuda",
+    "dim": 256,
+    "late_max_seq_length": 8192,
+    "max_seq_length": 1024,
+    "model_id": "BAAI/bge-m3",
+    "provider": "bge-m3"
+  },
+  "generate": {
+    "abstain_score_threshold": -100.0,
+    "max_claims": 3,
+    "min_claim_overlap": 0.12,
+    "model_id": "llm",
+    "provider": "llm"
+  },
+  "golden": {
+    "items_path": "golden/v0.jsonl",
+    "limit": null
+  },
+  "index": {
+    "backend": "qdrant",
+    "path": "data/index"
+  },
+  "llm": {
+    "base_url": "https://opencode.ai/zen/go/v1",
+    "cache_path": "data/cache/llm.sqlite",
+    "context_chunks": 8,
+    "max_tokens": 1600,
+    "model_generate": "deepseek-v4.1-flash",
+    "model_judge": "deepseek-v4-pro",
+    "price_in_usd_per_mtok": 0.15,
+    "price_out_usd_per_mtok": 0.6,
+    "session_header": "x-opencode-session",
+    "session_id": "",
+    "temperature": 0.0,
+    "timeout": 180
+  },
+  "retrieval": {
+    "k": 10,
+    "mode": "rerank",
+    "rerank_max_length": 512,
+    "rerank_top": 12,
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "rrf_k": 60
+  },
+  "run": {
+    "name": "real-llm",
+    "out_root": "runs"
+  }
+}

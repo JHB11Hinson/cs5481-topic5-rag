@@ -1,0 +1,40 @@
+# Smoke configuration — stub models, fixture corpus, no network (ticket 01).
+run:
+  name: smoke
+  out_root: runs
+
+corpus:
+  source: fixtures/smoke/docs.jsonl
+  snapshot_id: fixture-smoke-v1
+
+chunk:
+  strategy: fixed          # fixed | recursive_parent_child
+  size: 32                 # words, standing in for tokens until the real tokenizer lands
+  overlap: 8
+  parent_size: 64
+
+embed:
+  provider: stub           # stub | bge-m3
+  model_id: stub-hashing
+  dim: 256
+
+index:
+  backend: memory          # memory | qdrant
+
+retrieval:
+  mode: dense              # dense | hybrid | rerank
+  k: 3
+
+context:
+  mode: plain              # plain | contextual_prefix | late_chunking
+
+generate:
+  provider: stub           # stub | llm
+  model_id: stub-generator
+  abstain_score_threshold: 0.15
+  min_claim_overlap: 0.12
+  max_claims: 2
+
+golden:
+  items_path: fixtures/smoke/golden.jsonl
+  limit: 5

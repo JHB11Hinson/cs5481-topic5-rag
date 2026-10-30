@@ -1,0 +1,11 @@
+{
+  "embed": {
+    "id": "BAAI/bge-m3",
+    "provider": "bge-m3",
+    "version": "local"
+  },
+  "generate": {
+    "id": "deepseek-v4.1-flash",
+    "provider": "llm"
+  }
+}

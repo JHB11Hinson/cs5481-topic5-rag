@@ -1,0 +1,8 @@
+{
+  "chunks": 11,
+  "mean_tokens": 26.64,
+  "p95_tokens": 32,
+  "parents": 0,
+  "share_containing_table_row": 0.1818,
+  "share_ending_mid_sentence": 0.7273
+}

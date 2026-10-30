@@ -1,0 +1,50 @@
+{
+  "chunk": {
+    "overlap": 64,
+    "parent_size": 1024,
+    "size": 512,
+    "strategy": "recursive_parent_child"
+  },
+  "context": {
+    "mode": "plain"
+  },
+  "corpus": {
+    "snapshot_id": "vault-1.21.x-1817bdfe",
+    "source": "data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl"
+  },
+  "embed": {
+    "batch_size": 8,
+    "cache_path": "data/cache/embeddings.sqlite",
+    "device": "cuda",
+    "dim": 256,
+    "max_seq_length": 1024,
+    "model_id": "BAAI/bge-m3",
+    "provider": "bge-m3"
+  },
+  "generate": {
+    "abstain_score_threshold": 0.0,
+    "max_claims": 2,
+    "min_claim_overlap": 0.12,
+    "model_id": "stub-generator",
+    "provider": "stub"
+  },
+  "golden": {
+    "items_path": "golden/v0.jsonl",
+    "limit": null
+  },
+  "index": {
+    "backend": "qdrant",
+    "path": "data/index"
+  },
+  "retrieval": {
+    "k": 10,
+    "mode": "rerank",
+    "rerank_top": 12,
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "rrf_k": 60
+  },
+  "run": {
+    "name": "real-rerank",
+    "out_root": "runs"
+  }
+}

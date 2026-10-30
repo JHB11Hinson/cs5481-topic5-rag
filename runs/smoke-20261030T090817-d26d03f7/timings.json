@@ -1,0 +1,13 @@
+{
+  "index_build_seconds": 0.0025,
+  "p50_ms": 0.466,
+  "p95_ms": 0.844,
+  "per_item_ms": [
+    0.844,
+    0.466,
+    0.508,
+    0.46,
+    0.458
+  ],
+  "total_wall_seconds": 0.062
+}

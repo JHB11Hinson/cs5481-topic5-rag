@@ -1,0 +1,44 @@
+{
+  "abstention": {
+    "abstained_answerable": 0,
+    "abstained_unanswerable": 9,
+    "abstention_recall_on_negatives": 0.9,
+    "over_abstain_rate": 0.0,
+    "under_abstain": 1
+  },
+  "citations": {
+    "citation_precision": 0.9412,
+    "citation_recall": 0.9,
+    "claims": 17,
+    "containment_failures": {
+      "quote_not_in_chunk": 1
+    },
+    "span_hit_rate": 0.5882,
+    "supported": 16
+  },
+  "items": {
+    "answerable": 10,
+    "total": 20,
+    "unanswerable": 10
+  },
+  "retrieval": {
+    "hit_rate": 1.0,
+    "k": 10,
+    "misses": [],
+    "mrr": 0.95,
+    "ndcg_at_10": 0.9631,
+    "recall_at_k": 1.0
+  },
+  "system": {
+    "chunks_indexed": 2203,
+    "cost_cny": 0.199855,
+    "cost_per_1k_questions_cny": 9.9927,
+    "cost_usd": 0.029963,
+    "effective_rate": 1.0,
+    "embedding_model": "BAAI/bge-m3",
+    "generation_calls": 20,
+    "generator_model": "deepseek-v4.1-flash",
+    "index_backend": "qdrant",
+    "index_bytes": 22774324
+  }
+}

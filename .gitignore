@@ -1,0 +1,23 @@
+# Large or regenerable artifacts — fetch or rebuild, do not commit (ADR-0003)
+data/
+runs/*/vectors/
+*.gguf
+*.safetensors
+*.bin
+
+# Secrets
+.env
+
+# Local scratch from tooling and one-off measurement
+.scratch/corpus-measure/
+.scratch/**/clones/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
