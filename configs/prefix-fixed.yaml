@@ -1,0 +1,73 @@
+# Prefix cache warm-up for the *fixed* chunk set.
+# The prompt depends on (doc_id, heading, chunk text, neighbours), so the 2,318 fixed
+# children have different prompts from the 2,203 recursive ones: warming both
+# chunkings once is what keeps the three fixed prefix cells from paying for the same
+# 2,318 calls each. Reading only.
+# (ticket 07). The prefix enters the dense vector and the BM25 term list; the
+# generation prompt keeps the original chunk text so citations stay verifiable.
+run:
+  name: prefix-warm-fixed
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: fixed
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: bge-m3
+  model_id: BAAI/bge-m3
+  device: cuda
+  batch_size: 8
+  max_seq_length: 1024
+  cache_path: data/cache/embeddings.sqlite
+
+index:
+  backend: qdrant
+  path: data/index
+
+retrieval:
+  mode: rerank
+  k: 10
+  rrf_k: 60
+  reranker: BAAI/bge-reranker-v2-m3
+  rerank_top: 12
+  rerank_max_length: 512
+
+context:
+  mode: contextual_prefix
+  prefix_model: deepseek-v4.1-flash
+  prefix_prompt_version: v1
+  prefix_max_tokens: 200
+  prefix_concurrency: 8
+  prefix_neighbours: 1
+  prefix_reasoning_effort: none
+  prefix_cache_path: data/cache/prefixes.sqlite
+
+generate:
+  provider: llm
+  model_id: llm
+  abstain_score_threshold: -100.0
+  min_claim_overlap: 0.12
+  max_claims: 3
+
+llm:
+  base_url: https://opencode.ai/zen/go/v1
+  session_header: x-opencode-session
+  model_generate: deepseek-v4.1-flash
+  model_judge: deepseek-v4-pro
+  cache_path: data/cache/llm.sqlite
+  timeout: 180
+  temperature: 0.0
+  max_tokens: 900
+  context_chunks: 8
+  price_in_usd_per_mtok: 0.15
+  price_out_usd_per_mtok: 0.60
+
+golden:
+  items_path: golden/v0.jsonl
