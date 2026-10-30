@@ -102,7 +102,7 @@ class LLMClient:
         cache_path: str = "data/cache/llm.sqlite",
         timeout: int = 120,
         temperature: float = 0.0,
-        max_retries: int = 3,
+        max_retries: int = 5,
         session_header: str = "",
         session_id: str = "",
         reasoning_effort: str = "",

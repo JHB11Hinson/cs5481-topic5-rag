@@ -74,7 +74,6 @@ def _llm_client(
         session_header=cfg["llm.session_header"],
         session_id=cfg["llm.session_id"],
         reasoning_effort=reasoning_effort,
-        max_retries=int(cfg["llm.max_retries"]),
     )
 
 
