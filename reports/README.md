@@ -6,7 +6,7 @@ Every file in this directory is produced by one command. Editing anything here b
 python -m ragqa aggregate --runs "D:\DE Project\wt\exp\runs" --out reports
 ```
 
-That is the exact command used to produce this snapshot: 9 of 18 cells finished, 9 printed as `missing`.
+That is the exact command used to produce this snapshot: 12 of 18 cells finished, 6 printed as `missing`.
 
 ## What each file answers
 

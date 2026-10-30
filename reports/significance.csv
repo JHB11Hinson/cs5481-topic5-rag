@@ -79,14 +79,14 @@ cell-recursive_parent_child-dense-plain,grid-recursive_parent_child-dense-plain-
 cell-recursive_parent_child-dense-plain,grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e,span_hit_rate,0.957746,0.904110,1.000000,10000,614843436
 cell-recursive_parent_child-dense-plain,grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e,over_abstain_rate,0.050000,0.000000,0.125000,10000,614843436
 cell-recursive_parent_child-dense-plain,grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,614843436
-cell-recursive_parent_child-dense-contextual_prefix,missing,hit_at_10,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,mrr,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,ndcg_at_10,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,citation_precision,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,citation_recall,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,span_hit_rate,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,over_abstain_rate,missing,missing,missing,,
-cell-recursive_parent_child-dense-contextual_prefix,missing,abstention_recall_on_near_misses,missing,missing,missing,,
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,hit_at_10,0.875000,0.775000,0.975000,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,mrr,0.504474,0.384581,0.626145,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,ndcg_at_10,0.591970,0.484361,0.697953,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,citation_precision,1.000000,1.000000,1.000000,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,citation_recall,0.975000,0.925000,1.000000,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,span_hit_rate,1.000000,1.000000,1.000000,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,over_abstain_rate,0.025000,0.000000,0.075000,10000,479680488
+cell-recursive_parent_child-dense-contextual_prefix,grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,479680488
 cell-recursive_parent_child-dense-late_chunking,missing,hit_at_10,missing,missing,missing,,
 cell-recursive_parent_child-dense-late_chunking,missing,mrr,missing,missing,missing,,
 cell-recursive_parent_child-dense-late_chunking,missing,ndcg_at_10,missing,missing,missing,,
@@ -103,14 +103,14 @@ cell-recursive_parent_child-hybrid-plain,grid-recursive_parent_child-hybrid-plai
 cell-recursive_parent_child-hybrid-plain,grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e,span_hit_rate,0.957143,0.910256,1.000000,10000,2026947851
 cell-recursive_parent_child-hybrid-plain,grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e,over_abstain_rate,0.000000,0.000000,0.000000,10000,2026947851
 cell-recursive_parent_child-hybrid-plain,grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,2026947851
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,hit_at_10,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,mrr,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,ndcg_at_10,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,citation_precision,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,citation_recall,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,span_hit_rate,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,over_abstain_rate,missing,missing,missing,,
-cell-recursive_parent_child-hybrid-contextual_prefix,missing,abstention_recall_on_near_misses,missing,missing,missing,,
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,hit_at_10,0.900000,0.800000,0.975000,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,mrr,0.643155,0.531548,0.751488,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,ndcg_at_10,0.708379,0.605751,0.802726,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,citation_precision,0.975309,0.939024,1.000000,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,citation_recall,0.975000,0.925000,1.000000,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,span_hit_rate,0.975309,0.939024,1.000000,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,over_abstain_rate,0.025000,0.000000,0.075000,10000,1407403694
+cell-recursive_parent_child-hybrid-contextual_prefix,grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,1407403694
 cell-recursive_parent_child-hybrid-late_chunking,missing,hit_at_10,missing,missing,missing,,
 cell-recursive_parent_child-hybrid-late_chunking,missing,mrr,missing,missing,missing,,
 cell-recursive_parent_child-hybrid-late_chunking,missing,ndcg_at_10,missing,missing,missing,,
@@ -127,14 +127,14 @@ cell-recursive_parent_child-rerank-plain,grid-recursive_parent_child-rerank-plai
 cell-recursive_parent_child-rerank-plain,grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910,span_hit_rate,1.000000,1.000000,1.000000,10000,1954353206
 cell-recursive_parent_child-rerank-plain,grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910,over_abstain_rate,0.025000,0.000000,0.075000,10000,1954353206
 cell-recursive_parent_child-rerank-plain,grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,1954353206
-cell-recursive_parent_child-rerank-contextual_prefix,missing,hit_at_10,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,mrr,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,ndcg_at_10,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,citation_precision,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,citation_recall,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,span_hit_rate,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,over_abstain_rate,missing,missing,missing,,
-cell-recursive_parent_child-rerank-contextual_prefix,missing,abstention_recall_on_near_misses,missing,missing,missing,,
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,hit_at_10,0.900000,0.800000,0.975000,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,mrr,0.588016,0.464682,0.713850,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,ndcg_at_10,0.662105,0.553194,0.770316,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,citation_precision,0.951613,0.875000,1.000000,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,citation_recall,0.850000,0.725000,0.950000,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,span_hit_rate,0.951613,0.875000,1.000000,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,over_abstain_rate,0.050000,0.000000,0.125000,10000,503269320
+cell-recursive_parent_child-rerank-contextual_prefix,grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a,abstention_recall_on_near_misses,1.000000,1.000000,1.000000,10000,503269320
 cell-recursive_parent_child-rerank-late_chunking,missing,hit_at_10,missing,missing,missing,,
 cell-recursive_parent_child-rerank-late_chunking,missing,mrr,missing,missing,missing,,
 cell-recursive_parent_child-rerank-late_chunking,missing,ndcg_at_10,missing,missing,missing,,
@@ -143,12 +143,12 @@ cell-recursive_parent_child-rerank-late_chunking,missing,citation_recall,missing
 cell-recursive_parent_child-rerank-late_chunking,missing,span_hit_rate,missing,missing,missing,,
 cell-recursive_parent_child-rerank-late_chunking,missing,over_abstain_rate,missing,missing,missing,,
 cell-recursive_parent_child-rerank-late_chunking,missing,abstention_recall_on_near_misses,missing,missing,missing,,
-rerank vs hybrid (retrieval)|retrieval_hit,rerank/hybrid,mcnemar_p,1.000000,0,0,120,
-rerank vs hybrid (retrieval)|grounded_citation,rerank/hybrid,mcnemar_p,0.266846,4,9,120,
-rerank vs hybrid (retrieval)|abstention_decision,rerank/hybrid,mcnemar_p,1.000000,3,2,180,
-contextual_prefix vs plain (contextualization)|retrieval_hit,contextual_prefix/plain,mcnemar_p,0.250000,0,3,120,
-contextual_prefix vs plain (contextualization)|grounded_citation,contextual_prefix/plain,mcnemar_p,0.790527,6,8,120,
-contextual_prefix vs plain (contextualization)|abstention_decision,contextual_prefix/plain,mcnemar_p,0.753906,4,6,180,
+rerank vs hybrid (retrieval)|retrieval_hit,rerank/hybrid,mcnemar_p,1.000000,0,0,160,
+rerank vs hybrid (retrieval)|grounded_citation,rerank/hybrid,mcnemar_p,0.041389,5,15,160,
+rerank vs hybrid (retrieval)|abstention_decision,rerank/hybrid,mcnemar_p,1.000000,4,4,240,
+contextual_prefix vs plain (contextualization)|retrieval_hit,contextual_prefix/plain,mcnemar_p,0.726562,3,5,240,
+contextual_prefix vs plain (contextualization)|grounded_citation,contextual_prefix/plain,mcnemar_p,0.823803,9,11,240,
+contextual_prefix vs plain (contextualization)|abstention_decision,contextual_prefix/plain,mcnemar_p,0.581055,5,8,360,
 late_chunking vs plain (contextualization)|retrieval_hit,late_chunking/plain,mcnemar_p,1.000000,0,0,0,
 late_chunking vs plain (contextualization)|grounded_citation,late_chunking/plain,mcnemar_p,1.000000,0,0,0,
 late_chunking vs plain (contextualization)|abstention_decision,late_chunking/plain,mcnemar_p,1.000000,0,0,0,
