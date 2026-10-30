@@ -195,6 +195,34 @@ def mode_for_run(run_name: str) -> Optional[str]:
     return None
 
 
+def mode_from_config(run_dir: Path) -> Optional[str]:
+    """The score scale a finished run actually used, read from its own config.
+
+    A run's name is a convenience, not evidence: a cell called `ctx-plain` is a
+    reranked run with LLM generation and its scores live on the cross-encoder scale
+    exactly like `real-llm`. Reading `config.json` makes the sweep work on any
+    naming scheme, including the grid's `cell-*` names, without guessing.
+    """
+    config_path = Path(run_dir) / "config.json"
+    if not config_path.exists():
+        return None
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    retrieval = (config.get("retrieval") or {}).get("mode")
+    generator = ((config.get("generate") or {}).get("provider")) or ""
+    if retrieval == "hybrid":
+        return "hybrid"
+    if retrieval == "rerank":
+        # Same cross-encoder scale either way; the split records whether a hosted
+        # model wrote the answer, which is what a reader comparing rows wants.
+        return "llm" if generator == "llm" else "rerank"
+    if retrieval == "dense":
+        return "dense" if "dense" in MODES else None
+    return None
+
+
 # --- per-item observations -------------------------------------------------
 
 
@@ -294,6 +322,9 @@ def _classify(runs_root: Path) -> Tuple[Dict[str, List[Path]], List[str]]:
         if not entry.is_dir() or not (entry / "predictions.jsonl").exists():
             continue
         mode = mode_for_run(entry.name)
+        if mode is None:
+            # Fall back to what the run itself recorded before calling it unroutable.
+            mode = mode_from_config(entry)
         if mode is None:
             if not entry.name.startswith(IGNORED_PREFIXES):
                 skipped.append(entry.name)
