@@ -364,8 +364,8 @@ def comparison_row(
     }
     metrics["cny_per_1k_questions"] = pair_of("system", "cost_per_1k_questions_cny")
 
-    fixed_outcomes = baselines.item_outcomes(fixed_run)
-    recursive_outcomes = baselines.item_outcomes(recursive_run)
+    fixed_outcomes = baselines.per_item_outcomes(fixed_run)
+    recursive_outcomes = baselines.per_item_outcomes(recursive_run)
     shared = [
         item
         for item in sorted(set(fixed_outcomes) & set(recursive_outcomes))
