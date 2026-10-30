@@ -6,7 +6,7 @@ Every file in this directory is produced by one command. Editing anything here b
 python -m ragqa aggregate --runs "D:\DE Project\wt\exp\runs" --out reports
 ```
 
-That is the exact command used to produce this snapshot: 2 of 18 cells finished, 16 printed as `missing`.
+That is the exact command used to produce this snapshot: 12 of 18 cells finished, 6 printed as `missing`.
 
 ## What each file answers
 
@@ -46,8 +46,8 @@ That is the exact command used to produce this snapshot: 2 of 18 cells finished,
 - `figures/sweep-k.png`
 - `figures/sweep-chunk.png`
 - `figures/sweep-hops.png`
+- `figures/abstention-dense.png`
 - `figures/abstention-hybrid.png`
-- `figures/abstention-llm.png`
 - `figures/abstention-rerank.png`
 - `README.md`
 

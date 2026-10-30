@@ -78,3 +78,38 @@ def test_abstention_counters():
     assert metrics["abstention"]["over_abstain_rate"] == 0.5
     assert metrics["abstention"]["abstained_unanswerable"] == 1
     assert metrics["abstention"]["under_abstain"] == 1
+
+
+def test_a_layer_that_judged_nothing_reports_no_precision():
+    """0.0 would read as "every claim this layer saw was rejected"."""
+    verdicts = [
+        {"supported": True, "containment_ok": True, "span_start": 0,
+         "nli_supported": None, "judge_supported": None},
+        {"supported": True, "containment_ok": True, "span_start": 0,
+         "nli_supported": None, "judge_supported": None},
+    ]
+    metrics = evaluate.grounding_metrics(verdicts)
+    assert metrics["nli_judged"] == 0 and metrics["nli_precision"] is None, metrics
+    assert metrics["judge_judged"] == 0 and metrics["judge_precision"] is None, metrics
+    # Containment did see both claims, so its ratio is a real number.
+    assert metrics["containment_precision"] == 1.0, metrics
+    assert metrics["span_resolved_rate"] == 1.0, metrics
+
+    nothing = evaluate.grounding_metrics([])
+    assert nothing["containment_precision"] is None, nothing
+    assert nothing["span_resolved_rate"] is None, nothing
+
+
+def test_containment_precision_does_not_fall_back_to_the_judge_verdict():
+    """The layers stay separate: a judge rejection is not a containment failure."""
+    verdicts = [
+        # Containment failed but a (hypothetical) judge said supported.
+        {"supported": True, "containment_ok": False, "span_start": None,
+         "nli_supported": None, "judge_supported": None},
+        {"supported": False, "containment_ok": True, "span_start": 0,
+         "nli_supported": False, "judge_supported": False},
+    ]
+    metrics = evaluate.grounding_metrics(verdicts)
+    assert metrics["containment_pass"] == 1, metrics
+    assert metrics["containment_precision"] == 0.5, metrics
+    assert metrics["nli_precision"] == 0.0, metrics

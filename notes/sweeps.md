@@ -30,11 +30,16 @@ re-spend on what already ran.
 
 ## What every cell holds constant, and why
 
-- **The same 40-item item set.** `golden.limit: 40` in all ten cells, because
-  spec.md rows 2-4 measure each sweep over the 40 answerable items rather than the
-  full 60-item Golden QA Set. The golden file lists answerable items (`A###`)
-  before near-misses (`U###`), and `sweeps.check` refuses a limit whose selected
-  items are not all answerable — the subset is verified, not assumed.
+- **The same 40-item item set.** All ten cells point at
+  `golden/v1-answerable.jsonl`, the answerable *stratum* of golden v1 written by
+  `sweep emit`, because spec.md rows 2-4 measure each sweep over the 40 answerable
+  items rather than the full 60-item set. It used to be `golden.limit: 40`, which
+  selects the first forty lines: the same items today only because v1 happens to
+  list `A###` before `U###`, and invisible as a difference once every point ran with
+  zero near-misses and printed 0.0 for rates that had no denominator. `sweeps.check`
+  now refuses a positional limit, verifies every selected item is answerable, that
+  there are exactly 40, and that the set is v1's answerable stratum and not a
+  hand-picked subset.
 - **The same corpus, embedding model, index, reranker truncation, generator and
   prices** as the reference cell. `check` asserts that no cell differs from the
   sweep base outside its own parameter.
@@ -65,48 +70,42 @@ chunk stays half a parent at every point. Two honest remarks about this cell:
   what a 1024-word chunk can retrieve, and the report must say so rather than read a
   plateau as evidence that more context never helps.
 
-### Rule 3 — the hop trigger is a different number from the abstention point
+### Rule 3 - the hop trigger is the abstention point, on the same scale
 
-The measured rerank working point is **raw 0.75925** (t = 0.4471) in
-`reports/abstention/working-points.json`, fitted on the 20 items of the runs it
-names (`real-rerank-20261030T092425-8d738820`, `…093154-2ebd65d2`,
-`…095541-a6eb2d5e`; only the last contributed retained rows). That is the
-*abstention* point: at or above it, the calibration says the round's evidence was
-sufficient, and it is the wrong trigger for another round, which has to fire before
-the system gives up rather than at the moment it does.
+The measured rerank working point of golden v1 is **raw 0.426134** (t = 0.2) in
+`reports/abstention/working-points.json`, fitted on the 60 items of the v1 runs it
+names (`grid-fixed-rerank-plain-…125648`, `grid-fixed-rerank-contextual_prefix-…145745`,
+`grid-recursive_parent_child-rerank-plain-…133556`; the last contributed the retained
+scores). That is the *abstention* point: below it, the calibration says the round's
+evidence is not sufficient.
 
-The trigger in all three hop cells is **`retrieval.trigger_threshold = 0.5771`**,
-the raw score at t = 0.2 — the floor of the same 18-point curve
-(`reports/abstention/rerank-pr.csv`, row 1, `raw_threshold = 0.5771`), obtained from
-the fitted transform in `working-points.json`
-(`fitted_mean = 0.793426`, `fitted_stdev = 0.256976`):
+The trigger in all three hop cells is that same number:
+**`retrieval.trigger_threshold = 0.426134`**, taken straight from
+`modes.rerank.raw_threshold`. It is not a derived floor of some other curve - a
+rewrite now fires exactly on the rounds the system would otherwise abstain on, which
+is the only round worth another retrieval round, and the trigger and the decision it
+precedes cannot drift apart because they are the same measurement on the same score
+scale.
 
-    raw = 0.793426 + 0.256976 × Φ⁻¹(0.2)
-        = 0.793426 + 0.256976 × (−0.841621)
-        = 0.577143  →  0.5771
+An earlier version of this note derived the trigger from the grid *floor* of the v0
+curve (raw 0.5771, 0.182 below that curve's working point of 0.75925). When the
+abstention sweep moved to golden v1, 0.5771 ended up **above** the new working point,
+so it was re-derived rather than kept; no hop run directory existed when it changed,
+so nothing was orphaned. `ragqa/sweeps.py` records the provenance in
+`HOP_TRIGGER_SOURCE` and its test asserts the trigger equals the published rerank
+working point.
 
-Why there, and not the working point:
+The consequences, restated for the new number:
 
-- Every one of the 10 answerable calibration items scored above 0.75925, hence above
-  0.5771 too: nothing the calibration measured as answerable sits below the trigger,
-  so a rewrite is never spent on a round that had already succeeded.
-- Only 6 of 10 near-misses clear 0.5771 (`under_abstain_rate_on_near_miss = 0.6` at
-  t = 0.2). A top score below it is below the band that even topically adjacent,
-  unanswerable questions reach — a round that produced nothing resembling any
-  observed answer is the runtime definition of "plausibly failed".
-- It sits 0.182 below the abstention point, so the loop spends strictly under the
-  calibrated line: a question hops = 1 would have answered is never rewritten, and
-  ΔRecall is attributable to the loop rather than to a moved threshold.
-- It is identical in `hops-1`, `hops-2` and `hops-3`. Only the cap differs, so the
-  curve measures the cap and not the trigger.
-
-Consequence of the trigger being below the answer gate (0.75925): a fused round can
-stop as `hit_after_rewrite` on a score between 0.5771 and 0.75925 and still be
-abstained on by the generator. The stop reason records which round produced the hit;
-the abstention decision is read from `metrics.json`, never inferred from the stop
-reason. ADR-0016 governs both: `score` stays on the cross-encoder scale and
-`fusion_score` only orders, so the trigger and the abstention threshold read the
-same units at every hop.
+- a rewrite is never spent on a round the calibration would have answered, so
+  ΔRecall is attributable to the loop rather than to a moved threshold;
+- a rewritten round that clears 0.426134 can end above the abstention line and turn
+  an abstention into an answer - that is the mechanism working. `hop_stats.json`'s
+  stop reason records which round produced the hit, and the abstain decision is read
+  from `metrics.json`, never inferred from the stop reason;
+- it is identical in `hops-1`, `hops-2` and `hops-3`, so only the cap differs and the
+  curve measures the cap rather than the trigger. ADR-0016 governs the units:
+  `score` stays on the cross-encoder scale and `fusion_score` only orders.
 
 ## The three curves, in words
 
@@ -127,7 +126,7 @@ the first hypothesis to rule out is embedding truncation at 1024 tokens, not the
 idea of larger chunks.
 
 **Hops.** *Expected shape:* the second round recovers the questions whose first
-round put nothing above 0.5771; the third recovers little more while still paying a
+round put nothing above 0.426134; the third recovers little more while still paying a
 rewrite call and a second extra retrieval. The report needs the stop-reason
 histogram, not just the metric: `hit_first_round` / `hit_after_rewrite` /
 `cap_reached` / `abstained` per hop, plus `mean_hops`, is what shows *why* a hop did
@@ -193,7 +192,7 @@ run directories exist.
 
 ## Projection: what the sweep will spend (a count, not a measurement)
 
-From the declaration and `golden.limit: 40` (`python scripts/run_sweeps.py --dry-run`,
+From the declaration and `golden/v1-answerable.jsonl` (`python scripts/run_sweeps.py --dry-run`,
 which executes nothing). These numbers come from the configuration files and
 spec.md rows 2-4, not from a run:
 
@@ -205,18 +204,17 @@ spec.md rows 2-4, not from a run:
 | **total** | **10** | **400** | 160 + 120 + 120 |
 
 Worst case on top: 120 rewrite calls (hops-2: 40, hops-3: 80), each fired only when
-a round's best score is below 0.5771. The real number is read from each hop run's
+a round's best score is below 0.426134. The real number is read from each hop run's
 `hop_stats.json` afterwards.
 
 ## Where every number above comes from
 
 | number | source |
 |---|---|
-| 0.75925 (abstention working point, rerank) | `reports/abstention/working-points.json` → `modes.rerank.raw_threshold`, measured on `real-rerank-20261030T095541-a6eb2d5e` (plus `…092425-8d738820`, `…093154-2ebd65d2`) |
-| 0.5771 (hop trigger) | same file's fitted transform applied to t = 0.2; equals `reports/abstention/rerank-pr.csv` row 1 `raw_threshold` |
-| 0.793426 / 0.256976 | `working-points.json` → `modes.rerank.transform.fitted_mean/fitted_stdev` |
-| 10/10 answerable above, 6/10 near-misses above, at t = 0.2 | `rerank-pr.csv` row 1 (`recall = 1.0`, `under_abstain_rate_on_near_miss = 0.6`) |
-| 160 / 120 / 120 generations | spec.md rows 2-4; per-point items from `configs/sweeps/*.yaml` (`golden.limit: 40`) |
+| 0.426134 (abstention working point = hop trigger, rerank) | `reports/abstention/working-points.json` -> `modes.rerank.raw_threshold`, measured on the three v1 rerank cells it names |
+| 0.672310 / 0.292501 | `working-points.json` -> `modes.rerank.transform.fitted_mean/fitted_stdev`, fitted on the 60 v1 items |
+| 34/40 answerable above, 12/20 near-misses above, at t = 0.2 | `reports/abstention/rerank-pr.csv` row 1 (`recall = 0.85`, `under_abstain_rate_on_near_miss = 0.60`) |
+| 160 / 120 / 120 generations | spec.md rows 2-4; per-point items from `configs/sweeps/*.yaml` (`golden.items_path: golden/v1-answerable.jsonl`, 40 items) |
 | $0.15 / $0.60 per Mtok | `configs/sweeps/hops-*.yaml` → `llm.price_in_usd_per_mtok` / `price_out_usd_per_mtok` |
 | ≤ 200 output tokens per rewrite | `ragqa/agentic.py` → `client.complete(..., max_tokens=200)` |
 

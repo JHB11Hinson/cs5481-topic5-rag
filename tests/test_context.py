@@ -88,6 +88,95 @@ def test_contextual_text_keeps_the_original_verbatim():
         assert chunk["text"] == _chunks()[0]["text"] or chunk["chunk_id"] == "c2"
 
 
+class EmptyClient:
+    """What an emptied token budget returns: no content, and a full reasoning spend."""
+
+    def complete(self, model, messages, max_tokens=100, json_mode=False):
+        return {"text": "   ", "tokens_in": 12, "tokens_out": 120}
+
+
+def test_empty_model_content_raises_and_is_never_cached():
+    """An empty completion must stop the run, not be cached as an empty prefix.
+
+    This fired once in production: with the thinking channel on, the model spent the
+    whole token budget on reasoning and returned no content. Caching "" made
+    `contextual_text` byte-identical to the plain level while the config declared a
+    prefix level, so an A/B cell silently measured the thing it was compared against.
+    """
+    import os
+    import tempfile
+
+    import pytest
+
+    cache = os.path.join(tempfile.mkdtemp(prefix="ragqa-prefix-"), "p.sqlite")
+    generator = context_mod.PrefixGenerator(EmptyClient(), model="cheap", cache_path=cache)
+    with pytest.raises(context_mod.EmptyPrefixError):
+        generator.generate(_chunks(), _docs())
+    assert context_mod.PrefixCache(cache).count() == 0
+
+
+def test_prefix_lengths_are_measured_on_a_full_hit_rerun():
+    """The p50/max summary describes the chunks the invocation saw, hits included.
+
+    A rerun reports 100% cache hits and spends no tokens, so measuring only this
+    invocation's misses published `prefix_p50_chars: 0` on a run that had 2,203
+    real prefixes behind it.
+    """
+    import os
+    import tempfile
+
+    cache = os.path.join(tempfile.mkdtemp(prefix="ragqa-prefix-"), "p.sqlite")
+    first = context_mod.PrefixGenerator(FakeClient(), model="cheap", cache_path=cache)
+    first.generate(_chunks(), _docs())
+
+    chunks = _chunks()
+    second = context_mod.PrefixGenerator(FakeClient(), model="cheap", cache_path=cache)
+    stats = second.generate(chunks, _docs())
+    assert stats["hits"] == 2 and stats["misses"] == 0
+    # Ground truth: the prefixes the run actually carried, not a recomputation of
+    # the summary's own arithmetic.
+    carried = sorted(len(chunk["prefix"]) for chunk in chunks)
+    summary = second.summary()
+    assert summary["prefix_p50_chars"] == carried[len(carried) // 2]
+    assert summary["prefix_max_chars"] == carried[-1]
+    assert summary["prefix_p50_chars"] > 0
+
+
+def test_summary_reports_none_when_no_chunk_was_measured():
+    generator = context_mod.PrefixGenerator(FakeClient(), model="cheap", cache_path=":memory:")
+    generator.generate([], _docs())
+    summary = generator.summary()
+    assert summary["prefix_p50_chars"] is None
+    assert summary["prefix_max_chars"] is None
+
+
+def test_cache_migrates_a_database_without_the_length_column():
+    """An existing cache database must keep working, and keep its rows."""
+    import os
+    import sqlite3
+    import tempfile
+
+    path = os.path.join(tempfile.mkdtemp(prefix="ragqa-prefix-"), "p.sqlite")
+    old = sqlite3.connect(path)
+    old.execute(
+        "CREATE TABLE prefixes ("
+        " key TEXT PRIMARY KEY, model TEXT NOT NULL, prompt_version TEXT NOT NULL,"
+        " prefix TEXT NOT NULL, tokens_in INTEGER, tokens_out INTEGER)"
+    )
+    old.execute(
+        "INSERT INTO prefixes VALUES ('k', 'cheap', 'v1@default', 'a legacy prefix', 10, 4)"
+    )
+    old.commit()
+    old.close()
+
+    cache = context_mod.PrefixCache(path)
+    assert cache.get("k") == "a legacy prefix"
+    # A row written before the column existed still reports a real length.
+    assert cache.get_chars("k") == len("a legacy prefix")
+    cache.put("k2", "cheap", "v1@default", "a new prefix", 3, 2)
+    assert cache.get_chars("k2") == len("a new prefix")
+
+
 def test_sanitize_strips_markdown_and_bounds_length():
     assert context_mod.sanitize("**Hello**\n\nworld") == "Hello world"
     long = "word " * 300

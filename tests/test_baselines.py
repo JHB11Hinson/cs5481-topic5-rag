@@ -15,7 +15,13 @@ from pathlib import Path
 from ragqa import baselines, config as config_mod
 
 REPO = Path(__file__).resolve().parents[1]
-REFERENCE_CONFIG = REPO / "configs" / "ctx-plain.yaml"
+# The design point every baseline is declared against: recursive_parent_child /
+# rerank / plain. `configs/ctx-plain.yaml` is an older, differently configured
+# cell (max_tokens 900, threshold -100.0, no prefixer) and comparing against it
+# would put a second factor into every row.
+REFERENCE_CONFIG = (
+    REPO / "configs" / "grid" / "cell-recursive_parent_child-rerank-plain.yaml"
+)
 BASELINE_CONFIGS = REPO / "configs" / "baselines"
 
 
@@ -282,10 +288,23 @@ def test_mcnemar_outcomes_ignores_agreeing_pairs():
 
 
 def test_every_baseline_config_loads_and_differs_from_the_reference_in_one_factor():
+    """One factor each, except the MiniLM cell, which moves two.
+
+    `retrieval.mode` is its own factor group, not part of `embedder`, so the cell
+    that drops the cross-encoder *and* shrinks the embedder is reported as moving
+    two factors instead of being certified as a single-variable ablation. That is
+    the honest count and `notes/baselines.md` says so.
+    """
     reference = config_mod.load(str(REFERENCE_CONFIG))
     paths = sorted(BASELINE_CONFIGS.glob("*.yaml"))
     assert paths, "no baseline configs found"
 
+    expected = {
+        "closed-book": ["baseline-policy"],
+        "long-context": ["baseline-policy"],
+        "embed-minilm": ["embedder", "retrieval-mode"],
+        "gen-cheap": ["generator-model"],
+    }
     seen = set()
     for path in paths:
         cfg = config_mod.load(str(path))
@@ -293,9 +312,31 @@ def test_every_baseline_config_loads_and_differs_from_the_reference_in_one_facto
         diff = baselines.substantive_diff(reference, cfg)
         assert diff, f"{path.name} is identical to the reference cell"
         factors = baselines.differing_factors(diff)
-        assert len(factors) == 1, f"{path.name} varies {sorted(factors)}: {sorted(diff)}"
+        assert factors == expected[path.stem], (
+            f"{path.name} varies {sorted(factors)}: {sorted(diff)}"
+        )
 
-    assert seen == {"closed-book", "long-context", "embed-minilm", "gen-cheap"}, seen
+    assert seen == set(expected), seen
+
+
+def test_the_generator_swap_differs_from_the_grid_reference_in_exactly_one_factor():
+    """The cell exists to move the reader, so nothing else may move with it.
+
+    It used to carry `llm.max_tokens: 900`, `generate.abstain_score_threshold:
+    -100.0` and an empty `context.prefix_model`, so against the reference cell it
+    measured a budget, an abstention policy and a prefixer as well as a model.
+    """
+    reference = config_mod.load(str(REFERENCE_CONFIG))
+    cfg = config_mod.load(str(BASELINE_CONFIGS / "gen-cheap.yaml"))
+    verdict = baselines.ablation_verdict(reference, cfg)
+    assert verdict["differing_factors"] == ["generator-model"], verdict
+    assert verdict["ceteris_paribus"] is True, verdict
+    assert cfg["llm.max_tokens"] == reference["llm.max_tokens"], cfg["llm.max_tokens"]
+    assert (
+        cfg["generate.abstain_score_threshold"]
+        == reference["generate.abstain_score_threshold"]
+    ), cfg["generate.abstain_score_threshold"]
+    assert cfg["context.prefix_model"] == reference["context.prefix_model"]
 
 
 def test_closed_book_and_long_context_keep_the_reference_prompt_and_generator():
@@ -509,18 +550,51 @@ def test_dry_run_refuses_to_call_a_model_even_when_a_key_is_present():
         assert os.listdir(out) == [], os.listdir(out)
 
 
+def _full_config(run_name, **overrides):
+    values = dict(config_mod.DEFAULTS)
+    values.update(_flatten(_config(run_name, **overrides)))
+    return config_mod.Config(values)
+
+
 def test_resume_skips_a_cell_that_already_has_a_metrics_file():
     with tempfile.TemporaryDirectory() as out:
         root = os.path.join(out, "runs")
         reference, closed = _paired_runs(root)
-        full = dict(config_mod.DEFAULTS)
-        full.update(_flatten(_config("baseline-closed", **{"baseline.closed_book": True})))
-        found = baselines.completed_run(root, config_mod.Config(full))
+        full = _full_config("baseline-closed", **{"baseline.closed_book": True})
+        other = _full_config("baseline-ref")
+        # A real run directory records the whole resolved configuration, so both
+        # have to be written out in full before resume can recognise them.
+        _write(os.path.join(closed, "config.json"), full.nested())
+        _write(os.path.join(reference, "config.json"), other.nested())
+
+        found = baselines.completed_run(root, full)
         assert found == closed, found
         # The reference cell's own configuration must not be mistaken for it.
-        other = dict(config_mod.DEFAULTS)
-        other.update(_flatten(_config("baseline-ref")))
-        assert baselines.completed_run(root, config_mod.Config(other)) == reference
+        assert baselines.completed_run(root, other) == reference
+
+
+def test_resume_does_not_adopt_a_run_whose_config_is_only_a_subset():
+    """A stale or partial directory must not be credited to a cell.
+
+    Matching on the keys the two configurations happen to share credited any older
+    run of the same family whose config.json had since lost a key -- which is
+    exactly what a partially written directory looks like.
+    """
+    with tempfile.TemporaryDirectory() as out:
+        root = os.path.join(out, "runs")
+        _reference, closed = _paired_runs(root)
+        full = _full_config("baseline-closed", **{"baseline.closed_book": True})
+
+        # _fake_run writes the partial tree: fewer keys than the resolved config.
+        assert baselines.completed_run(root, full) is None
+        # Add one more key but keep the set incomplete: still not the same run.
+        partial = _flatten(_config("baseline-closed", **{"baseline.closed_book": True}))
+        partial["llm.model_generate"] = "deepseek-v4.1-flash"
+        _write(os.path.join(closed, "config.json"), config_mod.Config(partial).nested())
+        assert baselines.completed_run(root, full) is None
+        # Only the whole configuration matching is enough.
+        _write(os.path.join(closed, "config.json"), full.nested())
+        assert baselines.completed_run(root, full) == closed
 
 
 # --------------------------------------------------------------------------- #
@@ -596,3 +670,25 @@ def test_window_measurement_counts_truncation_and_corpus_shape():
         # No model is reachable from here: both token counts were measured at 100.
         assert summary["measured_tokens_in_mean"] == 100.0, summary
         assert os.path.exists(out_path)
+
+
+def test_retrieval_mode_is_its_own_factor_group():
+    """Dropping the cross-encoder is a different decision from swapping the embedder."""
+    assert baselines.differing_factors(["retrieval.mode"]) == ["retrieval-mode"]
+    assert baselines.differing_factors(["embed.model_id"]) == ["embedder"]
+
+
+def test_an_identical_pair_is_reported_as_identical_not_as_one_factor():
+    """`len(factors) <= 1` certified two copies of a cell as a valid ablation."""
+    cfg = config_mod.load(str(REFERENCE_CONFIG))
+    same = config_mod.load(str(REFERENCE_CONFIG))
+    verdict = baselines.ablation_verdict(cfg, same)
+    assert verdict["factor_count"] == 0, verdict
+    assert verdict["ceteris_paribus"] is False, verdict
+    assert verdict["ablation_verdict"] == "IDENTICAL", verdict
+
+    distinct = baselines.ablation_verdict(
+        cfg, config_mod.load(str(BASELINE_CONFIGS / "gen-cheap.yaml"))
+    )
+    assert distinct["ablation_verdict"] == "ONE_FACTOR", distinct
+    assert distinct["factor_count"] == 1, distinct

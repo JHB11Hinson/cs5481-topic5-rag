@@ -2,15 +2,18 @@
 # or `python scripts/run_sweeps.py --emit`; edit `ragqa/sweeps.py`, never this file.
 #
 #   sweep base: configs/grid/cell-recursive_parent_child-rerank-plain.yaml
-#               (recursive_parent_child / rerank / plain) + golden.limit 40
+#               (recursive_parent_child / rerank / plain) + the answerable
+#               stratum of golden v1 (40 items, no near-misses)
 #   point     : retrieval.hops = 3
 #   differs   : retrieval.hop_rewrite_model, retrieval.hops, retrieval.trigger_threshold
 #   invariants: rerank_top = max(k, 12) (ADR-0011); same corpus, same golden
 #               set, same prices as the reference cell.
 #
-#   trigger   : retrieval.trigger_threshold = 0.5771, a cross-encoder score read
-#               below the calibrated abstention point (0.75925); identical
-#               in hops-1, hops-2 and hops-3 so only the cap differs.
+#   trigger   : retrieval.trigger_threshold = 0.426134, the rerank abstention
+#               working point of golden v1 (reports/abstention/
+#               working-points.json), so a rewrite fires exactly where the
+#               system would otherwise abstain. Identical in hops-1,
+#               hops-2 and hops-3 so only the cap differs.
 baseline:
   closed_book: false
   long_context: false
@@ -50,8 +53,8 @@ generate:
   model_id: llm
   provider: llm
 golden:
-  items_path: golden/v1.jsonl
-  limit: 40
+  items_path: golden/v1-answerable.jsonl
+  limit: null
 index:
   backend: qdrant
   path: data/index
@@ -87,7 +90,7 @@ retrieval:
   rerank_top: 12
   reranker: BAAI/bge-reranker-v2-m3
   rrf_k: 60
-  trigger_threshold: 0.5771
+  trigger_threshold: 0.426134
 run:
   name: sweep-hops-3
   out_root: runs

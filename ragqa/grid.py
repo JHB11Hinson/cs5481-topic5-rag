@@ -701,7 +701,16 @@ def check(paths: Optional[Sequence[str]] = None) -> int:
 
 
 def _manifest_problems(paths: Sequence[str]) -> List[str]:
-    """A manifest is the join key `aggregate` uses; drift there is a grid bug."""
+    """A manifest is the join key `aggregate` uses; drift there is a grid bug.
+
+    Two things are compared, because they fail differently. Cell *names* catch a
+    manifest and a directory that have diverged in composition. Config *digests*
+    catch the quieter case: the same eighteen files, one of them edited, so the
+    manifest still names a run id that no run of this configuration will ever have.
+    Comparing names alone let that through, and `aggregate` would then report a cell
+    as absent while its finished run sat in the run root under a digest nobody
+    matched.
+    """
     problems: List[str] = []
     for path in list(paths):
         if not os.path.isdir(path):
@@ -709,7 +718,8 @@ def _manifest_problems(paths: Sequence[str]) -> List[str]:
         manifest = read_manifest(path)
         if manifest is None:
             continue
-        declared = sorted(entry["cell"] for entry in manifest.get("cells", []))
+        entries = list(manifest.get("cells", []))
+        declared = sorted(entry["cell"] for entry in entries)
         materialised = sorted(
             name[: -len(".yaml")] for name in os.listdir(path) if name.startswith("cell-")
         )
@@ -718,4 +728,22 @@ def _manifest_problems(paths: Sequence[str]) -> List[str]:
                 f"{path}: {MANIFEST_NAME} declares {len(declared)} cell(s) but "
                 f"{len(materialised)} config file(s) are present -- re-run `grid emit`"
             )
+            continue
+        stored = {entry.get("cell"): str(entry.get("config_digest") or "") for entry in entries}
+        for name in materialised:
+            try:
+                cfg = config_mod.load(os.path.join(path, name + ".yaml"))
+            except config_mod.ConfigError:
+                # `check` already reports the file itself; a digest for a config that
+                # does not load would only be noise.
+                continue
+            actual = config_digest(cfg)
+            expected = stored.get(name, "")
+            if expected != actual:
+                problems.append(
+                    f"{path}: {name} resolves to {actual} but {MANIFEST_NAME} records "
+                    f"{expected or '(none)'} -- the configuration changed after the "
+                    "manifest was written, so a finished run of this cell could no "
+                    "longer be joined; re-run `grid emit`"
+                )
     return problems

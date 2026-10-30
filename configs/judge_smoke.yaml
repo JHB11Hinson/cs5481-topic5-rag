@@ -50,7 +50,6 @@ judge:
   llm_max_chars: 2000
 
 llm:
-  base_url: https://opencode.ai/zen/go/v1
   session_header: x-opencode-session
   model_generate: deepseek-v4.1-flash
   model_judge: deepseek-v4-pro

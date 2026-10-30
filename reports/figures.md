@@ -20,17 +20,17 @@ Drawn from `sweeps/chunk.csv`: 0 of 3 point(s) finished.
 
 Drawn from `sweeps/hops.csv`: 0 of 3 point(s) finished.
 
+## `figures/abstention-dense.png`
+
+![](figures/abstention-dense.png)
+
+Drawn from `abstention/dense-pr.csv`: 18 of 18 point(s) finished.
+
 ## `figures/abstention-hybrid.png`
 
 ![](figures/abstention-hybrid.png)
 
 Drawn from `abstention/hybrid-pr.csv`: 18 of 18 point(s) finished.
-
-## `figures/abstention-llm.png`
-
-![](figures/abstention-llm.png)
-
-Drawn from `abstention/llm-pr.csv`: 18 of 18 point(s) finished.
 
 ## `figures/abstention-rerank.png`
 

@@ -37,7 +37,7 @@ The dry run against the real set:
 
 ```
 cell               config                                                    items   ans   calls  state
-baseline-reference configs/ctx-plain.yaml (retargeted at the baselines' golden set)  60    40      60  pending
+baseline-reference configs/grid/cell-recursive_parent_child-rerank-plain.yaml (renamed)  60    40      60  pending
 closed-book        configs/baselines/closed-book.yaml                           60    40      60  pending
 long-context       configs/baselines/long-context.yaml                          60    40      60  pending
 embed-minilm       configs/baselines/embed-minilm.yaml                          60    40      60  pending
@@ -56,19 +56,40 @@ python scripts/run_baselines.py --with-reference
 python scripts/run_baselines.py --report --reference-dir runs/<baseline-reference-run-id>
 ```
 
-`--with-reference` is opt-in and exists for exactly this reason: the four cells
-must be paired against a cell that answered the same items, and
-`configs/ctx-plain.yaml` still points at golden v0. The flag derives that
-configuration with a new run name and the baselines' golden set — identity keys
-only, asserted in `tests/test_baselines.py` — so the headline comparison cannot
-quietly acquire a second factor. Without the flag the runner executes exactly the
-four baselines and nothing else.
+`--with-reference` is opt-in: the four cells must be paired against a cell that
+answered the same items. That cell is the design's reference point,
+`configs/grid/cell-recursive_parent_child-rerank-plain.yaml`, which already answers
+the same 60-item set, so the flag only renames it (`baseline-reference`) -- identity
+keys only, asserted in `tests/test_baselines.py` -- and the headline comparison
+cannot quietly acquire a second factor. Comparing against `configs/ctx-plain.yaml`,
+as an earlier version of the runner did, would have: that cell carries a different
+generation budget (900 against 1600), a different abstention threshold (-100.0
+against 0.0) and no prefixer model, so every baseline row would have shown
+`MORE THAN ONE FACTOR` for keys nobody meant to move. Without the flag the runner
+executes exactly the four baselines and nothing else.
 
 
 ## The four cells
 
-Each differs from `configs/ctx-plain.yaml` in exactly one factor, and the table
-prints that factor list per row rather than trusting the author:
+Every cell is declared against the design's own reference point,
+`configs/grid/cell-recursive_parent_child-rerank-plain.yaml`
+(`scripts/run_baselines.py --with-reference` derives it under the name
+`baseline-reference`). The table prints the factor list per row rather than
+trusting the author:
+
+* **closed book** and **long context** move one factor, `baseline-policy`.
+* **cheaper generator** moves one factor, `generator-model` -- the model and the two
+  prices that belong to it. It used to move three: `llm.max_tokens` 1600 to 900,
+  `generate.abstain_score_threshold` 0.0 to -100.0, and `context.prefix_model`
+  dropped to empty. All three now hold the reference cell's values, so the cell
+  measures the reader and nothing else.
+* **smaller embedder** moves **two** factors, `embedder` and `retrieval-mode`, and
+  says so. `retrieval.mode` is its own factor group rather than part of `embedder`:
+  swapping the embedder is one decision and removing the cross-encoder is another,
+  and folding them together let a cell that moves both certify as a single-variable
+  ablation. This is the one baseline whose row is flagged `MORE THAN ONE FACTOR`,
+  and the flag is the honest reading -- the cell deliberately measures the dense
+  retrieval a small model produces, i.e. both at once.
 
 | cell | config | the factor | what it isolates | deliberately not changed |
 |---|---|---|---|---|
@@ -82,6 +103,14 @@ prints that factor list per row rather than trusting the author:
 checked per table instead of asserted in prose. Identity keys (`run.name`,
 `run.out_root`, `golden.items_path`, `golden.limit`) are ignored: they name a cell
 and its instrument, they do not change behaviour.
+
+The verdict is `== 1`, not `<= 1`, and it has four values: `reference`,
+`IDENTICAL`, `ONE_FACTOR`, `MULTIPLE_FACTORS`. `<= 1` certified a pair that differs
+in *nothing* as a valid single-factor ablation, which is the one thing an ablation
+table must never do; an identical pair now prints `IDENTICAL` and is explicitly not
+ceteris paribus. Resume uses the same idea in reverse: `completed_run` adopts a run
+directory only when the whole resolved configuration matches (or the recomputed
+config digest does), never on the subset of keys the two happen to share.
 
 ## Closed book says less than it looks like it says
 
@@ -170,15 +199,28 @@ Three things, and only one of them is free:
    chunk becomes reachable. Given that the reference cell's hit@10 is already 1.000
    on golden v0 (`real-llm-...113604`), this buys nothing there — it is a bet that
    v1's harder items are the ones where chunking hurts.
-3. **A broken citation handle.** This is the cost the money column hides. The
-   prompt for this cell contains no chunk ids — there are none to contain — so a
-   claim comes back citing a document id. `verify.check_claims` looks that id up in
-   the retrieved chunks, does not find it, and records `chunk_not_retrieved`;
-   `generate.py` files the claim under `doc_id: ""`. Expected signature in the
-   table: **citation precision 0, `no-cite` unchanged (the claims exist, they are
-   just unsupported), and `over-abstain` set by the model's own judgement** rather
-   than by any verifier. If the run shows anything else, the reasoning above is
-   wrong and the note has to be rewritten.
+3. **A weaker citation handle, and it has to be an honest one.** The prompt for
+   this cell contains no chunk ids — there are none to contain — so a claim comes
+   back citing the document. The first version of the cell therefore handed the
+   prompt an *empty* retrieval block while the verifier still checked claims
+   against the retrieved chunks: no claim could resolve to anything, so citation
+   precision and recall were 0 by construction rather than by measurement, and a
+   parroted zero is not evidence about a baseline.
+
+   `run.item_context` now builds one **synthetic** hit per item — the top-ranked
+   chunk's document, truncated to `baseline.long_context_max_chars`, `rank` 1,
+   `chunk_id` `document:<doc_id>` — and hands that same list to the generator and
+   to `verify.check_claims`. A claim citing the document is checkable containment
+   against the text the model was actually shown, so the cell measures what it
+   claims to measure: the citation *granularity* is a document instead of a chunk,
+   not the absence of a handle. `predictions.jsonl` marks the entry
+   `"synthetic": true` under `prompt_context`, because no chunker produced it and
+   a reader must not mistake it for a retrieved chunk; `retrieved` keeps the real
+   retrieval, so hit@k is still the retriever's own number.
+
+   Proof at the seam (`generate.provider: stub`, fixture corpus, `long_context`
+   on): citation precision 1.0, recall 0.75, one claim asserted and located inside
+   the synthetic hit, where the same configuration used to report 0.0/0.0.
 
 ## The embedding swap
 
