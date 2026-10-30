@@ -14,6 +14,8 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
 
+PARTIAL_SUFFIX = ".partial"
+
 RUN_FILES = (
     "config.json",
     "git_sha.txt",
@@ -55,10 +57,39 @@ def git_state(cwd: str = ".") -> Dict[str, Any]:
 
 
 class RunContract:
-    def __init__(self, out_root: str, run_id: str):
+    """One run's directory.
+
+    With `partial=True` the run is written to `<run_id>.partial/` and only renamed
+    to `<run_id>/` by `finalize()`. That is what makes ADR-0003 true for a process
+    that is killed rather than raised: a directory holding a `config.json` and no
+    `metrics.json` is never published under a real run id.
+    """
+
+    def __init__(self, out_root: str, run_id: str, partial: bool = False):
         self.run_id = run_id
-        self.path = Path(out_root) / run_id
+        self.out_root = Path(out_root)
+        self.partial = bool(partial)
+        name = f"{run_id}{PARTIAL_SUFFIX}" if partial else run_id
+        self.path = self.out_root / name
         self.path.mkdir(parents=True, exist_ok=True)
+
+    def finalize(self) -> Path:
+        """Publish the directory under its real run id, once it is complete."""
+        if not self.partial:
+            return self.path
+        final = self.out_root / self.run_id
+        if final.exists():
+            raise FileExistsError(f"{final} already exists; a run id is never reused")
+        os.replace(str(self.path), str(final))
+        self.path = final
+        self.partial = False
+        return final
+
+    def discard(self) -> None:
+        """Remove the working directory: a run that failed leaves nothing behind."""
+        import shutil
+
+        shutil.rmtree(str(self.path), ignore_errors=True)
 
     def write_json(self, name: str, payload: Any) -> Path:
         target = self.path / name

@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 import time
 from typing import Any, Callable, Dict, List, Optional
@@ -31,7 +32,7 @@ from . import chunk as chunk_mod
 from . import config as config_mod
 from . import corpus, embed, evaluate, generate, golden, index, judges, retrieve, verify
 from . import agentic, context as context_mod
-from .contract import RunContract, git_state
+from .contract import PARTIAL_SUFFIX, RunContract, git_state
 from .llm import LLMClient, LLMError
 
 
@@ -42,10 +43,56 @@ def _percentile(values: List[float], fraction: float) -> float:
     return float(ordered[int(round(fraction * (len(ordered) - 1)))])
 
 
+def token_cost(tokens_in: int, tokens_out: int, price_in: float, price_out: float) -> float:
+    """Dollars for one component: input at the input price, output at the output price."""
+    return (
+        int(tokens_in or 0) / 1e6 * float(price_in)
+        + int(tokens_out or 0) / 1e6 * float(price_out)
+    )
+
+
+def cost_components(
+    generation: Dict[str, Any],
+    price_in: float,
+    price_out: float,
+    prefix: Optional[Dict[str, Any]] = None,
+    rewrite: Optional[Dict[str, Any]] = None,
+    judge: Optional[Dict[str, Any]] = None,
+    judge_price_in: Optional[float] = None,
+    judge_price_out: Optional[float] = None,
+) -> Dict[str, Dict[str, float]]:
+    """Tokens and dollars per component, each priced on both sides of the meter.
+
+    Every component prices its completion tokens at the output price. Charging a
+    component's output tokens at the input rate under-counts it by the ratio of the
+    two prices (4x on the cheap model this matrix uses), which is how the published
+    prefix figure was 23% too low.
+    """
+    entries = [("generation", generation, price_in, price_out)]
+    if prefix is not None:
+        entries.append(("prefix", prefix, price_in, price_out))
+    if rewrite is not None:
+        entries.append(("rewrite", rewrite, price_in, price_out))
+    if judge is not None:
+        # An unset or zero judge price means "the same rate as generation".
+        entries.append(
+            ("judge", judge, judge_price_in or price_in, judge_price_out or price_out)
+        )
+
+    components: Dict[str, Dict[str, float]] = {}
+    for name, stats, in_price, out_price in entries:
+        tokens_in = int(stats.get("tokens_in", 0) or 0)
+        tokens_out = int(stats.get("tokens_out", 0) or 0)
+        components[name] = {
+            "tokens_in": tokens_in,
+            "tokens_out": tokens_out,
+            "usd": token_cost(tokens_in, tokens_out, in_price, out_price),
+        }
+    return components
+
+
 def _file_digest(path: str) -> Dict[str, Any]:
     """sha256 and size of one artifact, or a marker when it was never written."""
-    import os
-
     if not os.path.exists(path):
         return {"sha256": "", "bytes": 0}
     digest = hashlib.sha256()
@@ -99,17 +146,99 @@ def _make_prefixer(cfg: config_mod.Config) -> context_mod.PrefixGenerator:
 
 
 def execute(cfg: config_mod.Config, out_root: str) -> Dict[str, Any]:
-    run_id = run_id_for(cfg)
-    contract = RunContract(out_root, run_id)
-    try:
-        return _execute(cfg, contract, run_id)
-    except Exception:
-        # A run directory that exists without metrics.json is a lie about what was
-        # measured (ADR-0003): either the run completed or it left nothing behind.
-        import shutil
+    """Run one configuration, publishing the directory only once it is complete.
 
-        shutil.rmtree(contract.path, ignore_errors=True)
+    ADR-0003 says a run either completes or leaves nothing behind, but a killed
+    process cannot clean up after itself. So the work happens in `<run_id>.partial/`
+    and the directory is renamed to `<run_id>/` only after `metrics.json` exists: a
+    run directory with a `config.json` and no `metrics.json` never appears, and a
+    process killed mid-run leaves a `.partial` that the next `execute` sweeps.
+    """
+    run_id = run_id_for(cfg)
+    sweep_partials(out_root)
+    contract = RunContract(out_root, run_id, partial=True)
+    try:
+        result = _execute(cfg, contract, run_id)
+    except Exception:
+        contract.discard()
         raise
+    contract.finalize()
+    result["run_dir"] = str(contract.path)
+    return result
+
+
+def sweep_partials(out_root: str) -> List[str]:
+    """Delete `<run_id>.partial` directories left by a process that was killed.
+
+    They hold work that never finished, which is exactly the state ADR-0003 says
+    must not survive; nothing in them is evidence, because the evidence is the
+    finished directory.
+    """
+    import shutil
+
+    removed: List[str] = []
+    if not out_root or not os.path.isdir(out_root):
+        return removed
+    for name in sorted(os.listdir(out_root)):
+        if not name.endswith(PARTIAL_SUFFIX):
+            continue
+        path = os.path.join(out_root, name)
+        if os.path.isdir(path):
+            shutil.rmtree(path, ignore_errors=True)
+            removed.append(path)
+    return removed
+
+
+def item_context(
+    cfg: config_mod.Config,
+    retrieved: List[Dict[str, Any]],
+    docs_by_id: Dict[str, Dict[str, Any]],
+) -> Dict[str, Any]:
+    """What the generator is given, and what the verifier gets to check it against.
+
+    The two are the same list on purpose. A baseline that hands the generator an
+    empty retrieval block while the verifier still checks against the retrieved
+    chunks makes every claim resolve to nothing, so its citation precision and
+    recall are 0 by construction rather than by measurement.
+
+    `baseline.long_context` builds one synthetic hit: the whole source document of
+    the top-ranked chunk, truncated to the configured window, ranked 1, carrying the
+    document's own id. It is marked `synthetic` so a reader of `predictions.jsonl`
+    can see it is not a chunk — no chunker produced it.
+    """
+    prompt_hits = retrieved
+    extra_context = ""
+
+    if bool(cfg["baseline.closed_book"]):
+        # Same generator, same prompt, empty retrieval block: the question is what
+        # the model knows on its own, not what the corpus holds. Nothing was shown,
+        # so nothing can be checked: claims against an empty context are unresolved
+        # rather than unsupported.
+        prompt_hits = []
+    elif bool(cfg["baseline.long_context"]):
+        top_doc_id = retrieved[0]["doc_id"] if retrieved else ""
+        if top_doc_id:
+            text = docs_by_id[top_doc_id]["text"][
+                : int(cfg["baseline.long_context_max_chars"])
+            ]
+            prompt_hits = [
+                {
+                    "chunk_id": f"document:{top_doc_id}",
+                    "doc_id": top_doc_id,
+                    "rank": 1,
+                    "score": float(retrieved[0].get("score", 0.0)),
+                    "text": text,
+                    "synthetic": True,
+                }
+            ]
+        else:
+            prompt_hits = []
+
+    return {
+        "prompt_hits": prompt_hits,
+        "verify_hits": prompt_hits,
+        "extra_context": extra_context,
+    }
 
 
 def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict[str, Any]:
@@ -261,19 +390,13 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
 
         prompt_hits = retrieved
         extra_context = ""
-        if closed_book:
-            # Same generator, same prompt, empty retrieval block: the question is
-            # what the model knows on its own, not what the corpus holds.
-            prompt_hits = []
-        elif long_context:
-            # The whole source document of the top-ranked chunk, truncated to the
-            # configured window: what a long-context model would have to read.
-            top_doc_id = retrieved[0]["doc_id"] if retrieved else ""
-            if top_doc_id:
-                extra_context = docs_by_id[top_doc_id]["text"][
-                    : int(cfg["baseline.long_context_max_chars"])
-                ]
-            prompt_hits = []
+        if closed_book or long_context:
+            served = item_context(cfg, retrieved, docs_by_id)
+            prompt_hits = served["prompt_hits"]
+            extra_context = served["extra_context"]
+        # The verifier sees exactly what the generator saw: a claim can only be
+        # checked against a context the model was actually handed.
+        verify_hits = prompt_hits
 
         answer = generator.generate(
             item,
@@ -291,10 +414,10 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                     "detail": (answer.get("raw_response") or "")[:200],
                 }
             )
-        verdicts = verify.check_claims(answer["claims"], retrieved)
+        verdicts = verify.check_claims(answer["claims"], verify_hits)
         if judge_stack is not None:
             for claim, verdict in zip(answer["claims"], verdicts):
-                judge_stack.judge_claim(claim, verdict, retrieved)
+                judge_stack.judge_claim(claim, verdict, verify_hits)
         all_verdicts.extend(verdicts)
         elapsed_ms = (time.perf_counter() - began) * 1000.0
         latencies.append(elapsed_ms)
@@ -342,31 +465,45 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                     }
                 )
 
-        predictions.append(
-            {
-                "item_id": item["id"],
-                "answerable": bool(item.get("answerable", True)),
-                "answer_text": answer["answer_text"],
-                "abstained": answer["abstained"],
-                "abstain_reason": answer["abstain_reason"],
-                "claims": answer["claims"],
-                "raw_response": (answer.get("raw_response") or "")[:2000],
-                "tokens_in": answer.get("tokens_in", 0),
-                "tokens_out": answer.get("tokens_out", 0),
-                "citation_chunk_ids": [c["chunk_id"] for c in answer["citations"]],
-                "hop_stop_reason": hop_meta["stop_reason"],
-                "hop_queries": hop_meta["queries"],
-                "retrieved": [
-                    {
-                        "chunk_id": hit["chunk_id"],
-                        "doc_id": hit["doc_id"],
-                        "rank": hit["rank"],
-                        "score": round(hit["score"], 6),
-                    }
-                    for hit in retrieved
-                ],
-            }
-        )
+        prediction = {
+            "item_id": item["id"],
+            "answerable": bool(item.get("answerable", True)),
+            "answer_text": answer["answer_text"],
+            "abstained": answer["abstained"],
+            "abstain_reason": answer["abstain_reason"],
+            "claims": answer["claims"],
+            "raw_response": (answer.get("raw_response") or "")[:2000],
+            "tokens_in": answer.get("tokens_in", 0),
+            "tokens_out": answer.get("tokens_out", 0),
+            "citation_chunk_ids": [c["chunk_id"] for c in answer["citations"]],
+            "hop_stop_reason": hop_meta["stop_reason"],
+            "hop_queries": hop_meta["queries"],
+            "retrieved": [
+                {
+                    "chunk_id": hit["chunk_id"],
+                    "doc_id": hit["doc_id"],
+                    "rank": hit["rank"],
+                    "score": round(hit["score"], 6),
+                }
+                for hit in retrieved
+            ],
+        }
+        if prompt_hits is not retrieved:
+            # The prompt held something other than the retrieved chunks (closed
+            # book, or the long-context baseline's whole document). Record what the
+            # generator was actually shown, and mark a synthetic entry as synthetic:
+            # its chunk_id names a document, and no chunker produced it.
+            prediction["prompt_context"] = [
+                {
+                    "chunk_id": hit["chunk_id"],
+                    "doc_id": hit["doc_id"],
+                    "rank": hit["rank"],
+                    "chars": len(hit.get("text") or ""),
+                    "synthetic": bool(hit.get("synthetic", False)),
+                }
+                for hit in prompt_hits
+            ]
+        predictions.append(prediction)
 
         per_item.append(
             {
@@ -385,44 +522,23 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
 
     metrics = evaluate.compute(items, per_item, int(cfg["retrieval.k"]))
     gen_stats = dict(getattr(generator, "last_stats", {}) or {})
-    price_in = float(cfg["llm.price_in_usd_per_mtok"])
-    price_out = float(cfg["llm.price_out_usd_per_mtok"])
-    judge_in = float(cfg["llm.price_judge_in_usd_per_mtok"]) or price_in
-    judge_out = float(cfg["llm.price_judge_out_usd_per_mtok"]) or price_out
-
-    components: Dict[str, Dict[str, float]] = {
-        "generation": {
+    components = cost_components(
+        generation={
             "tokens_in": gen_stats.get("tokens_in", 0),
             "tokens_out": gen_stats.get("tokens_out", 0),
-            "usd": gen_stats.get("tokens_in", 0) / 1e6 * price_in
-            + gen_stats.get("tokens_out", 0) / 1e6 * price_out,
-        }
-    }
-    if prefixer is not None:
-        summary = prefixer.summary()
-        components["prefix"] = {
-            "tokens_in": summary["tokens_in"],
-            "tokens_out": summary["tokens_out"],
-            "usd": summary["tokens_in"] / 1e6 * price_in
-            + summary["tokens_out"] / 1e6 * price_in,
-        }
-    if judge_stack is not None and judge_stack.llm is not None:
-        stats = judge_stack.llm.last_stats
-        components["judge"] = {
-            "tokens_in": stats["tokens_in"],
-            "tokens_out": stats["tokens_out"],
-            "usd": stats["tokens_in"] / 1e6 * judge_in
-            + stats["tokens_out"] / 1e6 * judge_out,
-        }
-    if rewriter is not None:
-        stats = rewriter.last_stats
-        components["rewrite"] = {
-            "tokens_in": stats["tokens_in"],
-            "tokens_out": stats["tokens_out"],
-            "usd": stats["tokens_in"] / 1e6 * price_in
-            + stats["tokens_out"] / 1e6 * price_in,
-        }
-
+        },
+        price_in=float(cfg["llm.price_in_usd_per_mtok"]),
+        price_out=float(cfg["llm.price_out_usd_per_mtok"]),
+        prefix=prefixer.summary() if prefixer is not None else None,
+        rewrite=(rewriter.last_stats if rewriter is not None else None),
+        judge=(
+            judge_stack.llm.last_stats
+            if judge_stack is not None and judge_stack.llm is not None
+            else None
+        ),
+        judge_price_in=float(cfg["llm.price_judge_in_usd_per_mtok"]),
+        judge_price_out=float(cfg["llm.price_judge_out_usd_per_mtok"]),
+    )
     cost_usd = sum(component["usd"] for component in components.values())
     metrics["system"].update(
         {

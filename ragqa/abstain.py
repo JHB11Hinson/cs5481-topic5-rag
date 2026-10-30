@@ -6,7 +6,7 @@ and that score lives on a different scale in every retrieval mode:
 - `dense`: cosine similarity, already in [0, 1].
 - `hybrid`: a reciprocal-rank-fusion sum, ~1/(rrf_k + rank), which for k=10 and
   rrf_k=60 lands in roughly [0.015, 0.035] — never near 0.2.
-- `rerank`, `llm`: a cross-encoder score in [0, 1], clustered high (0.77–1.00 for
+- `rerank`: a cross-encoder score in [0, 1], clustered high (0.77–1.00 for
   answerable items in the runs on disk).
 
 Writing one number into the config and pretending it means the same thing in all
@@ -14,6 +14,14 @@ three modes is how a system ends up abstaining on everything in hybrid and on
 nothing in rerank. So the sweep runs in a per-mode *normalized* space and reports
 the raw-scale equivalent of every threshold it prints, which is the number that
 can actually be written back into a config.
+
+**A curve is published per score scale, and nothing else.** Which model wrote the
+answer cannot move a curve that only reads the retrieval score, so the generator is
+recorded as a label column rather than as its own curve: an `llm` mode whose scale
+was rerank's produced `llm-pr.csv` byte-identical to `rerank-pr.csv`, which is a
+duplicate pretending to be a replication. Each curve also names the golden set it
+was measured on and lists the run directories it declined, because mixing a 20-item
+v0 population into a 60-item v1 one changes the denominator of every rate.
 
 Normalization is monotone, fitted on the run's own score distribution:
 
@@ -63,6 +71,7 @@ THRESHOLD_GRID: Tuple[float, ...] = tuple(
 
 OVER_ABSTAIN_BUDGET = 0.05
 CSV_COLUMNS = (
+    "generator",
     "t",
     "precision",
     "recall",
@@ -164,16 +173,6 @@ MODES: Dict[str, ModeSpec] = {
         "raw score is not a probability of answerability; the per-mode normal fit keeps "
         "the ordering and makes the sweep's t comparable with the other modes.",
     ),
-    "llm": ModeSpec(
-        mode="llm",
-        transform="zscore-normal-cdf",
-        scale="same cross-encoder score as rerank; generation is an LLM, but the "
-        "abstain threshold is still compared against the retrieval score",
-        prefixes=("llm",),
-        rationale="retrieval is rerank, so the scale is rerank's; the mode is swept "
-        "separately because generation changes which items ultimately abstain and the "
-        "score threshold has to leave room for that.",
-    ),
 }
 
 MODE_ORDER = tuple(MODES)
@@ -202,6 +201,11 @@ def mode_from_config(run_dir: Path) -> Optional[str]:
     reranked run with LLM generation and its scores live on the cross-encoder scale
     exactly like `real-llm`. Reading `config.json` makes the sweep work on any
     naming scheme, including the grid's `cell-*` names, without guessing.
+
+    The generator is not part of the answer. It cannot be: the threshold is compared
+    against the retrieval score, so `rerank` with a stub generator and `rerank` with a
+    hosted one sit on the same scale and belong on the same curve. The generator is
+    recorded as a label on that curve instead.
     """
     config_path = Path(run_dir) / "config.json"
     if not config_path.exists():
@@ -211,16 +215,27 @@ def mode_from_config(run_dir: Path) -> Optional[str]:
     except (OSError, json.JSONDecodeError):
         return None
     retrieval = (config.get("retrieval") or {}).get("mode")
-    generator = ((config.get("generate") or {}).get("provider")) or ""
-    if retrieval == "hybrid":
-        return "hybrid"
-    if retrieval == "rerank":
-        # Same cross-encoder scale either way; the split records whether a hosted
-        # model wrote the answer, which is what a reader comparing rows wants.
-        return "llm" if generator == "llm" else "rerank"
-    if retrieval == "dense":
-        return "dense" if "dense" in MODES else None
+    if retrieval in ("hybrid", "rerank", "dense"):
+        return retrieval
     return None
+
+
+def run_labels(run_dir: Path) -> Dict[str, str]:
+    """What a run directory says about itself: its generator and its golden set."""
+    config_path = Path(run_dir) / "config.json"
+    labels = {"generator": "", "golden": "", "golden_limit": ""}
+    if not config_path.exists():
+        return labels
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return labels
+    generate = config.get("generate") or {}
+    golden = config.get("golden") or {}
+    labels["generator"] = str(generate.get("provider") or "")
+    labels["golden"] = str(golden.get("items_path") or "")
+    labels["golden_limit"] = "" if golden.get("limit") is None else str(golden.get("limit"))
+    return labels
 
 
 # --- per-item observations -------------------------------------------------
@@ -236,6 +251,7 @@ class Item:
     run_id: str = ""
     abstained: bool = False
     retrieved: Tuple[Dict[str, Any], ...] = field(default=())
+    generator: str = ""
 
 
 def _score_of(hit: Dict[str, Any], run_name: str, item_id: str, where: str) -> float:
@@ -264,6 +280,7 @@ def load_items(run_dir: Path) -> List[Item]:
             "nothing to sweep."
         )
 
+    labels = run_labels(run_dir)
     items: List[Item] = []
     with predictions.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
@@ -299,6 +316,7 @@ def load_items(run_dir: Path) -> List[Item]:
                         }
                         for hit in ordered[:3]
                     ),
+                    generator=labels["generator"],
                 )
             )
     if not items:
@@ -335,7 +353,9 @@ def _classify(runs_root: Path) -> Tuple[Dict[str, List[Path]], List[str]]:
     return groups, skipped
 
 
-def collect_mode_items(run_paths: Sequence[Path]) -> List[Item]:
+def collect_mode_items(
+    run_paths: Sequence[Path], cache: Optional[Dict[str, List[Item]]] = None
+) -> List[Item]:
     """One row per golden item for a mode; the newest run supersedes older ones.
 
     Two runs of the same mode over the same golden set would otherwise double
@@ -344,11 +364,78 @@ def collect_mode_items(run_paths: Sequence[Path]) -> List[Item]:
     """
     merged: Dict[str, Item] = {}
     for path in sorted(Path(p) for p in run_paths):
-        for item in load_items(path):
+        key = str(path)
+        if cache is not None and key in cache:
+            rows = cache[key]
+        else:
+            rows = load_items(path)
+            if cache is not None:
+                cache[key] = rows
+        for item in rows:
             merged[item.item_id] = item
     if not merged:
         raise AbstainError("no items collected for this mode.")
     return [merged[item_id] for item_id in sorted(merged)]
+
+
+def select_population(
+    run_paths: Sequence[Path], cache: Optional[Dict[str, List[Item]]] = None
+) -> Dict[str, Any]:
+    """Pick the golden-set population a single curve may be drawn on.
+
+    Two runs of the same score scale can be measured on different golden sets --
+    v0's 20 items and v1's 60 among the runs on disk -- and putting them on one
+    curve mixes populations: the shared item ids are overwritten by whichever run
+    sorts last, and the items only one population has silently change every rate's
+    denominator. That is what made the committed curve a v0 measurement while its
+    ticket asked for v1.
+
+    So a mode's runs are partitioned by the golden set they answered, and the
+    partition with the most distinct items is the curve. The rest are reported as
+    excluded, with their size, instead of being dropped quietly.
+    """
+    cache = {} if cache is None else cache
+    partitions: Dict[Tuple[str, str], List[Path]] = {}
+    for path in sorted(Path(p) for p in run_paths):
+        labels = run_labels(path)
+        partitions.setdefault((labels["golden"], labels["golden_limit"]), []).append(path)
+
+    scored = []
+    for key, paths in partitions.items():
+        items = collect_mode_items(paths, cache)
+        scored.append(
+            {
+                "golden": key[0],
+                "golden_limit": key[1],
+                "paths": paths,
+                "items": len(items),
+                "answerable": sum(1 for item in items if item.answerable),
+                "newest": max(path.name for path in paths),
+            }
+        )
+    if not scored:
+        raise AbstainError("no items collected for this mode.")
+    scored.sort(key=lambda entry: (-entry["items"], -len(entry["paths"]), entry["newest"]))
+    chosen = scored[0]
+    excluded = [
+        {
+            "run_ids": [path.name for path in entry["paths"]],
+            "golden": entry["golden"] or "(not recorded)",
+            "golden_limit": entry["golden_limit"],
+            "items": entry["items"],
+            "reason": "different golden-set population from the curve's "
+            f"{chosen['items']} item(s) on {chosen['golden'] or '(not recorded)'}",
+        }
+        for entry in scored[1:]
+    ]
+    return {
+        "paths": chosen["paths"],
+        "golden": chosen["golden"],
+        "golden_limit": chosen["golden_limit"],
+        "items": chosen["items"],
+        "answerable": chosen["answerable"],
+        "excluded": excluded,
+    }
 
 
 def fit_transform(scores: Iterable[float], kind: str) -> ScoreTransform:
@@ -400,8 +487,14 @@ def curve(
     items: Sequence[Item],
     transform: ScoreTransform,
     grid: Sequence[float] = THRESHOLD_GRID,
+    generator: str = "",
 ) -> List[Dict[str, Any]]:
-    """One row per threshold: precision/recall plus both abstention error rates."""
+    """One row per threshold: precision/recall plus both abstention error rates.
+
+    `generator` is carried through as the curve's label. The curve is a function of
+    the retrieval score alone, so which model wrote the answer is recorded, never
+    swept: two generators on the same scale share one curve.
+    """
     answerable = [item for item in items if item.answerable]
     near_miss = [item for item in items if not item.answerable]
     if not answerable or not near_miss:
@@ -432,6 +525,7 @@ def curve(
         )
         points.append(
             {
+                "generator": generator,
                 "t": round(float(t), 4),
                 "precision": precision,
                 "recall": recall,
@@ -476,6 +570,7 @@ def _annotate(point: Dict[str, Any], budget: float, feasible: bool) -> Dict[str,
 
 
 def _write_csv(path: Path, points: Sequence[Dict[str, Any]]) -> None:
+    """One row per grid point; `generator` labels the curve, it is not a variable."""
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(CSV_COLUMNS)
@@ -563,6 +658,12 @@ def _plot(path: Path, mode: str, points, chosen, spec: ModeSpec, transform) -> N
     plt.close(figure)
 
 
+def _generator_label(items: Sequence[Item]) -> str:
+    """The generator(s) behind a curve, as one label column."""
+    labels = sorted({item.generator or "unknown" for item in items})
+    return "+".join(labels)
+
+
 def _justification(mode: str, chosen, points, spec: ModeSpec, items) -> str:
     answerable = sum(1 for item in items if item.answerable)
     near_miss = len(items) - answerable
@@ -594,17 +695,20 @@ def _justification(mode: str, chosen, points, spec: ModeSpec, items) -> str:
         f"is {chosen['precision']:.4f}."
     )
     scale = (
-        f" t is on the normalized scale ({spec.transform}): {spec.rationale} The grid "
-        f"spans t={floor:.4f}..{ceiling:.4f} on a nominal 0.05 step flattened to 18 "
-        f"points over [0.2, 0.9]. Only {chosen['raw_threshold']:.6g} may be written into "
-        f"`generate.abstain_score_threshold` for the {mode} mode; the normalized t "
-        "transfers nowhere else, and this raw number transfers to no other mode either."
+        f" t is on the normalized scale ({spec.transform}): {spec.rationale} The grid is "
+        f"18 points over [0.2, 0.9] on a 0.0412 step: the ticket fixes both the interval "
+        f"and the count, and a 0.05 step would fit only 15 points into the same interval, "
+        f"so the extra resolution is spent inside the endpoints rather than beyond them "
+        f"(t={floor:.4f}..{ceiling:.4f}). Only {chosen['raw_threshold']:.6g} may be "
+        f"written into `generate.abstain_score_threshold` for the {mode} mode; the "
+        "normalized t transfers nowhere else, and this raw number transfers to no other "
+        "mode either."
     )
     caveat = (
-        f" The curve rests on {answerable} answerable and {near_miss} near-miss items "
-        "from golden v0, so every rate moves in steps of "
-        f"1/{max(answerable, 1)} and the working point is a v0 estimate until golden v1 "
-        "is labelled."
+        f" The curve rests on {answerable} answerable and {near_miss} near-miss items of "
+        f"the golden set the run directories record, so every rate moves in steps of "
+        f"1/{max(answerable, 1)} and 1/{max(near_miss, 1)}; which generator produced the "
+        "answer is a label on the curve, never a swept variable."
     )
     return opening + body + scale + caveat
 
@@ -618,9 +722,11 @@ def _read_questions(run_dir: Path) -> Dict[str, str]:
         items_path = json.loads(config_path.read_text(encoding="utf-8"))["golden"]["items_path"]
     except (KeyError, ValueError, json.JSONDecodeError):
         return {}
+    if not str(items_path or "").strip():
+        return {}
     candidates = [Path(items_path), Path.cwd() / items_path]
     for candidate in candidates:
-        if candidate.exists():
+        if candidate.is_file():
             questions: Dict[str, str] = {}
             with candidate.open("r", encoding="utf-8") as handle:
                 for line in handle:
@@ -815,6 +921,11 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
             "the newest supersedes the older",
             "score": "top score = max over retrieved[] score, the quantity "
             "generate.abstain_score_threshold is compared against",
+            "population": "a curve is drawn on one golden-set population: the runs of a "
+            "mode are partitioned by the golden set they answered and the partition with "
+            "the most items wins; the others are listed under `excluded_runs`",
+            "label": "the curve is a function of the retrieval score, so the generator is "
+            "a label column (`generator`), never a published curve of its own",
         },
         "runs_root": str(runs_root),
         "unrouted_runs": skipped,
@@ -825,13 +936,16 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
     sections = []
     answerable_counts: Dict[str, int] = {}
     summary_rows: List[Dict[str, Any]] = []
+    item_cache: Dict[str, List[Item]] = {}
     for mode in order:
         spec = MODES[mode]
         run_paths = groups[mode]
         try:
-            items = collect_mode_items(run_paths)
+            population = select_population(run_paths, item_cache)
+            items = collect_mode_items(population["paths"], item_cache)
             transform = fit_transform((item.top_score for item in items), spec.transform)
-            points = curve(items, transform)
+            generators = _generator_label(items)
+            points = curve(items, transform, generator=generators)
             chosen = choose_working_point(points)
         except AbstainError as error:
             print(f"abstention sweep ({mode}): {error}")
@@ -845,6 +959,10 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
         retained: Dict[str, int] = {}
         for item in items:
             retained[item.run_id] = retained.get(item.run_id, 0) + 1
+        by_generator: Dict[str, int] = {}
+        for item in items:
+            label = item.generator or "unknown"
+            by_generator[label] = by_generator.get(label, 0) + 1
         answerable_counts[mode] = answerable
         payload["modes"][mode] = {
             **{key: chosen[key] for key in (
@@ -891,7 +1009,14 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
                 "must be a threshold the system can actually cross",
             },
             "scale": spec.scale,
-            "runs": [path.name for path in run_paths],
+            "generator": generators,
+            "items_by_generator": by_generator,
+            "golden": population["golden"],
+            "golden_limit": population["golden_limit"],
+            "applies_to_run_ids": sorted(path.name for path in population["paths"]),
+            "scoring_run_ids": sorted(retained),
+            "runs": [path.name for path in population["paths"]],
+            "excluded_runs": population["excluded"],
             "items": {"answerable": answerable, "near_miss": near_miss, "total": len(items)},
             "justification": _justification(mode, chosen, points, spec, items),
             "artifacts": [
@@ -902,15 +1027,17 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
         }
         payload["sources"][mode] = {
             path.name: {
-                "items_in_run": len(load_items(path)),
+                "items_in_run": len(item_cache.get(str(path)) or load_items(path)),
                 "rows_retained": retained.get(path.name, 0),
+                "golden": run_labels(path)["golden"],
+                "generator": run_labels(path)["generator"],
             }
-            for path in run_paths
+            for path in population["paths"]
         }
 
         # The showcase needs text, which lives in the run's own chunks.jsonl; read
         # only the chunk ids the displayed near-misses actually cite.
-        by_run_id = {path.name: path for path in run_paths}
+        by_run_id = {path.name: path for path in population["paths"]}
         wanted: Dict[str, set] = {}
         for item in _hardest_near_misses(items, transform):
             path = by_run_id.get(item.run_id)
@@ -930,7 +1057,7 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
                 items,
                 transform,
                 spec,
-                _read_questions(run_paths[-1]),
+                _read_questions(population["paths"][-1]),
                 chunks_by_run,
             )
         )
@@ -940,7 +1067,9 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
                 "chosen": chosen,
                 "answerable": answerable,
                 "near_miss": near_miss,
-                "runs": len(run_paths),
+                "runs": len(population["paths"]),
+                "excluded": len(population["excluded"]),
+                "generator": generators,
             }
         )
 
@@ -959,7 +1088,8 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
             f"over={chosen['over_abstain_rate_on_answerable']:.3f} "
             f"under={chosen['under_abstain_rate_on_near_miss']:.3f} "
             f"({'feasible' if chosen['constraint_feasible'] else 'budget infeasible'}) "
-            f"n={row['answerable']}+{row['near_miss']} from {row['runs']} run(s)"
+            f"n={row['answerable']}+{row['near_miss']} from {row['runs']} run(s), "
+            f"generator={row['generator']}, {row['excluded']} run(s) excluded"
         )
     print(f"wrote {directory}")
     return 0

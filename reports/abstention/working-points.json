@@ -14,84 +14,206 @@
     "working_point_rule": "maximise F1 of the answer class subject to over_abstain_rate_on_answerable <= 0.05; if infeasible at every t, choose the smallest over-abstain rate and break ties on F1; ties always go to the largest t",
     "budget": 0.05,
     "dedupe": "one row per golden item_id per mode; when a mode has several runs the newest supersedes the older",
-    "score": "top score = max over retrieved[] score, the quantity generate.abstain_score_threshold is compared against"
+    "score": "top score = max over retrieved[] score, the quantity generate.abstain_score_threshold is compared against",
+    "population": "a curve is drawn on one golden-set population: the runs of a mode are partitioned by the golden set they answered and the partition with the most items wins; the others are listed under `excluded_runs`",
+    "label": "the curve is a function of the retrieval score, so the generator is a label column (`generator`), never a published curve of its own"
   },
-  "runs_root": "D:\\DE Project\\Project\\runs",
+  "runs_root": "D:\\DE Project\\wt\\exp\\runs",
   "unrouted_runs": [],
   "sources": {
-    "hybrid": {
-      "real-hybrid-20261030T091924-f1742d4e": {
-        "items_in_run": 20,
-        "rows_retained": 0
+    "dense": {
+      "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
       },
-      "real-hybrid-20261030T092148-08d22872": {
-        "items_in_run": 20,
-        "rows_retained": 20
+      "grid-fixed-dense-plain-20261030T124637-8ae4eb06": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
+      },
+      "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e": {
+        "items_in_run": 60,
+        "rows_retained": 60,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
+      }
+    },
+    "hybrid": {
+      "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
+      },
+      "grid-fixed-hybrid-plain-20261030T125429-6170ae66": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
+      },
+      "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e": {
+        "items_in_run": 60,
+        "rows_retained": 60,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
       }
     },
     "rerank": {
-      "real-rerank-20261030T092425-8d738820": {
-        "items_in_run": 20,
-        "rows_retained": 0
+      "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
       },
-      "real-rerank-20261030T093154-2ebd65d2": {
-        "items_in_run": 20,
-        "rows_retained": 0
+      "grid-fixed-rerank-plain-20261030T125648-57be667d": {
+        "items_in_run": 60,
+        "rows_retained": 0,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
       },
-      "real-rerank-20261030T095541-a6eb2d5e": {
-        "items_in_run": 20,
-        "rows_retained": 20
-      }
-    },
-    "llm": {
-      "real-llm-20261030T112955-6dba1b8f": {
-        "items_in_run": 20,
-        "rows_retained": 0
-      },
-      "real-llm-20261030T113427-6dba1b8f": {
-        "items_in_run": 20,
-        "rows_retained": 0
-      },
-      "real-llm-20261030T113604-a5c0a3e4": {
-        "items_in_run": 20,
-        "rows_retained": 20
+      "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910": {
+        "items_in_run": 60,
+        "rows_retained": 60,
+        "golden": "golden/v1.jsonl",
+        "generator": "llm"
       }
     }
   },
   "modes": {
-    "hybrid": {
-      "t": 0.4059,
-      "raw_threshold": 0.030432,
-      "precision": 0.555556,
-      "recall": 1.0,
-      "f1": 0.714286,
-      "over_abstain_rate_on_answerable": 0.0,
-      "under_abstain_rate_on_near_miss": 0.8,
-      "answerable_answered": 10,
-      "answerable_total": 10,
-      "near_miss_answered": 8,
-      "near_miss_total": 10,
+    "dense": {
+      "t": 0.5706,
+      "raw_threshold": 0.5706,
+      "precision": 0.690909,
+      "recall": 0.95,
+      "f1": 0.8,
+      "over_abstain_rate_on_answerable": 0.05,
+      "under_abstain_rate_on_near_miss": 0.85,
+      "answerable_answered": 38,
+      "answerable_total": 40,
+      "near_miss_answered": 17,
+      "near_miss_total": 20,
       "constraint_feasible": true,
       "budget": 0.05,
       "config_write_back": {
         "key": "generate.abstain_score_threshold",
-        "value": 0.030432,
+        "value": 0.5706,
+        "mode": "dense"
+      },
+      "curve": {
+        "precision_at_t_min": 0.666667,
+        "precision_at_t_max": 0.0,
+        "best_f1": 0.8,
+        "best_f1_t": 0.2,
+        "f1_at_t_min": 0.8,
+        "f1_at_t_max": 0.0,
+        "points": 18
+      },
+      "transform": {
+        "kind": "identity",
+        "fitted_mean": 0.645542,
+        "fitted_stdev": 0.048768,
+        "fitted_count": 60,
+        "raw_low": 0.535599,
+        "raw_high": 0.766378,
+        "forward": "identity: p = score",
+        "inverse": "raw = p"
+      },
+      "grid_support": {
+        "observed_raw_low": 0.535599,
+        "observed_raw_high": 0.766378,
+        "t_raw_above_observed_high": [
+          0.7765,
+          0.8176,
+          0.8588,
+          0.9
+        ],
+        "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
+      },
+      "scale": "cosine similarity in [0, 1] from the dense branch",
+      "generator": "llm",
+      "items_by_generator": {
+        "llm": 60
+      },
+      "golden": "golden/v1.jsonl",
+      "golden_limit": "",
+      "applies_to_run_ids": [
+        "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+        "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+        "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e"
+      ],
+      "scoring_run_ids": [
+        "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e"
+      ],
+      "runs": [
+        "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+        "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+        "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e"
+      ],
+      "excluded_runs": [
+        {
+          "run_ids": [
+            "judge-smoke-20261030T122905-b67fc09f",
+            "smoke-20261030T085149-9d616d8d",
+            "smoke-20261030T085151-9d616d8d",
+            "smoke-20261030T085227-9d616d8d",
+            "smoke-20261030T090817-d26d03f7",
+            "smoke-20261030T094511-25b8cc8d",
+            "smoke-20261030T120804-540d0c0b"
+          ],
+          "golden": "fixtures/smoke/golden.jsonl",
+          "golden_limit": "5",
+          "items": 5,
+          "reason": "different golden-set population from the curve's 60 item(s) on golden/v1.jsonl"
+        }
+      ],
+      "items": {
+        "answerable": 40,
+        "near_miss": 20,
+        "total": 60
+      },
+      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.8000 at t=0.5706, which is the raw score 0.5706 for this mode. There it answers 38/40 answerable items (over-abstain 0.0500, recall 0.9500) and answers 17/20 near-misses (under-abstain 0.8500), so precision is 0.6909. t is on the normalized scale (identity): cosine is already a bounded similarity; normalizing it would discard the meaning of the number the reader recognizes. The grid is 18 points over [0.2, 0.9] on a 0.0412 step: the ticket fixes both the interval and the count, and a 0.05 step would fit only 15 points into the same interval, so the extra resolution is spent inside the endpoints rather than beyond them (t=0.2000..0.9000). Only 0.5706 may be written into `generate.abstain_score_threshold` for the dense mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 40 answerable and 20 near-miss items of the golden set the run directories record, so every rate moves in steps of 1/40 and 1/20; which generator produced the answer is a label on the curve, never a swept variable.",
+      "artifacts": [
+        "dense-pr.csv",
+        "dense-pr.png",
+        "near-miss-examples.md"
+      ]
+    },
+    "hybrid": {
+      "t": 0.2824,
+      "raw_threshold": 0.028606,
+      "precision": 0.660714,
+      "recall": 0.925,
+      "f1": 0.770833,
+      "over_abstain_rate_on_answerable": 0.075,
+      "under_abstain_rate_on_near_miss": 0.95,
+      "answerable_answered": 37,
+      "answerable_total": 40,
+      "near_miss_answered": 19,
+      "near_miss_total": 20,
+      "constraint_feasible": false,
+      "budget": 0.05,
+      "config_write_back": {
+        "key": "generate.abstain_score_threshold",
+        "value": 0.028606,
         "mode": "hybrid"
       },
       "curve": {
-        "precision_at_t_min": 0.526316,
+        "precision_at_t_min": 0.660714,
         "precision_at_t_max": 0.0,
-        "best_f1": 0.714286,
-        "best_f1_t": 0.3647,
-        "f1_at_t_min": 0.689655,
+        "best_f1": 0.772727,
+        "best_f1_t": 0.5294,
+        "f1_at_t_min": 0.770833,
         "f1_at_t_max": 0.0,
         "points": 18
       },
       "transform": {
         "kind": "zscore-normal-cdf",
-        "fitted_mean": 0.031268,
-        "fitted_stdev": 0.00351,
-        "fitted_count": 20,
+        "fitted_mean": 0.03089,
+        "fitted_stdev": 0.003967,
+        "fitted_count": 60,
         "raw_low": 0.016393,
         "raw_high": 0.032787,
         "forward": "p = Phi((score - mean) / stdev)",
@@ -111,16 +233,54 @@
         "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
       },
       "scale": "RRF fused sum, ~1/(rrf_k + rank); with rrf_k=60 and k=10 the observed range is about [0.015, 0.035], so no threshold in [0.2, 0.9] is reachable raw",
+      "generator": "llm",
+      "items_by_generator": {
+        "llm": 60
+      },
+      "golden": "golden/v1.jsonl",
+      "golden_limit": "",
+      "applies_to_run_ids": [
+        "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+        "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+        "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e"
+      ],
+      "scoring_run_ids": [
+        "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e"
+      ],
       "runs": [
-        "real-hybrid-20261030T091924-f1742d4e",
-        "real-hybrid-20261030T092148-08d22872"
+        "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+        "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+        "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e"
+      ],
+      "excluded_runs": [
+        {
+          "run_ids": [
+            "real-hybrid-20261030T091924-f1742d4e",
+            "real-hybrid-20261030T092148-08d22872"
+          ],
+          "golden": "golden/v0.jsonl",
+          "golden_limit": "",
+          "items": 20,
+          "reason": "different golden-set population from the curve's 60 item(s) on golden/v1.jsonl"
+        },
+        {
+          "run_ids": [
+            "smoke-prefix-20261030T121107-788c2098",
+            "smoke-prefix-20261030T121131-788c2098",
+            "smoke-prefix-20261030T121401-3b1394e9"
+          ],
+          "golden": "fixtures/smoke/golden.jsonl",
+          "golden_limit": "5",
+          "items": 5,
+          "reason": "different golden-set population from the curve's 60 item(s) on golden/v1.jsonl"
+        }
       ],
       "items": {
-        "answerable": 10,
-        "near_miss": 10,
-        "total": 20
+        "answerable": 40,
+        "near_miss": 20,
+        "total": 60
       },
-      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.7143 at t=0.4059, which is the raw score 0.030432 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 8/10 near-misses (under-abstain 0.8000), so precision is 0.5556. t is on the normalized scale (zscore-normal-cdf): the RRF sum is an unbounded-ish reciprocal-rank artifact with no absolute meaning; its z-score against the run's own distribution is the only comparable quantity, and the inverse maps every t back to a raw sum. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.030432 may be written into `generate.abstain_score_threshold` for the hybrid mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
+      "justification": "The over-abstention budget of 0.05 is infeasible at every one of the 18 grid points: even at the lowest t the smallest achievable over-abstention is 0.0750. The rule then asks for the smallest over-abstention rate and breaks the tie on F1, which lands on t=0.2824 (raw 0.028606). There it answers 37/40 answerable items (over-abstain 0.0750, recall 0.9250) and answers 19/20 near-misses (under-abstain 0.9500), so precision is 0.6607. t is on the normalized scale (zscore-normal-cdf): the RRF sum is an unbounded-ish reciprocal-rank artifact with no absolute meaning; its z-score against the run's own distribution is the only comparable quantity, and the inverse maps every t back to a raw sum. The grid is 18 points over [0.2, 0.9] on a 0.0412 step: the ticket fixes both the interval and the count, and a 0.05 step would fit only 15 points into the same interval, so the extra resolution is spent inside the endpoints rather than beyond them (t=0.2000..0.9000). Only 0.028606 may be written into `generate.abstain_score_threshold` for the hybrid mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 40 answerable and 20 near-miss items of the golden set the run directories record, so every rate moves in steps of 1/40 and 1/20; which generator produced the answer is a label on the curve, never a swept variable.",
       "artifacts": [
         "hybrid-pr.csv",
         "hybrid-pr.png",
@@ -128,134 +288,105 @@
       ]
     },
     "rerank": {
-      "t": 0.4471,
-      "raw_threshold": 0.75925,
-      "precision": 0.714286,
-      "recall": 1.0,
-      "f1": 0.833334,
-      "over_abstain_rate_on_answerable": 0.0,
-      "under_abstain_rate_on_near_miss": 0.4,
-      "answerable_answered": 10,
-      "answerable_total": 10,
-      "near_miss_answered": 4,
-      "near_miss_total": 10,
-      "constraint_feasible": true,
+      "t": 0.2,
+      "raw_threshold": 0.426134,
+      "precision": 0.73913,
+      "recall": 0.85,
+      "f1": 0.790697,
+      "over_abstain_rate_on_answerable": 0.15,
+      "under_abstain_rate_on_near_miss": 0.6,
+      "answerable_answered": 34,
+      "answerable_total": 40,
+      "near_miss_answered": 12,
+      "near_miss_total": 20,
+      "constraint_feasible": false,
       "budget": 0.05,
       "config_write_back": {
         "key": "generate.abstain_score_threshold",
-        "value": 0.75925,
+        "value": 0.426134,
         "mode": "rerank"
       },
       "curve": {
-        "precision_at_t_min": 0.625,
+        "precision_at_t_min": 0.73913,
         "precision_at_t_max": 0.0,
-        "best_f1": 0.857143,
-        "best_f1_t": 0.6529,
-        "f1_at_t_min": 0.769231,
+        "best_f1": 0.810811,
+        "best_f1_t": 0.5294,
+        "f1_at_t_min": 0.790697,
         "f1_at_t_max": 0.0,
         "points": 18
       },
       "transform": {
         "kind": "zscore-normal-cdf",
-        "fitted_mean": 0.793426,
-        "fitted_stdev": 0.256976,
-        "fitted_count": 20,
-        "raw_low": 0.101169,
-        "raw_high": 0.998754,
+        "fitted_mean": 0.67231,
+        "fitted_stdev": 0.292501,
+        "fitted_count": 60,
+        "raw_low": 0.02601,
+        "raw_high": 0.999475,
         "forward": "p = Phi((score - mean) / stdev)",
         "inverse": "raw = mean + stdev * Phi^-1(p)"
       },
       "grid_support": {
-        "observed_raw_low": 0.101169,
-        "observed_raw_high": 0.998754,
+        "observed_raw_low": 0.02601,
+        "observed_raw_high": 0.999475,
         "t_raw_above_observed_high": [
-          0.8176,
-          0.8588,
           0.9
         ],
         "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
       },
       "scale": "cross-encoder score in [0, 1], clustered high: answerable items in the runs on disk score 0.77-1.00 while near-misses reach 0.97",
+      "generator": "llm",
+      "items_by_generator": {
+        "llm": 60
+      },
+      "golden": "golden/v1.jsonl",
+      "golden_limit": "",
+      "applies_to_run_ids": [
+        "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+        "grid-fixed-rerank-plain-20261030T125648-57be667d",
+        "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910"
+      ],
+      "scoring_run_ids": [
+        "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910"
+      ],
       "runs": [
-        "real-rerank-20261030T092425-8d738820",
-        "real-rerank-20261030T093154-2ebd65d2",
-        "real-rerank-20261030T095541-a6eb2d5e"
+        "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+        "grid-fixed-rerank-plain-20261030T125648-57be667d",
+        "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910"
+      ],
+      "excluded_runs": [
+        {
+          "run_ids": [
+            "real-llm-20261030T112955-6dba1b8f",
+            "real-llm-20261030T113427-6dba1b8f",
+            "real-llm-20261030T113604-a5c0a3e4",
+            "real-rerank-20261030T092425-8d738820",
+            "real-rerank-20261030T093154-2ebd65d2",
+            "real-rerank-20261030T095541-a6eb2d5e"
+          ],
+          "golden": "golden/v0.jsonl",
+          "golden_limit": "",
+          "items": 20,
+          "reason": "different golden-set population from the curve's 60 item(s) on golden/v1.jsonl"
+        },
+        {
+          "run_ids": [
+            "ctx-plain-20261030T121513-d8c10497"
+          ],
+          "golden": "golden/v0.jsonl",
+          "golden_limit": "5",
+          "items": 5,
+          "reason": "different golden-set population from the curve's 60 item(s) on golden/v1.jsonl"
+        }
       ],
       "items": {
-        "answerable": 10,
-        "near_miss": 10,
-        "total": 20
+        "answerable": 40,
+        "near_miss": 20,
+        "total": 60
       },
-      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.8333 at t=0.4471, which is the raw score 0.75925 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 4/10 near-misses (under-abstain 0.4000), so precision is 0.7143. t is on the normalized scale (zscore-normal-cdf): the cross-encoder is calibrated towards the positive class, so its raw score is not a probability of answerability; the per-mode normal fit keeps the ordering and makes the sweep's t comparable with the other modes. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.75925 may be written into `generate.abstain_score_threshold` for the rerank mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
+      "justification": "The over-abstention budget of 0.05 is infeasible at every one of the 18 grid points: even at the lowest t the smallest achievable over-abstention is 0.1500. The rule then asks for the smallest over-abstention rate and breaks the tie on F1, which lands on t=0.2000 (raw 0.426134). There it answers 34/40 answerable items (over-abstain 0.1500, recall 0.8500) and answers 12/20 near-misses (under-abstain 0.6000), so precision is 0.7391. t is on the normalized scale (zscore-normal-cdf): the cross-encoder is calibrated towards the positive class, so its raw score is not a probability of answerability; the per-mode normal fit keeps the ordering and makes the sweep's t comparable with the other modes. The grid is 18 points over [0.2, 0.9] on a 0.0412 step: the ticket fixes both the interval and the count, and a 0.05 step would fit only 15 points into the same interval, so the extra resolution is spent inside the endpoints rather than beyond them (t=0.2000..0.9000). Only 0.426134 may be written into `generate.abstain_score_threshold` for the rerank mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 40 answerable and 20 near-miss items of the golden set the run directories record, so every rate moves in steps of 1/40 and 1/20; which generator produced the answer is a label on the curve, never a swept variable.",
       "artifacts": [
         "rerank-pr.csv",
         "rerank-pr.png",
-        "near-miss-examples.md"
-      ]
-    },
-    "llm": {
-      "t": 0.4471,
-      "raw_threshold": 0.75925,
-      "precision": 0.714286,
-      "recall": 1.0,
-      "f1": 0.833334,
-      "over_abstain_rate_on_answerable": 0.0,
-      "under_abstain_rate_on_near_miss": 0.4,
-      "answerable_answered": 10,
-      "answerable_total": 10,
-      "near_miss_answered": 4,
-      "near_miss_total": 10,
-      "constraint_feasible": true,
-      "budget": 0.05,
-      "config_write_back": {
-        "key": "generate.abstain_score_threshold",
-        "value": 0.75925,
-        "mode": "llm"
-      },
-      "curve": {
-        "precision_at_t_min": 0.625,
-        "precision_at_t_max": 0.0,
-        "best_f1": 0.857143,
-        "best_f1_t": 0.6529,
-        "f1_at_t_min": 0.769231,
-        "f1_at_t_max": 0.0,
-        "points": 18
-      },
-      "transform": {
-        "kind": "zscore-normal-cdf",
-        "fitted_mean": 0.793426,
-        "fitted_stdev": 0.256976,
-        "fitted_count": 20,
-        "raw_low": 0.101169,
-        "raw_high": 0.998754,
-        "forward": "p = Phi((score - mean) / stdev)",
-        "inverse": "raw = mean + stdev * Phi^-1(p)"
-      },
-      "grid_support": {
-        "observed_raw_low": 0.101169,
-        "observed_raw_high": 0.998754,
-        "t_raw_above_observed_high": [
-          0.8176,
-          0.8588,
-          0.9
-        ],
-        "note": "those t points sit past the highest score any run in this mode produced, so their raw thresholds are extrapolations of the fitted normal rather than reachable numbers; they stay in the curve for completeness and are never candidates for the working point, which must be a threshold the system can actually cross"
-      },
-      "scale": "same cross-encoder score as rerank; generation is an LLM, but the abstain threshold is still compared against the retrieval score",
-      "runs": [
-        "real-llm-20261030T112955-6dba1b8f",
-        "real-llm-20261030T113427-6dba1b8f",
-        "real-llm-20261030T113604-a5c0a3e4"
-      ],
-      "items": {
-        "answerable": 10,
-        "near_miss": 10,
-        "total": 20
-      },
-      "justification": "Applied the pre-registered rule: among the 18 grid points, the largest F1 whose over-abstention on answerable items stays inside the 0.05 budget is F1=0.8333 at t=0.4471, which is the raw score 0.75925 for this mode. There it answers 10/10 answerable items (over-abstain 0.0000, recall 1.0000) and answers 4/10 near-misses (under-abstain 0.4000), so precision is 0.7143. t is on the normalized scale (zscore-normal-cdf): retrieval is rerank, so the scale is rerank's; the mode is swept separately because generation changes which items ultimately abstain and the score threshold has to leave room for that. The grid spans t=0.2000..0.9000 on a nominal 0.05 step flattened to 18 points over [0.2, 0.9]. Only 0.75925 may be written into `generate.abstain_score_threshold` for the llm mode; the normalized t transfers nowhere else, and this raw number transfers to no other mode either. The curve rests on 10 answerable and 10 near-miss items from golden v0, so every rate moves in steps of 1/10 and the working point is a v0 estimate until golden v1 is labelled.",
-      "artifacts": [
-        "llm-pr.csv",
-        "llm-pr.png",
         "near-miss-examples.md"
       ]
     }

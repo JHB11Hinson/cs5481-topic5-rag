@@ -413,3 +413,63 @@ def test_regeneration_from_the_same_runs_is_byte_identical() -> None:
     finally:
         for path in (root, first, second):
             shutil.rmtree(path, ignore_errors=True)
+
+
+# ---- judge confusion -------------------------------------------------------
+
+
+def test_judge_confusion_message_names_the_grid_and_the_runs_outside_it() -> None:
+    """The note said "absent from every run directory"; a smoke run carries one."""
+    root = _temp("agg-judge-")
+    try:
+        metrics = _metrics()
+        metrics["grounding"] = dict(metrics["grounding"])
+        metrics["grounding"]["judge_confusion"] = {
+            "both_supported": 3,
+            "neither": 1,
+            "nli_only": 0,
+            "judge_only": 2,
+        }
+        # A finished grid cell without the judge, an unfinished one, and a run
+        # directory that is not a cell at all (the judge smoke test).
+        _write_run(root, "grid-fixed-dense-plain-20260101T000000-aaaaaaaa", _metrics())
+        os.makedirs(os.path.join(root, "grid-fixed-hybrid-plain-20260101T000000-bbbbbbbb"))
+        _write_run(root, "judge-smoke-20260101T000000-b67fc09f", metrics)
+
+        runs = aggregate.scan_runs(root)
+        rows = aggregate.matrix_rows(root, _design(), runs=runs)
+        table = aggregate.judge_table(rows, notes_dir=os.path.join(root, "notes"), runs=runs)
+
+        assert table["runs_with_confusion"] == [], table["runs_with_confusion"]
+        outside = [entry["run_id"] for entry in table["confusion_outside_grid"]]
+        assert outside == ["judge-smoke-20260101T000000-b67fc09f"], outside
+
+        rendered = aggregate._render_judges_md(table)
+        assert "absent from every run directory" not in rendered, rendered
+        assert "No finished **grid cell** ran with the judge enabled" in rendered, rendered
+        assert "judge-smoke-20260101T000000-b67fc09f" in rendered, rendered
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def test_judge_confusion_of_a_finished_cell_is_reported_as_the_cells() -> None:
+    root = _temp("agg-judge-cell-")
+    try:
+        metrics = _metrics()
+        metrics["grounding"] = dict(metrics["grounding"])
+        metrics["grounding"]["judge_confusion"] = {
+            "both_supported": 5,
+            "neither": 0,
+            "nli_only": 1,
+            "judge_only": 0,
+        }
+        _write_run(root, "grid-fixed-dense-plain-20260101T000000-aaaaaaaa", metrics)
+        runs = aggregate.scan_runs(root)
+        rows = aggregate.matrix_rows(root, _design(), runs=runs)
+        table = aggregate.judge_table(rows, notes_dir=os.path.join(root, "notes"), runs=runs)
+        assert [entry["cell"] for entry in table["runs_with_confusion"]] == [
+            "cell-fixed-dense-plain"
+        ], table["runs_with_confusion"]
+        assert table["confusion_outside_grid"] == [], table["confusion_outside_grid"]
+    finally:
+        shutil.rmtree(root, ignore_errors=True)

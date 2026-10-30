@@ -109,5 +109,42 @@ def test_llm_judge_parses_a_fenced_reply_and_records_cost():
     assert judge.last_stats["tokens_in"] == 100
 
     garbage = judges.LLMJudge(Client("the model rambled"), "m")
-    assert garbage.judge("claim", "evidence")["supported"] is False
+    # Not parseable is "not judged", not "rejected": see
+    # test_an_unparseable_judge_reply_is_not_a_rejection.
+    assert garbage.judge("claim", "evidence")["supported"] is None
     assert garbage.last_stats["parse_failures"] == 1
+
+
+def test_an_unparseable_judge_reply_is_not_a_rejection():
+    """A parse failure is the judge's defect, not a verdict about the citation."""
+
+    class Client:
+        def complete(self, model, messages, max_tokens=200, json_mode=False):
+            return {"text": "the model rambled", "tokens_in": 90, "tokens_out": 12}
+
+    judge = judges.LLMJudge(Client(), "m")
+    outcome = judge.judge("claim", "evidence")
+    assert outcome["supported"] is None, outcome
+    assert outcome["error_class"] == "judge_parse_failure", outcome
+    assert judge.last_stats["parse_failures"] == 1, judge.last_stats
+    assert judge.last_stats["supported"] == 0, judge.last_stats
+
+
+def test_an_unjudged_claim_keeps_the_containment_verdict():
+    """None means "not judged", so the AND-rule must not read it as "rejected"."""
+    claim = _claim()
+    retrieved = _retrieved()
+    verdicts = verify.check_claims([claim], retrieved)
+    stack = judges.SupportJudges(nli=None, llm=judges.LLMJudge(_RamblingClient(), "m"))
+    stack.judge_claim(claim, verdicts[0], retrieved)
+
+    assert verdicts[0]["judge_supported"] is None, verdicts[0]
+    assert verdicts[0]["judge_error_class"] == "judge_parse_failure", verdicts[0]
+    # Containment passed and no layer rejected the claim, so it stays supported.
+    assert verdicts[0]["supported"] is True, verdicts[0]
+    assert verdicts[0]["error_class"] == "", verdicts[0]
+
+
+class _RamblingClient:
+    def complete(self, model, messages, max_tokens=200, json_mode=False):
+        return {"text": "I think this is probably fine", "tokens_in": 90, "tokens_out": 8}

@@ -1,4 +1,4 @@
-label,family,x,status,run_id,recall_at_k,mrr,ndcg_at_10,citation_precision,citation_recall,span_hit_rate,over_abstain_rate,p50_ms,p95_ms,tokens,cny_per_1k,answers,hops,mean_hops,stop_hit_first_round,stop_hit_after_rewrite,stop_cap_reached,stop_abstained,delta_recall,delta_citation_precision,delta_p50_ms,delta_cny_per_1k,incremental_cny_per_recall_point
-chunk-256,chunk,256,pending,,,,,,,,,,,,,,1,,,,,,,,,,
-chunk-512,chunk,512,pending,,,,,,,,,,,,,,1,,,,,,,,,,
-chunk-1024,chunk,1024,pending,,,,,,,,,,,,,,1,,,,,,,,,,
+label,family,x,status,run_id,recall_at_k,mrr,ndcg_at_10,citation_precision,citation_recall,span_hit_rate,over_abstain_rate,p50_ms,p95_ms,tokens,cny_per_1k,answers,negatives,hops,mean_hops,stop_hit_first_round,stop_hit_after_rewrite,stop_cap_reached,stop_abstained,delta_recall,delta_citation_precision,delta_p50_ms,delta_cny_per_1k,incremental_cny_per_recall_point
+chunk-256,chunk,256,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
+chunk-512,chunk,512,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
+chunk-1024,chunk,1024,pending,,,,,,,,,,,,,,,1,,,,,,,,,,

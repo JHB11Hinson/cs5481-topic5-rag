@@ -21,6 +21,7 @@ Two things are computed rather than asserted:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -34,9 +35,7 @@ IDENTITY_KEYS = frozenset(
 
 # Which config keys move together as one experimental factor. A factor can span
 # several keys when the keys are one decision: a generator swap has to carry the
-# generator's price or its cost column would describe the old model, and the
-# MiniLM cell is defined as dense-only because the cross-encoder would repair the
-# recall the cell exists to measure.
+# generator's price or its cost column would describe the old model.
 FACTOR_GROUPS: Dict[str, frozenset] = {
     "baseline-policy": frozenset(
         {
@@ -54,9 +53,13 @@ FACTOR_GROUPS: Dict[str, frozenset] = {
             "embed.batch_size",
             "embed.max_seq_length",
             "embed.cache_path",
-            "retrieval.mode",
         }
     ),
+    # Its own factor, not part of the embedder: switching the embedder is one
+    # decision, and dropping the cross-encoder is another. Folding the two together
+    # let a cell that moves both -- `embed-minilm` does -- certify as a single-factor
+    # ablation, which is exactly the claim the table exists to check.
+    "retrieval-mode": frozenset({"retrieval.mode"}),
     "generator-model": frozenset(
         {
             "generate.provider",
@@ -175,6 +178,48 @@ def differing_factors(diff: Iterable[str]) -> List[str]:
     return sorted(factors)
 
 
+#: What the ablation verdict says beside a row. `IDENTICAL` is its own answer: a
+#: pair that differs in nothing is not a single-factor ablation, it is two copies
+#: of the same cell, and it must not be certified as one.
+REFERENCE_VERDICT = "reference"
+IDENTICAL_VERDICT = "IDENTICAL"
+ONE_FACTOR_VERDICT = "ONE_FACTOR"
+MULTIPLE_FACTORS_VERDICT = "MULTIPLE_FACTORS"
+
+
+def ablation_verdict(reference, other) -> Dict[str, Any]:
+    """How many declared factors separate two configurations, and whether that is one.
+
+    ADR-0003 asks an ablation to differ in exactly one factor. `<= 1` was wrong in
+    both directions: it certified an identical pair (zero factors) as a valid
+    single-factor ablation, and it hid a cell that moved two keys of the same group
+    in opposite directions behind one factor name.
+    """
+    if reference is None:
+        return {
+            "differing_factors": [],
+            "differing_keys": [],
+            "factor_count": 0,
+            "ceteris_paribus": False,
+            "ablation_verdict": REFERENCE_VERDICT,
+        }
+    diff = substantive_diff(reference, other)
+    factors = differing_factors(diff)
+    if not factors:
+        verdict = IDENTICAL_VERDICT
+    elif len(factors) == 1:
+        verdict = ONE_FACTOR_VERDICT
+    else:
+        verdict = MULTIPLE_FACTORS_VERDICT
+    return {
+        "differing_factors": factors,
+        "differing_keys": sorted(diff),
+        "factor_count": len(factors),
+        "ceteris_paribus": len(factors) == 1,
+        "ablation_verdict": verdict,
+    }
+
+
 # --------------------------------------------------------------------------- #
 # McNemar
 # --------------------------------------------------------------------------- #
@@ -276,8 +321,15 @@ def load_run(path: str) -> Dict[str, Any]:
     }
 
 
-def item_outcomes(run: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    """Per-item binary outcomes, computed from the run's own artifacts."""
+def per_item_outcomes(run: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Per-item binary outcomes for one run, computed from its own artifacts.
+
+    Named `per_item_outcomes` rather than `item_outcomes` because
+    `aggregate.item_outcomes` is a different function: that one takes a run's loaded
+    items and returns a bundle with recomputed rates, this one takes a `load_run`
+    result and returns one record per item. Two functions with one name across two
+    modules is how a reader ends up calling the wrong one.
+    """
     misses = set(run["metrics"].get("retrieval", {}).get("misses") or [])
     outcomes: Dict[str, Dict[str, Any]] = {}
     for item_id, prediction in run["predictions"].items():
@@ -327,7 +379,7 @@ def _cny_per_1k(run: Dict[str, Any]) -> float:
 def _row(run: Dict[str, Any], reference: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     metrics = run["metrics"]
     grounding = metrics.get("grounding") or {}
-    outcomes = item_outcomes(run)
+    outcomes = per_item_outcomes(run)
     answerable = {item for item, entry in outcomes.items() if entry["answerable"]}
     tokens_in, tokens_out = _tokens(run)
 
@@ -383,7 +435,15 @@ def _row(run: Dict[str, Any], reference: Optional[Dict[str, Any]]) -> Dict[str, 
         ),
         "differing_keys_vs_reference": sorted(diff),
         "differing_factors_vs_reference": factors,
-        "ceteris_paribus": reference is None or len(factors) <= 1,
+        "factor_count": len(factors) if reference else 0,
+        # Exactly one factor, not "at most one": an identical pair is not an ablation.
+        "ceteris_paribus": bool(reference) and len(factors) == 1,
+        "ablation_verdict": (
+            REFERENCE_VERDICT if reference is None
+            else IDENTICAL_VERDICT if not factors
+            else ONE_FACTOR_VERDICT if len(factors) == 1
+            else MULTIPLE_FACTORS_VERDICT
+        ),
         "golden_items_path": run["config"].get("golden.items_path", ""),
     }
 
@@ -395,8 +455,8 @@ def _row(run: Dict[str, Any], reference: Optional[Dict[str, Any]]) -> Dict[str, 
 
 def _paired(run, reference, metric: str) -> Tuple[List[str], List[Tuple[bool, bool]]]:
     field = OUTCOME_FIELD[metric]
-    left = item_outcomes(reference)
-    right = item_outcomes(run)
+    left = per_item_outcomes(reference)
+    right = per_item_outcomes(run)
     shared = [
         item
         for item in sorted(set(left) & set(right))
@@ -553,6 +613,13 @@ def render_markdown(table: Dict[str, Any], title: str = "Baseline comparison") -
         if row["run_id"] == table["reference_run_id"]:
             lines.append(f"- `{row['run_id']}`: reference cell.")
             continue
+        verdict = row.get("ablation_verdict", "")
+        if verdict == IDENTICAL_VERDICT or not keys:
+            lines.append(
+                f"- `{row['run_id']}`: **IDENTICAL** to the reference cell -- it moves no "
+                "factor at all, so it is a copy rather than a single-factor ablation."
+            )
+            continue
         verdict = "one factor" if row["ceteris_paribus"] else "MORE THAN ONE FACTOR"
         lines.append(
             f"- `{row['run_id']}`: {verdict}"
@@ -589,15 +656,38 @@ def report(
 # --------------------------------------------------------------------------- #
 
 
-def completed_run(root: str, cfg) -> Optional[str]:
-    """The newest finished run directory that belongs to this configuration.
+def config_digest(values: Dict[str, Any]) -> str:
+    """The eight hex characters `run.py` stamps into a run directory's name.
 
-    "Belongs to" means every config key the two have in common agrees. Run ids
-    carry a UTC timestamp, so sorting the candidates makes "newest" well defined.
+    Identical to `grid.config_digest`, computed from a flat or nested mapping so a
+    caller holding either can ask the question "is this the same configuration?".
+    """
+    flat = values if not any(isinstance(value, dict) for value in values.values()) else flatten(values)
+    nested: Dict[str, Any] = {}
+    for path, value in flat.items():
+        node = nested
+        parts = path.split(".")
+        for part in parts[:-1]:
+            node = node.setdefault(part, {})
+        node[parts[-1]] = value
+    payload = json.dumps(nested, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()[:8]
+
+
+def completed_run(root: str, cfg) -> Optional[str]:
+    """The newest finished run directory that is *this exact* configuration.
+
+    "Belongs to" means the whole resolved configuration agrees: either the run's
+    recorded digest equals the digest of `cfg`, or its `config.json` has the same
+    key set with the same values. A subset match used to be enough, which credited
+    a stale or partial directory to a cell whose config had since changed — the run
+    id is a name, not evidence, and a config diff is the only thing that says two
+    cells measure the same thing.
     """
     if not os.path.isdir(root):
         return None
     wanted = _values(cfg)
+    wanted_digest = config_digest(wanted)
     name = str(wanted.get("run.name", ""))
     found = None
     for entry in sorted(os.listdir(root)):
@@ -606,11 +696,19 @@ def completed_run(root: str, cfg) -> Optional[str]:
         path = os.path.join(root, entry)
         if not os.path.isfile(os.path.join(path, "metrics.json")):
             continue
+        config_path = os.path.join(path, "config.json")
         try:
-            existing = flatten(_read_json(os.path.join(path, "config.json")))
+            tree = _read_json(config_path)
         except (OSError, ValueError):
             continue
-        shared = set(existing) & set(wanted)
-        if shared and all(existing[key] == wanted[key] for key in shared):
+        if not isinstance(tree, dict):
+            continue
+        existing = flatten(tree)
+        if config_digest(existing) == wanted_digest:
+            found = path
+            continue
+        if set(existing) != set(wanted):
+            continue
+        if all(existing[key] == wanted[key] for key in wanted):
             found = path
     return found

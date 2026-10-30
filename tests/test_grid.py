@@ -361,3 +361,46 @@ def test_manifest_maps_cells_to_configs_and_run_ids():
             }
     finally:
         shutil.rmtree(out, ignore_errors=True)
+
+
+def test_a_stale_manifest_digest_is_caught_even_when_the_cell_names_match():
+    """Same 18 files, one edited: the names still match and the digest does not.
+
+    Names alone passed this, and `aggregate` would then have reported a finished
+    cell as absent while its run sat in the run root under a digest nothing matched.
+    """
+    out = _tmpdir()
+    stdout, stderr = io.StringIO(), io.StringIO()
+    try:
+        grid.emit(out_dir=out)
+        manifest = grid.read_manifest(out)
+        assert grid._manifest_problems([out]) == []
+
+        victim = os.path.join(out, "cell-fixed-hybrid-plain.yaml")
+        with open(victim, "r", encoding="utf-8") as handle:
+            text = handle.read()
+        # A loadable change that moves the resolved configuration and therefore the
+        # digest, so the file list stays identical.
+        with open(victim, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text.replace("abstain_score_threshold: 0.01", "abstain_score_threshold: 0.02"))
+
+        problems = grid._manifest_problems([out])
+        assert len(problems) == 1, problems
+        assert "cell-fixed-hybrid-plain" in problems[0], problems[0]
+        assert "re-run `grid emit`" in problems[0], problems[0]
+
+        before = {entry["cell"]: entry["config_digest"] for entry in manifest["cells"]}
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            assert grid.check([out]) != 0, "a stale manifest digest was accepted"
+        assert "cell-fixed-hybrid-plain" in stderr.getvalue(), stderr.getvalue()
+
+        # Re-emitting rebuilds both sides from the declaration, so they agree again.
+        grid.emit(out_dir=out)
+        after = {
+            entry["cell"]: entry["config_digest"]
+            for entry in grid.read_manifest(out)["cells"]
+        }
+        assert after == before, "emit is a pure function of the declaration"
+        assert grid._manifest_problems([out]) == []
+    finally:
+        shutil.rmtree(out, ignore_errors=True)

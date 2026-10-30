@@ -55,7 +55,12 @@ def main(argv=None) -> int:
     summary = prefixer.summary()
 
     price_in = float(cfg["llm.price_in_usd_per_mtok"])
-    cost_usd = summary["tokens_in"] / 1e6 * price_in + summary["tokens_out"] / 1e6 * price_in
+    price_out = float(cfg["llm.price_out_usd_per_mtok"])
+    # Output tokens are priced at the output rate, exactly as `run.py` prices them;
+    # charging them at the input rate under-counts the warm-up by the price ratio.
+    cost_usd = run_mod.token_cost(
+        summary["tokens_in"], summary["tokens_out"], price_in, price_out
+    )
     summary["cost_usd"] = round(cost_usd, 6)
     summary["cost_cny"] = round(cost_usd * 6.67, 6)
     summary["hit_rate"] = round(

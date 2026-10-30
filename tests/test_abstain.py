@@ -15,7 +15,7 @@ from ragqa import abstain
 # --- fixtures -------------------------------------------------------------
 
 
-def _write_run(root, run_name, rows, threshold=0.0):
+def _write_run(root, run_name, rows, threshold=0.0, golden="", generator=""):
     """One run directory: predictions.jsonl plus the config.json a run writes."""
     path = Path(root) / run_name
     path.mkdir(parents=True, exist_ok=True)
@@ -26,7 +26,8 @@ def _write_run(root, run_name, rows, threshold=0.0):
         json.dumps(
             {
                 "retrieval": {"mode": "dense", "k": 10},
-                "generate": {"abstain_score_threshold": threshold},
+                "generate": {"abstain_score_threshold": threshold, "provider": generator},
+                "golden": {"items_path": golden},
                 "run": {"name": run_name},
             }
         ),
@@ -219,7 +220,10 @@ def test_raw_threshold_column_is_the_raw_scale_equivalent_of_t():
 def test_mode_is_read_from_the_run_name(tmp_path=None):
     assert abstain.mode_for_run("real-hybrid-20261030T092148-08d22872") == "hybrid"
     assert abstain.mode_for_run("real-rerank-20261030T095541-a6eb2d5e") == "rerank"
-    assert abstain.mode_for_run("real-llm-20261030T113604-a5c0a3e4") == "llm"
+    # There is no `llm` scale: an LLM-generated rerank run is a rerank run, and its
+    # name says nothing the score can act on. The generator is a label, not a mode.
+    assert abstain.mode_for_run("real-llm-20261030T113604-a5c0a3e4") is None
+    assert set(abstain.MODES) == {"dense", "hybrid", "rerank"}
     assert abstain.mode_for_run("smoke-20261030T085149-9d616d8d") is None
 
 
@@ -296,7 +300,7 @@ def test_sweep_command_writes_csv_png_and_working_points():
     assert csv_path.exists()
     lines = csv_path.read_text(encoding="utf-8").strip().splitlines()
     assert lines[0] == (
-        "t,precision,recall,over_abstain_rate_on_answerable,"
+        "generator,t,precision,recall,over_abstain_rate_on_answerable,"
         "under_abstain_rate_on_near_miss,raw_threshold"
     )
     assert len(lines) == 1 + 18
@@ -364,7 +368,8 @@ def test_mode_is_recovered_from_the_run_config_when_the_name_says_nothing():
         encoding="utf-8",
     )
     assert abstain.mode_for_run(run.name) is None
-    assert abstain.mode_from_config(run) == "llm"
+    # rerank + a hosted generator is still the cross-encoder scale.
+    assert abstain.mode_from_config(run) == "rerank"
 
     (run / "config.json").write_text(
         json.dumps({"retrieval": {"mode": "hybrid"}, "generate": {"provider": "llm"}}),
@@ -377,3 +382,64 @@ def test_mode_is_recovered_from_the_run_config_when_the_name_says_nothing():
         encoding="utf-8",
     )
     assert abstain.mode_from_config(run) == "dense"
+
+# --- population -----------------------------------------------------------
+
+
+def test_a_curve_is_drawn_on_one_golden_set_population():
+    """v0's 20 items and v1's 60 must not share a curve.
+
+    The committed curve was measured on v0 while the ticket asked for v1's 40
+    answerable + 20 near-miss items; mixing the two populations silently changed
+    every rate's denominator and let the newest run overwrite shared item ids.
+    """
+    root = Path(_tmp())
+    old_population = _write_run(
+        root,
+        "real-dense-20260101T000000-aaaaaaaa",
+        [_row("A1", True, 0.90), _row("A2", True, 0.85)],
+        golden="golden/v0.jsonl",
+        generator="stub",
+    )
+    new_population = _write_run(
+        root,
+        "real-dense-20260102T000000-bbbbbbbb",
+        [
+            _row("A1", True, 0.95),
+            _row("A2", True, 0.70),
+            _row("N1", False, 0.10),
+            _row("N2", False, 0.05),
+        ],
+        golden="golden/v1.jsonl",
+        generator="llm",
+    )
+
+    population = abstain.select_population([old_population, new_population])
+    assert [path.name for path in population["paths"]] == [new_population.name]
+    assert population["golden"] == "golden/v1.jsonl"
+    assert population["items"] == 4
+    assert [entry["items"] for entry in population["excluded"]] == [2]
+    assert population["excluded"][0]["run_ids"] == [old_population.name]
+
+    items = abstain.collect_mode_items(population["paths"])
+    assert {item.generator for item in items} == {"llm"}
+
+
+def test_an_existing_database_of_runs_reports_the_items_it_kept():
+    root = Path(_tmp())
+    run = _separable_run(root, "real-dense-20260102T000000-bbbbbbbb", count=4)
+    # `_separable_run` writes no golden path; both runs are then the same population.
+    out = root / "reports"
+    assert abstain.sweep_command(root, out) == 0
+
+    payload = json.loads((out / "abstention" / "working-points.json").read_text(encoding="utf-8"))
+    dense = payload["modes"]["dense"]
+    assert dense["items"] == {"answerable": 4, "near_miss": 4, "total": 8}
+    assert dense["applies_to_run_ids"] == [run.name]
+    assert dense["items_by_generator"] == {"unknown": 8}, dense["items_by_generator"]
+    assert dense["generator"] == "unknown"
+    assert dense["excluded_runs"] == []
+    # The working point is what a config would carry, and it says which runs it is
+    # measured on, so `ragqa aggregate` can join it back onto those cells.
+    assert dense["config_write_back"]["key"] == "generate.abstain_score_threshold"
+    assert 0.2 <= dense["t"] <= 0.9
