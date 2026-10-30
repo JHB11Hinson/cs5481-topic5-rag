@@ -164,11 +164,21 @@ class BgeM3Embedder:
 class LateChunkingEmbedder:
     """Whole-document encoding, per-chunk pooling (ticket 09, ADR-0006).
 
-    bge-m3 accepts 8,192 tokens, so a document fits in one forward pass and each
-    chunk's vector is the mean of the token states covering its character span.
-    The chunk therefore carries its document's context without a generated
+    bge-m3 accepts 8,192 tokens, so a document can be encoded in one forward pass
+    and each chunk's vector is the mean of the token states covering its character
+    span. The chunk therefore carries its document's context without a generated
     prefix. Output is cached in its own namespace: the key includes the document
-    hash and the span, so it can never collide with chunk-level entries.
+    hash, the span, and the window geometry, so it can never collide with
+    chunk-level entries or with a run at a different window size.
+
+    Windowing exists because the whole document does not fit on a 6 GB card:
+    probing five documents at 8,192 tokens peaked at 5.56 GB of 6.00, and one
+    53 k-char document truncated, so its later chunks were pooled from states that
+    never saw them. Documents are therefore encoded in windows of
+    `window_tokens` with `window_overlap` tokens of overlap; a span that crosses a
+    boundary is pooled from every window that covers part of it, weighted by the
+    number of tokens each window contributes. Every window is still several times
+    the context of a 512-token chunk, which is the point of the mechanism.
     """
 
     provider = "bge-m3-late"
@@ -178,6 +188,8 @@ class LateChunkingEmbedder:
         model_id: str = "BAAI/bge-m3",
         device: str = "cuda",
         max_seq_length: int = 8192,
+        window_tokens: int = 2048,
+        window_overlap: int = 256,
         cache_path: str = "data/cache/embeddings.sqlite",
         model_version: str = "local",
     ):
@@ -188,6 +200,8 @@ class LateChunkingEmbedder:
         self.model_id = model_id
         self.model_version = model_version
         self.max_seq_length = int(max_seq_length)
+        self.window_tokens = int(window_tokens)
+        self.window_overlap = int(window_overlap)
         self.device = device if torch.cuda.is_available() else "cpu"
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
         self.model = AutoModel.from_pretrained(
@@ -195,53 +209,149 @@ class LateChunkingEmbedder:
         ).to(self.device)
         self.model.eval()
         self.cache = EmbeddingCache(cache_path)
-        self.last_stats: Dict[str, int] = {"hits": 0, "misses": 0, "documents": 0, "windows": 0}
+        self._special_prefix = len(
+            self.tokenizer.build_inputs_with_special_tokens([0])
+        ) - 1
+        self.last_stats: Dict[str, int] = {
+            "hits": 0,
+            "misses": 0,
+            "documents": 0,
+            "windows": 0,
+            "documents_over_window": 0,
+            "peak_vram_bytes": 0,
+        }
+
+    def windows_for(self, token_count: int) -> List[Tuple[int, int]]:
+        """Half-open token windows covering a document, overlapping at the seams."""
+        size = max(1, min(self.window_tokens, self.max_seq_length))
+        overlap = max(0, min(self.window_overlap, size // 2))
+        stride = max(1, size - overlap)
+        windows: List[Tuple[int, int]] = []
+        start = 0
+        while start < token_count:
+            end = min(start + size, token_count)
+            windows.append((start, end))
+            if end >= token_count:
+                break
+            start += stride
+        return windows or [(0, 0)]
+
+    def _encode_window(self, token_ids: List[int]):
+        torch = self.torch
+        ids = self.tokenizer.build_inputs_with_special_tokens(token_ids)
+        tensor = torch.tensor([ids], dtype=torch.long, device=self.device)
+        attention = torch.ones_like(tensor)
+        with torch.inference_mode():
+            states = self.model(input_ids=tensor, attention_mask=attention).last_hidden_state[0]
+        if self.device == "cuda":
+            peak = int(torch.cuda.max_memory_allocated())
+            self.last_stats["peak_vram_bytes"] = max(self.last_stats["peak_vram_bytes"], peak)
+        self.last_stats["windows"] += 1
+        return states
 
     def encode_document(self, text: str, spans: List[Tuple[int, int]]) -> List[List[float]]:
-        """Vector per (start, end) span, pooled from the document's token states."""
-        torch = self.torch
+        """Vector per (start, end) character span, pooled from the document's states."""
         encoded = self.tokenizer(
             text,
-            return_tensors="pt",
-            truncation=True,
-            max_length=self.max_seq_length,
+            truncation=False,
             return_offsets_mapping=True,
+            add_special_tokens=False,
         )
-        offsets = encoded.pop("offset_mapping")[0].tolist()
-        inputs = {key: value.to(self.device) for key, value in encoded.items()}
+        offsets = [tuple(pair) for pair in encoded["offset_mapping"]]
+        token_ids = encoded["input_ids"]
 
-        with torch.inference_mode():
-            states = self.model(**inputs).last_hidden_state[0]
-
-        out: List[List[float]] = []
         doc_key = hashlib.sha256(text.encode("utf-8")).hexdigest()
-        for start, end in spans:
-            key = EmbeddingCache.key(self.model_id, self.model_version, f"{doc_key}:{start}:{end}", text)
+        geometry = f"w{self.window_tokens}-o{self.window_overlap}-s{self.max_seq_length}"
+        keys = [
+            EmbeddingCache.key(
+                self.model_id, self.model_version, f"{doc_key}:{start}:{end}:{geometry}", text
+            )
+            for start, end in spans
+        ]
+
+        out: List[Optional[np.ndarray]] = [None] * len(spans)
+        pending: List[int] = []
+        for index, key in enumerate(keys):
             cached = self.cache.get(key)
-            if cached is not None:
+            if cached is None:
+                pending.append(index)
+            else:
+                out[index] = cached
                 self.last_stats["hits"] += 1
-                out.append(cached.tolist())
-                continue
-            indices = [
-                index
-                for index, (token_start, token_end) in enumerate(offsets)
-                if token_end > start and token_start < end and token_end > token_start
-            ]
-            if not indices:
-                indices = [0]
-            vector = states[indices].mean(dim=0).float().cpu().numpy().astype(np.float64)
-            norm = float(np.linalg.norm(vector))
-            if norm > 0:
-                vector = vector / norm
-            self.cache.put(key, vector)
-            self.last_stats["misses"] += 1
-            out.append(vector.tolist())
+
+        if pending:
+            windows = self.windows_for(len(offsets))
+            if len(windows) > 1:
+                self.last_stats["documents_over_window"] = (
+                    self.last_stats.get("documents_over_window", 0) + 1
+                )
+            states_by_window: Dict[Tuple[int, int], Any] = {}
+
+            def states_for(window: Tuple[int, int]):
+                if window not in states_by_window:
+                    states_by_window[window] = self._encode_window(
+                        token_ids[window[0]:window[1]]
+                    )
+                return states_by_window[window]
+
+            # One ordered sweep per window: advance a cursor across the document's
+            # tokens once, so pooling stays linear rather than spans × window.
+            ordered = sorted(pending, key=lambda i: spans[i][0])
+            pooled: Dict[int, Tuple[Any, int]] = {}
+            for window in windows:
+                window_start, window_end = window
+                cursor = window_start
+                for index in ordered:
+                    start, end = spans[index]
+                    while cursor < window_end and offsets[cursor][1] <= start:
+                        cursor += 1
+                    first = -1
+                    last = -1
+                    probe = cursor
+                    while probe < window_end and offsets[probe][0] < end:
+                        if offsets[probe][1] > start:
+                            if first < 0:
+                                first = probe
+                            last = probe + 1
+                        probe += 1
+                    if first < 0 or last <= first:
+                        continue
+                    states = states_for(window)
+                    local_start = first - window_start + self._special_prefix
+                    local_end = last - window_start + self._special_prefix
+                    weight = local_end - local_start
+                    block = states[local_start:local_end].mean(dim=0).float().cpu().numpy()
+                    previous = pooled.get(index)
+                    pooled[index] = (
+                        block * weight if previous is None else previous[0] + block * weight,
+                        weight if previous is None else previous[1] + weight,
+                    )
+
+            for index in pending:
+                entry = pooled.get(index)
+                if entry is None or entry[1] == 0:
+                    # A span with no token overlap (whitespace only): the first token
+                    # state is the least wrong answer and keeps the shape valid.
+                    states = states_for(windows[0])
+                    vector = (
+                        states[self._special_prefix].float().cpu().numpy().astype(np.float64)
+                    )
+                else:
+                    vector = (entry[0] / entry[1]).astype(np.float64)
+                norm = float(np.linalg.norm(vector))
+                if norm > 0:
+                    vector = vector / norm
+                out[index] = vector
+                self.cache.put(keys[index], vector)
+                self.last_stats["misses"] += 1
+            self.cache.flush()
+
         self.last_stats["documents"] += 1
-        self.cache.flush()
-        return out
+        return [vector.tolist() for vector in out if vector is not None]
 
     def close(self) -> None:
         self.cache.close()
+
 
 
 def make(cfg) -> object:
