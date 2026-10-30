@@ -19,6 +19,11 @@
 # because ten chunks averaging 3.4 k chars paste more text than one document
 # capped at 20 k chars. What the window costs is the citation handle: no chunk
 # ids exist in the prompt, so the verifier has nothing to check a claim against.
+#
+# Declared against the reference cell `configs/grid/cell-recursive_parent_child-
+# rerank-plain.yaml`: the keys this cell does not mean to move hold that cell's
+# values (`llm.max_tokens` 1600, `generate.abstain_score_threshold` 0.0, and
+# `context.prefix_model` set even though `context.mode: plain` leaves it idle).
 run:
   name: baseline-long-context
   out_root: runs
@@ -55,11 +60,12 @@ retrieval:
 
 context:
   mode: plain
+  prefix_model: deepseek-v4.1-flash
 
 generate:
   provider: llm
   model_id: llm
-  abstain_score_threshold: -100.0
+  abstain_score_threshold: 0.0
   min_claim_overlap: 0.12
   max_claims: 3
 
@@ -70,7 +76,7 @@ llm:
   cache_path: data/cache/llm.sqlite
   timeout: 180
   temperature: 0.0
-  max_tokens: 900
+  max_tokens: 1600
   context_chunks: 8
   price_in_usd_per_mtok: 0.15
   price_out_usd_per_mtok: 0.60

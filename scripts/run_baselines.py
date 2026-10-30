@@ -43,16 +43,18 @@ CELLS: Tuple[Tuple[str, str], ...] = (
     ("gen-cheap", os.path.join(CONFIG_DIR, "gen-cheap.yaml")),
 )
 
-REFERENCE_RUN_NAME = "ctx-plain"
+REFERENCE_RUN_NAME = "grid-recursive_parent_child-rerank-plain"
 
-# The four cells are compared against a reference cell that must answer the same
-# golden items. `configs/ctx-plain.yaml` names the reference cell but still points
-# at golden v0, and editing another ticket's cell is not this ticket's business —
-# so `--with-reference` derives the same configuration, renamed, retargeted at the
-# set the baselines use. Off by default: without the flag this runner executes
-# exactly the four baselines.
+# The four cells are compared against the design's reference point, which is the
+# grid cell `recursive_parent_child / rerank / plain`. It already answers the same
+# 60-item golden set the baselines use, so `--with-reference` only has to rename it
+# -- and comparing against anything else (the older `configs/ctx-plain.yaml`, say,
+# whose generation budget and abstention threshold are different) would put a
+# second factor in every baseline row.
 REFERENCE_NAME = "baseline-reference"
-REFERENCE_SOURCE = os.path.join("configs", "ctx-plain.yaml")
+REFERENCE_SOURCE = os.path.join(
+    "configs", "grid", "cell-recursive_parent_child-rerank-plain.yaml"
+)
 
 # ADR-0005 fixes the golden set at 60 items, 40 of them answerable. Used to
 # project the call count while golden/v1.jsonl is not on the branch yet, and
@@ -275,7 +277,7 @@ def measure_window(
 
 
 def reference_config(golden_path: str):
-    """`configs/ctx-plain.yaml`, renamed and retargeted at the baselines' golden set.
+    """The reference cell, renamed so its run directory says what it is used for.
 
     Derived rather than copied so the two cells cannot drift: the only keys that
     move are the run name and the golden set, both identity keys for the purpose
@@ -297,7 +299,7 @@ def plan(
     rows = []
     cells = list(CELLS)
     if with_reference:
-        cells.insert(0, (REFERENCE_NAME, f"{REFERENCE_SOURCE} (retargeted at the baselines' golden set)"))
+        cells.insert(0, (REFERENCE_NAME, f"{REFERENCE_SOURCE} (renamed for the comparison)"))
     for stem, relative in cells:
         if only and stem not in only and not (with_reference and stem == REFERENCE_NAME):
             continue
@@ -392,7 +394,7 @@ def run_cells(
 
     cells = list(CELLS)
     if with_reference:
-        cells.insert(0, (REFERENCE_NAME, "configs/ctx-plain.yaml retargeted at the baselines' golden set"))
+        cells.insert(0, (REFERENCE_NAME, f"{REFERENCE_SOURCE} (renamed for the comparison)"))
 
     results = []
     for stem, relative in cells:

@@ -38,6 +38,15 @@
 #
 # The prices belong to the swap: leaving the reference cell's rate in place would
 # report deepseek's price against luna's tokens and the cost column would be a lie.
+#
+# One factor, checked rather than asserted. Against the reference cell
+# (`configs/grid/cell-recursive_parent_child-rerank-plain.yaml`) the keys that move
+# are `llm.model_generate` and its two prices, which `baselines.FACTOR_GROUPS` files
+# as the single `generator-model` factor. Three other keys used to move as well --
+# `llm.max_tokens` 1600 to 900, `generate.abstain_score_threshold` 0.0 to -100.0,
+# and `context.prefix_model` dropped to empty -- so the cell measured three things
+# and reported one. All three now hold the reference cell's values, and
+# `tests/test_baselines.py` fails if any of them moves again.
 run:
   name: baseline-gen-cheap
   out_root: runs
@@ -74,11 +83,18 @@ retrieval:
 
 context:
   mode: plain
+  # Held at the reference cell's value even though `mode: plain` leaves the
+  # prefixer idle, the same way every grid cell is configured: a factor must be the
+  # only thing that differs between two cells, and an unset value is a difference.
+  prefix_model: deepseek-v4.1-flash
 
 generate:
   provider: llm
   model_id: llm
-  abstain_score_threshold: -100.0
+  # 0.0, not -100.0: the reference cell's own threshold. Lowering it here would
+  # have made the "generator swap" also a change to when the system abstains, and
+  # abstention is a headline column of the same table.
+  abstain_score_threshold: 0.0
   min_claim_overlap: 0.12
   max_claims: 3
 
@@ -89,7 +105,12 @@ llm:
   cache_path: data/cache/llm.sqlite
   timeout: 180
   temperature: 0.0
-  max_tokens: 900
+  # 1600, the reference cell's budget, not the 900 the generator probe used: the
+  # probe measured whether a model can hold the output contract, which is a
+  # property of the model. A shorter cap in the cell itself would clip answers and
+  # turn a generator comparison into a budget comparison. The probe's evidence is
+  # still the reason this model was chosen, and it is reported as a probe.
+  max_tokens: 1600
   context_chunks: 8
   price_in_usd_per_mtok: 0.10
   price_out_usd_per_mtok: 0.50
