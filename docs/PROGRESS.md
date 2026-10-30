@@ -60,6 +60,22 @@ Generation at the same retrieval, two token budgets: citation precision 0.941 (9
 
 hybrid raw 0.030432 (precision 0.556, recall 1.000); rerank raw 0.759250 (0.714 / 1.000). Hybrid's ceiling is structural — five near-misses and two answerable items share the score 0.032522 — and `notes/abstention.md` says so rather than moving the point.
 
+### Answer correctness (ticket 18, golden v1, 40 answerable items)
+
+Judged against each item's 
+eference_answer by deepseek-v4-pro; abstentions are never judged and are reported separately. Twelve finished cells: **0.750–0.900** over all 40 answerable items and **0.821–0.923** over the items the system chose to answer, with 0–6 abstentions per cell. 
+otes/correctness.md, 
+eports/correctness.csv. First pass ¥0.2171; the rerun is free (457/457 cache hits).
+
+### Chunking comparison (ticket 18, six finished pairs)
+
+
+ecursive_parent_child − ixed: hit@10 +0.05 (dense/ctx, p=0.50), +0.025 (hybrid/ctx, rerank/ctx, p=1.00), 0.00 elsewhere; |MRR, nDCG deltas| ≤ 0.087. The only significant paired result is citation support, dense/ctx **+7 items, p=0.0156**, against rerank/ctx −4 items, p=0.22 — direction inconsistent. Mechanism: recursive yields 2,203 children / 1,536 parents, mean 312 words, p95 543, **477 over the 512-word budget of which 86.8% carry a table row or code fence**; fixed is under budget by construction. The atomic-table hypothesis is **not testable** here: all eight 	able_content items are hit 8/8 by both strategies, so the paired test has no discordant pair.
+
+### Contextual prefixes: the A/B is null (ticket 07)
+
+Four usable pairs, both retrieval and citation metrics: hit@10 −0.025 (fixed, all three retrieval modes), +0.025 (recursive/dense); **every paired bootstrap interval contains zero**, and the sign splits by chunk strategy rather than by retrieval mode — an interaction with one cell per corner, i.e. a hypothesis, not a finding. Citation precision −0.018 to +0.042, none significant. The prefix is one of the two mechanisms ADR-0006 identified as shipping nowhere; on this corpus it costs ¥0.48 and 35 minutes to build and buys nothing measurable at n=40.
+
 ## Gateway and model facts (each cost an hour, do not rediscover)
 
 - OpenCode **Go** subscription uses `https://opencode.ai/zen/go/v1` — *not* `https://opencode.ai/zen/v1`. The plain zen path is a different catalog whose upstream answers `402 Insufficient account funds`. `scripts/probe_models.py` probes the plain path and will always look broken; probe `$LLM_BASE_URL` directly instead.
