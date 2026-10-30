@@ -153,8 +153,18 @@ class LLMJudge:
         }
         payload = _parse(result.get("text", ""))
         if payload is None or "supported" not in payload:
+            # A reply that does not parse is not a rejection. Returning False here
+            # counted the judge's own formatting failure as "this citation is
+            # unsupported", which reads as a fact about the citation. None means the
+            # layer never judged it, and `evaluate.grounding_metrics` leaves it out
+            # of `judge_judged` instead of scoring it.
             self.last_stats["parse_failures"] += 1
-            return {"supported": False, "reason": "judge reply was not parseable", **usage}
+            return {
+                "supported": None,
+                "reason": "judge reply was not parseable",
+                "error_class": "judge_parse_failure",
+                **usage,
+            }
         supported = bool(payload.get("supported"))
         if supported:
             self.last_stats["supported"] += 1
@@ -226,6 +236,10 @@ class SupportJudges:
             outcome = self.llm.judge(claim_text, text)
             verdict["judge_supported"] = outcome["supported"]
             verdict["judge_reason"] = outcome["reason"]
+            if outcome.get("error_class"):
+                # Kept beside the verdict so a reader can see that the claim was not
+                # judged rather than judged and rejected.
+                verdict["judge_error_class"] = outcome["error_class"]
             # Per-claim usage, so a calibration or a run can price exactly the
             # claims it judged instead of only the aggregate (ticket 10).
             verdict["judge_tokens_in"] = int(outcome.get("tokens_in", 0) or 0)
@@ -234,6 +248,9 @@ class SupportJudges:
             verdict.get("nli_supported"),
             verdict.get("judge_supported"),
         ]
+        # `is not False`, not `bool(layer)`: a layer that never judged the claim
+        # (None) has no opinion and must not veto it. Only an explicit rejection
+        # counts as a rejection.
         verdict["supported"] = bool(verdict["supported"]) and all(
             layer is not False for layer in layers
         )

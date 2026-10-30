@@ -35,5 +35,11 @@ Kappa is recomputed from the stored verdicts and the hand labels, not copied fro
 
 ## Confusion recorded inside run directories
 
-No finished cell ran with the judge enabled, so `grounding.judge_confusion` is absent from every run directory. The calibration set above is the only judge evidence in this snapshot.
+No finished **grid cell** ran with the judge enabled, so `grounding.judge_confusion` is absent from every finished grid cell's run directory. It is not absent from the run root: a run directory outside the design can carry it, and those are listed below when they do.
+
+| run id (not a grid cell) | both | nli only | judge only | neither |
+|---|---|---|---|---|
+| judge-smoke-20261030T122905-b67fc09f | 4 | 0 | 1 | 0 |
+
+Those rows are judge evidence from outside the matrix: they show the two layers do run and do disagree, and they are not a cell's numbers, so they do not enter any headline figure.
 

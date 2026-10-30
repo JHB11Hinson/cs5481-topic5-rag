@@ -955,15 +955,21 @@ def interaction(
 
 
 def _outcomes_for(
-    items: Dict[str, Dict[str, Any]], rates: Dict[str, Any]
+    items: Dict[str, Dict[str, Any]], outcome: Dict[str, Any]
 ) -> Dict[str, Dict[str, bool]]:
-    """The three paired labellings, per item, that a contrast is tested on."""
+    """The three paired labellings, per item, that a contrast is tested on.
+
+    `outcome` is a whole `item_outcomes` result, not its `rates` sub-dict: the
+    per-item hit vector lives at the top level, and reading it from `rates` raised
+    KeyError as soon as a contrast actually had two finished cells to pair.
+    """
+    hits = outcome.get("hits") or {}
     hit: Dict[str, bool] = {}
     grounded: Dict[str, bool] = {}
     decision: Dict[str, bool] = {}
     for item_id, record in items.items():
         if record["answerable"]:
-            hit[item_id] = bool(rates["hits"].get(item_id))
+            hit[item_id] = bool(hits.get(item_id))
             grounded[item_id] = bool(record["supported"] > 0 and not record["abstained"])
             decision[item_id] = not record["abstained"]
         else:
@@ -1019,8 +1025,8 @@ def contrasts(
                 right_items = items_by_run.get(right_row["run_id"])
                 if not left_items or not right_items:
                     continue
-                left_outcomes = _outcomes_for(left_items["items"], left_items["rates"])[outcome]
-                right_outcomes = _outcomes_for(right_items["items"], right_items["rates"])[outcome]
+                left_outcomes = _outcomes_for(left_items["items"], left_items)[outcome]
+                right_outcomes = _outcomes_for(right_items["items"], right_items)[outcome]
                 discordance = paired_discordance(left_outcomes, right_outcomes)
                 test = mcnemar_exact(discordance["b"], discordance["c"])
                 pooled_b += discordance["b"]
@@ -1072,7 +1078,11 @@ def contrasts(
 # ---- judges ----------------------------------------------------------------
 
 
-def judge_table(rows: Sequence[Dict[str, Any]], notes_dir: str = CALIBRATION_DIR) -> Dict[str, Any]:
+def judge_table(
+    rows: Sequence[Dict[str, Any]],
+    notes_dir: str = CALIBRATION_DIR,
+    runs: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """Cohen's kappa per verification layer, and the layer that gates reporting.
 
     The layers are recomputed from `judge-calibration.verdicts.json` against the
@@ -1146,6 +1156,19 @@ def judge_table(rows: Sequence[Dict[str, Any]], notes_dir: str = CALIBRATION_DIR
         if confusion:
             per_run.append({"run_id": row["run_id"], "cell": row["cell"], "grid": confusion})
 
+    # A run directory outside the design can carry the same grid -- the judge smoke
+    # test does -- and it is evidence, just not a cell's evidence. Naming it is the
+    # difference between "absent" and "present somewhere the matrix does not see".
+    outside = []
+    if runs:
+        grid_run_ids = {row["run_id"] for row in rows if row.get("run_id")}
+        for _digest, entry in sorted((runs.get("finished") or {}).items()):
+            if entry.get("run_id") in grid_run_ids:
+                continue
+            confusion = (entry["metrics"].get("grounding") or {}).get("judge_confusion")
+            if confusion:
+                outside.append({"run_id": entry["run_id"], "grid": confusion})
+
     gate = "none"
     for entry in extra:
         if entry["layer"] == "judge" and entry["gates"]:
@@ -1160,6 +1183,7 @@ def judge_table(rows: Sequence[Dict[str, Any]], notes_dir: str = CALIBRATION_DIR
         "gate": gate,
         "confusion": confusion_rows,
         "runs_with_confusion": per_run,
+        "confusion_outside_grid": outside,
     }
 
 
@@ -1778,10 +1802,39 @@ def _render_judges_md(table: Dict[str, Any]) -> str:
             )
     else:
         lines.append(
-            "No finished cell ran with the judge enabled, so `grounding.judge_confusion` "
-            "is absent from every run directory. The calibration set above is the only "
-            "judge evidence in this snapshot."
+            "No finished **grid cell** ran with the judge enabled, so "
+            "`grounding.judge_confusion` is absent from every finished grid cell's run "
+            "directory. It is not absent from the run root: a run directory outside the "
+            "design can carry it, and those are listed below when they do."
         )
+        outside = table.get("confusion_outside_grid") or []
+        if outside:
+            lines.append("")
+            lines.append("| run id (not a grid cell) | both | nli only | judge only | neither |")
+            lines.append("|---|---|---|---|---|")
+            for entry in outside:
+                counts = entry["grid"]
+                lines.append(
+                    "| %s | %d | %d | %d | %d |"
+                    % (
+                        entry["run_id"],
+                        counts.get("both_supported", 0),
+                        counts.get("nli_only", 0),
+                        counts.get("judge_only", 0),
+                        counts.get("neither", 0),
+                    )
+                )
+            lines.append("")
+            lines.append(
+                "Those rows are judge evidence from outside the matrix: they show the two "
+                "layers do run and do disagree, and they are not a cell's numbers, so they "
+                "do not enter any headline figure."
+            )
+        else:
+            lines.append(
+                "No other run directory under the run root carries one either, so the "
+                "calibration set above is the only judge evidence in this snapshot."
+            )
     lines.append("")
     return "\n".join(lines) + "\n"
 
@@ -2161,7 +2214,7 @@ def regenerate(
                 )
 
     contrast_rows = contrasts(rows, items_by_run)
-    judge_rows = judge_table(rows, notes_dir=notes_dir)
+    judge_rows = judge_table(rows, notes_dir=notes_dir, runs=runs)
     costs = cost_rows(rows)
 
     os.makedirs(out, exist_ok=True)

@@ -8,7 +8,7 @@ change with every chunk strategy (golden/SPEC.md).
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 from .textutil import normalize, overlap_ratio
 
@@ -37,15 +37,23 @@ def grounding_metrics(verdicts: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     Containment is arithmetic and cannot be wrong about what it measures; the NLI
     and model layers are opinions, which is why their pass rates are reported
     separately and never silently folded into one "citation precision".
+
+    A layer that judged nothing has no precision, and the ratio says so: `None`
+    rather than `0.0`. Zero is a measurement ("every claim this layer saw was
+    rejected"); a run whose judge was never called has made no such measurement,
+    and publishing 0.0 for it puts a fake failure into the table.
     """
     claims = len(verdicts)
-    containment = [v for v in verdicts if v.get("containment_ok", v.get("supported"))]
+    # `containment_ok` only: falling back to `supported` re-folded the judge layer
+    # into the arithmetic one, so a claim the model rejected looked like a
+    # containment failure.
+    containment = [v for v in verdicts if v.get("containment_ok")]
     nli = [v for v in verdicts if v.get("nli_supported") is not None]
     judge = [v for v in verdicts if v.get("judge_supported") is not None]
     resolved = [v for v in verdicts if v.get("span_start") is not None]
 
-    def ratio(part: int, whole: int) -> float:
-        return round(part / whole, 4) if whole else 0.0
+    def ratio(part: int, whole: int) -> Optional[float]:
+        return round(part / whole, 4) if whole else None
 
     return {
         "claims": claims,
