@@ -45,6 +45,15 @@ CELLS: Tuple[Tuple[str, str], ...] = (
 
 REFERENCE_RUN_NAME = "ctx-plain"
 
+# The four cells are compared against a reference cell that must answer the same
+# golden items. `configs/ctx-plain.yaml` names the reference cell but still points
+# at golden v0, and editing another ticket's cell is not this ticket's business —
+# so `--with-reference` derives the same configuration, renamed, retargeted at the
+# set the baselines use. Off by default: without the flag this runner executes
+# exactly the four baselines.
+REFERENCE_NAME = "baseline-reference"
+REFERENCE_SOURCE = os.path.join("configs", "ctx-plain.yaml")
+
 # ADR-0005 fixes the golden set at 60 items, 40 of them answerable. Used to
 # project the call count while golden/v1.jsonl is not on the branch yet, and
 # always labelled as an assumption when it is.
@@ -265,13 +274,38 @@ def measure_window(
     return summary
 
 
-def plan(out_root: str, items_limit: Optional[int], only: Optional[List[str]]) -> List[Dict[str, Any]]:
+def reference_config(golden_path: str):
+    """`configs/ctx-plain.yaml`, renamed and retargeted at the baselines' golden set.
+
+    Derived rather than copied so the two cells cannot drift: the only keys that
+    move are the run name and the golden set, both identity keys for the purpose
+    of a single-variable comparison (ADR-0003).
+    """
+    cfg = config_mod.load(os.path.join(REPO, REFERENCE_SOURCE))
+    flat = dict(cfg.as_dict())
+    flat["run.name"] = REFERENCE_NAME
+    flat["golden.items_path"] = golden_path
+    return config_mod.Config(flat)
+
+
+def plan(
+    out_root: str,
+    items_limit: Optional[int],
+    only: Optional[List[str]],
+    with_reference: bool = False,
+) -> List[Dict[str, Any]]:
     rows = []
-    for stem, relative in CELLS:
-        path = os.path.join(REPO, relative)
-        cfg = config_mod.load(path)
-        if only and stem not in only:
+    cells = list(CELLS)
+    if with_reference:
+        cells.insert(0, (REFERENCE_NAME, f"{REFERENCE_SOURCE} (retargeted at the baselines' golden set)"))
+    for stem, relative in cells:
+        if only and stem not in only and not (with_reference and stem == REFERENCE_NAME):
             continue
+        if stem == REFERENCE_NAME:
+            golden = config_mod.load(os.path.join(REPO, CELLS[0][1]))["golden.items_path"]
+            cfg = reference_config(golden)
+        else:
+            cfg = config_mod.load(os.path.join(REPO, relative))
         total, answerable = golden_size(cfg["golden.items_path"])
         assumed = total is None
         if assumed:
@@ -304,7 +338,7 @@ def print_plan(rows: List[Dict[str, Any]], out_root: str) -> int:
     print("dry-run: no model is called, no run directory is written, nothing is spent")
     print(f"run root: {out_root}")
     print("")
-    header = "{:<14} {:<38} {:>6} {:>5} {:>7}  {}"
+    header = "{:<18} {:<56} {:>6} {:>5} {:>7}  {}"
     print(header.format("cell", "config", "items", "ans", "calls", "state"))
     projected = 0
     assumed_any = False
@@ -320,7 +354,7 @@ def print_plan(rows: List[Dict[str, Any]], out_root: str) -> int:
             header.format(row["cell"], row["config"], items, answerable, calls, state)
         )
         if row["extra_calls"]:
-            print(f"{'':<14} extra calls per item: {', '.join(row['extra_calls'])}")
+            print(f"{'':<18} extra calls per item: {', '.join(row['extra_calls'])}")
 
     print("")
     if assumed_any:
@@ -332,11 +366,18 @@ def print_plan(rows: List[Dict[str, Any]], out_root: str) -> int:
     print(f"Projected generation calls: {projected} ({len(rows)} cells x items)")
 
     print("")
-    print(
-        "The comparison needs a reference cell on the same golden items. This script "
-        "runs the four baselines and nothing else, so the reference cell is one command "
-        "away: python -m ragqa.run --config configs/ctx-plain.yaml"
-    )
+    has_reference = any(row["cell"] == REFERENCE_NAME for row in rows)
+    if has_reference:
+        print(
+            "The reference row is configs/ctx-plain.yaml renamed and retargeted at this "
+            "golden set; it exists so the four baselines have something to pair against."
+        )
+    else:
+        print(
+            "The comparison needs a reference cell on the same golden items. Without "
+            "--with-reference this runner executes exactly the four baselines, so pass it "
+            "when building a table, or point --report at a run made from configs/ctx-plain.yaml."
+        )
     return 0
 
 
@@ -345,14 +386,23 @@ def run_cells(
     items_limit: Optional[int],
     only: Optional[List[str]],
     force: bool,
+    with_reference: bool = False,
 ) -> int:
     from ragqa.run import execute
 
+    cells = list(CELLS)
+    if with_reference:
+        cells.insert(0, (REFERENCE_NAME, "configs/ctx-plain.yaml retargeted at the baselines' golden set"))
+
     results = []
-    for stem, relative in CELLS:
-        if only and stem not in only:
+    for stem, relative in cells:
+        if only and stem not in only and not (with_reference and stem == REFERENCE_NAME):
             continue
-        cfg = config_mod.load(os.path.join(REPO, relative))
+        if stem == REFERENCE_NAME:
+            golden = config_mod.load(os.path.join(REPO, CELLS[0][1]))["golden.items_path"]
+            cfg = reference_config(golden)
+        else:
+            cfg = config_mod.load(os.path.join(REPO, relative))
         if items_limit:
             cfg = config_mod.Config({**cfg.as_dict(), "golden.limit": int(items_limit)})
 
@@ -396,7 +446,11 @@ def run_cells(
 
 def build_report(out_root: str, reports_dir: str, reference_dir: Optional[str]) -> int:
     runs: List[str] = []
-    reference = reference_dir or latest_run(out_root, REFERENCE_RUN_NAME)
+    reference = (
+        reference_dir
+        or latest_run(out_root, REFERENCE_NAME)
+        or latest_run(out_root, REFERENCE_RUN_NAME)
+    )
     if not reference:
         print(
             "no reference cell found. Pass --reference-dir runs/<run-id>: a baseline "
@@ -443,6 +497,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="regenerate reports/baselines/window-cost.json from a finished run; calls no model",
     )
     parser.add_argument("--corpus", default=None, help="corpus path for --measure-window")
+    parser.add_argument(
+        "--with-reference",
+        action="store_true",
+        help="also run the reference cell (configs/ctx-plain.yaml, retargeted at the "
+        "baselines' golden set) so the table has something to pair against; without "
+        "the flag this runner executes exactly the four baselines",
+    )
     args = parser.parse_args(argv)
 
     out_root = args.out or "runs"
@@ -475,7 +536,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         return build_report(out_root, args.reports_dir, args.reference_dir)
 
     if args.dry_run:
-        return print_plan(plan(out_root, args.items, args.only), out_root)
+        return print_plan(
+            plan(out_root, args.items, args.only, with_reference=args.with_reference),
+            out_root,
+        )
 
     state = git_state(REPO)
     if state["dirty"] and not args.allow_dirty:
@@ -486,7 +550,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
         return 2
 
-    return run_cells(out_root, args.items, args.only, args.force)
+    return run_cells(
+        out_root, args.items, args.only, args.force, with_reference=args.with_reference
+    )
 
 
 if __name__ == "__main__":

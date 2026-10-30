@@ -440,6 +440,18 @@ def test_compare_needs_at_least_two_runs():
             raise AssertionError("compare accepted a single run directory")
 
 
+def test_reference_cell_derivation_moves_only_identity_keys():
+    from scripts.run_baselines import reference_config
+
+    base = config_mod.load(str(REFERENCE_CONFIG))
+    derived = reference_config("golden/v1.jsonl")
+    assert derived["golden.items_path"] == "golden/v1.jsonl"
+    assert derived["run.name"] == "baseline-reference"
+    # Everything substantive must be untouched, or the headline comparison would
+    # have a second factor in it.
+    assert baselines.substantive_diff(base, derived) == {}
+
+
 # --------------------------------------------------------------------------- #
 # the runner
 # --------------------------------------------------------------------------- #
