@@ -1,0 +1,13 @@
+{
+  "embed": {
+    "context_mode": "plain",
+    "id": "stub-hashing",
+    "provider": "stub",
+    "version": "1"
+  },
+  "generate": {
+    "id": "stub-generator",
+    "provider": "stub"
+  },
+  "judge": null
+}

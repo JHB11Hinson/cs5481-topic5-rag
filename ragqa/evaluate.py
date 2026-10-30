@@ -31,6 +31,37 @@ def _percentile(values: List[float], fraction: float) -> float:
     return float(ordered[index])
 
 
+def grounding_metrics(verdicts: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """Per-layer precision over every claim, so the layers can be compared.
+
+    Containment is arithmetic and cannot be wrong about what it measures; the NLI
+    and model layers are opinions, which is why their pass rates are reported
+    separately and never silently folded into one "citation precision".
+    """
+    claims = len(verdicts)
+    containment = [v for v in verdicts if v.get("containment_ok", v.get("supported"))]
+    nli = [v for v in verdicts if v.get("nli_supported") is not None]
+    judge = [v for v in verdicts if v.get("judge_supported") is not None]
+    resolved = [v for v in verdicts if v.get("span_start") is not None]
+
+    def ratio(part: int, whole: int) -> float:
+        return round(part / whole, 4) if whole else 0.0
+
+    return {
+        "claims": claims,
+        "containment_pass": len(containment),
+        "containment_precision": ratio(len(containment), claims),
+        "nli_judged": len(nli),
+        "nli_pass": sum(1 for v in nli if v.get("nli_supported")),
+        "nli_precision": ratio(sum(1 for v in nli if v.get("nli_supported")), len(nli)),
+        "judge_judged": len(judge),
+        "judge_pass": sum(1 for v in judge if v.get("judge_supported")),
+        "judge_precision": ratio(sum(1 for v in judge if v.get("judge_supported")), len(judge)),
+        "span_resolved": len(resolved),
+        "span_resolved_rate": ratio(len(resolved), claims),
+    }
+
+
 def compute(
     items: List[Dict[str, Any]],
     per_item: List[Dict[str, Any]],
@@ -62,12 +93,10 @@ def compute(
         for entry in answerable
         if any(c["supported"] for c in entry["verdicts"]) and not entry["abstained"]
     )
-    span_hits = 0
-    for entry in answerable:
-        quote = entry["quotes"][0] if entry["quotes"] else ""
-        for claim in entry["claims"]:
-            if overlap_ratio(claim["text"], quote) >= 0.5:
-                span_hits += 1
+    # Span hit rate is counted from verified spans, not from the generator's own
+    # claim about what it quoted: a claim only counts when the verifier located the
+    # quote inside the cited chunk (ticket 10).
+    span_hits = sum(1 for claim in claims if claim.get("span_start") is not None)
 
     abstained_negatives = sum(1 for e in unanswerable if e["abstained"])
     over_abstain = sum(1 for e in answerable if e["abstained"])

@@ -1,0 +1,93 @@
+{
+  "baseline": {
+    "closed_book": false,
+    "long_context": false,
+    "long_context_max_chars": 12000
+  },
+  "chunk": {
+    "overlap": 8,
+    "parent_size": 64,
+    "size": 32,
+    "strategy": "recursive_parent_child"
+  },
+  "context": {
+    "mode": "contextual_prefix",
+    "prefix_cache_path": "data/cache/prefixes.sqlite",
+    "prefix_concurrency": 2,
+    "prefix_max_tokens": 120,
+    "prefix_model": "deepseek-v4.1-flash",
+    "prefix_neighbours": 1,
+    "prefix_prompt_version": "v1",
+    "prefix_reasoning_effort": "none",
+    "window_overlap": 256,
+    "window_tokens": 2048
+  },
+  "corpus": {
+    "snapshot_id": "fixture-smoke-v1",
+    "source": "fixtures/smoke/docs.jsonl"
+  },
+  "embed": {
+    "batch_size": 16,
+    "cache_path": "data/cache/embeddings.sqlite",
+    "device": "auto",
+    "dim": 256,
+    "late_max_seq_length": 8192,
+    "max_seq_length": 8192,
+    "model_id": "stub-hashing",
+    "provider": "stub"
+  },
+  "generate": {
+    "abstain_score_threshold": 0.01,
+    "max_claims": 2,
+    "min_claim_overlap": 0.12,
+    "model_id": "stub-generator",
+    "provider": "stub"
+  },
+  "golden": {
+    "items_path": "fixtures/smoke/golden.jsonl",
+    "limit": 5
+  },
+  "index": {
+    "backend": "memory",
+    "path": "data/index"
+  },
+  "judge": {
+    "enabled": false,
+    "llm_max_chars": 2000,
+    "llm_model": "",
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "llm": {
+    "base_url": "",
+    "cache_path": "data/cache/llm.sqlite",
+    "context_chunks": 8,
+    "max_tokens": 900,
+    "model_generate": "",
+    "model_judge": "",
+    "price_in_usd_per_mtok": 0.0,
+    "price_judge_in_usd_per_mtok": 0.0,
+    "price_judge_out_usd_per_mtok": 0.0,
+    "price_out_usd_per_mtok": 0.0,
+    "reasoning_effort": "",
+    "session_header": "x-opencode-session",
+    "session_id": "",
+    "temperature": 0.0,
+    "timeout": 120
+  },
+  "retrieval": {
+    "hop_rewrite_model": "",
+    "hops": 1,
+    "k": 3,
+    "mode": "hybrid",
+    "rerank_max_length": 512,
+    "rerank_top": 12,
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "rrf_k": 60,
+    "trigger_threshold": null
+  },
+  "run": {
+    "name": "smoke-prefix",
+    "out_root": "runs"
+  }
+}

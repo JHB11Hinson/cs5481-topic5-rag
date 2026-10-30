@@ -72,6 +72,7 @@ class StubGenerator:
         threshold: float,
         max_claims: int,
         min_claim_overlap: float = 0.12,
+        extra_context: str = "",
     ) -> Dict[str, Any]:
         question = item["question"]
         if not retrieved:
@@ -146,13 +147,24 @@ class LLMGenerator:
         self.max_tokens = int(max_tokens)
         self.last_stats: Dict[str, int] = {"hits": 0, "misses": 0}
 
-    def _messages(self, item: Dict[str, Any], retrieved: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    def _messages(self, item: Dict[str, Any], retrieved: List[Dict[str, Any]],
+                  extra_context: str = "") -> List[Dict[str, str]]:
         blocks = []
         for hit in retrieved[: self.context_chunks]:
             blocks.append(
                 f"[{hit['chunk_id']}] doc={hit['doc_id']} rank={hit['rank']}\n{hit['text']}"
             )
-        context = "\n\n".join(blocks) if blocks else "(no context retrieved)"
+        if blocks:
+            context = "\n\n".join(blocks)
+        elif extra_context:
+            # Long-context baseline: one document in full instead of retrieval.
+            context = (
+                "The whole source document follows. It is not chunked and no chunk "
+                "ids exist, so cite the document id only if you use it.\n\n"
+                + extra_context
+            )
+        else:
+            context = "(no context retrieved)"
         user = (
             f"Question: {item['question']}\n\n"
             f"Context chunks:\n{context}\n\n"
@@ -170,8 +182,9 @@ class LLMGenerator:
         threshold: float,
         max_claims: int,
         min_claim_overlap: float = 0.12,
+        extra_context: str = "",
     ) -> Dict[str, Any]:
-        messages = self._messages(item, retrieved)
+        messages = self._messages(item, retrieved, extra_context)
         result = self.client.complete(self.model_id, messages, max_tokens=self.max_tokens)
         raw = result["text"]
         payload = self._parse(raw)
@@ -289,6 +302,7 @@ def make(cfg):
             temperature=float(cfg["llm.temperature"]),
             session_header=cfg["llm.session_header"],
             session_id=cfg["llm.session_id"],
+            reasoning_effort=cfg["llm.reasoning_effort"],
         )
         return LLMGenerator(
             client,
