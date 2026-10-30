@@ -141,6 +141,7 @@ class PrefixGenerator:
         prompt_version: str = "v1",
         concurrency: int = 1,
         client_factory: Optional[Callable[[], Any]] = None,
+        effort_salt: str = "",
     ):
         if not model:
             raise ValueError("PrefixGenerator needs a model id")
@@ -148,6 +149,9 @@ class PrefixGenerator:
         self.cache = PrefixCache(cache_path)
         self.max_tokens = int(max_tokens)
         self.prompt_version = str(prompt_version)
+        # The model's reasoning budget changes its output, so it belongs in the key:
+        # a prefix generated with thinking on must never be served to a run with it off.
+        self.effort_salt = str(effort_salt)
         self.concurrency = max(1, int(concurrency))
         self.client = client
         self.client_factory = client_factory
@@ -161,12 +165,17 @@ class PrefixGenerator:
             "prefix_chars": [],
         }
 
+    def _version(self) -> str:
+        return f"{self.prompt_version}@{self.effort_salt or 'default'}"
+
     def _call(self, client, prompt: str) -> Dict[str, Any]:
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
-        return client.complete(self.model, messages, max_tokens=self.max_tokens)
+        # Plain prose, not JSON: the gateway rejects a json_object response_format
+        # on a prompt that never mentions json, and a prefix is one sentence.
+        return client.complete(self.model, messages, max_tokens=self.max_tokens, json_mode=False)
 
     def generate(
         self,
@@ -198,7 +207,7 @@ class PrefixGenerator:
                     before,
                     after,
                 )
-                key = PrefixCache.key(self.model, self.prompt_version, prompt)
+                key = PrefixCache.key(self.model, self._version(), prompt)
                 cached = self.cache.get(key)
                 if cached is not None:
                     chunk["prefix"] = cached
@@ -218,14 +227,24 @@ class PrefixGenerator:
             return chunk, key, result
 
         if jobs:
+            stored = 0
             if self.concurrency > 1 and self.client_factory is not None:
                 with ThreadPoolExecutor(max_workers=self.concurrency) as pool:
                     for chunk, key, result in pool.map(run, jobs):
                         self._store(chunk, key, result)
+                        stored += 1
+                        if stored % 50 == 0:
+                            # Persist progress: a warm-up over 2,203 chunks takes tens
+                            # of minutes, and an interrupted run must not throw away
+                            # everything it already paid for.
+                            self.cache.flush()
             else:
                 for job in jobs:
                     chunk, key, result = run(job)
                     self._store(chunk, key, result)
+                    stored += 1
+                    if stored % 50 == 0:
+                        self.cache.flush()
         self.cache.flush()
 
         for chunk in chunks:
@@ -240,7 +259,7 @@ class PrefixGenerator:
         chunk["prefix"] = prefix
         tokens_in = int(result.get("tokens_in", 0) or 0)
         tokens_out = int(result.get("tokens_out", 0) or 0)
-        self.cache.put(key, self.model, self.prompt_version, prefix, tokens_in, tokens_out)
+        self.cache.put(key, self.model, self._version(), prefix, tokens_in, tokens_out)
         self.last_stats["tokens_in"] += tokens_in
         self.last_stats["tokens_out"] += tokens_out
         self.last_stats["prefix_chars"].append(len(prefix))
@@ -250,7 +269,7 @@ class PrefixGenerator:
         p50 = lengths[len(lengths) // 2] if lengths else 0
         return {
             "model": self.model,
-            "prompt_version": self.prompt_version,
+            "prompt_version": self._version(),
             "chunks": self.last_stats.get("chunks", 0),
             "cache_hits": self.last_stats.get("hits", 0),
             "cache_misses": self.last_stats.get("misses", 0),
