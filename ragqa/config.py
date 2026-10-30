@@ -72,6 +72,9 @@ DEFAULTS: Dict[str, Any] = {
     "llm.model_generate": "",
     "llm.model_judge": "",
     "llm.timeout": 120,
+    # A dropped TLS handshake costs one cell of the matrix when this is too low;
+    # the gateway's flakiness is bursty rather than persistent, so patience pays.
+    "llm.max_retries": 5,
     "llm.temperature": 0.0,
     "llm.max_tokens": 900,
     # Empty means the provider default (thinking on). Mechanical calls pass "none".

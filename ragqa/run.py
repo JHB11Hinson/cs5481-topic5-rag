@@ -74,6 +74,7 @@ def _llm_client(
         session_header=cfg["llm.session_header"],
         session_id=cfg["llm.session_id"],
         reasoning_effort=reasoning_effort,
+        max_retries=int(cfg["llm.max_retries"]),
     )
 
 
@@ -306,8 +307,21 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                     "claim_id": claim["claim_id"],
                     "chunk_id": claim["chunk_id"],
                     "doc_id": claim["doc_id"],
-                    "span_start": claim.get("span_start", -1),
-                    "span_end": claim.get("span_end", -1),
+                    # The verifier's span, not the generator's: a model cannot count
+                    # characters, so a claim that arrives without a located span keeps
+                    # its -1 sentinel, and a claim whose span the verifier placed
+                    # carries the real offsets. Writing the generator's sentinel here
+                    # made a rejected claim look like a span hit.
+                    "span_start": (
+                        verdict["span_start"]
+                        if verdict.get("span_start") is not None
+                        else claim.get("span_start", -1)
+                    ),
+                    "span_end": (
+                        verdict["span_end"]
+                        if verdict.get("span_end") is not None
+                        else claim.get("span_end", -1)
+                    ),
                     "quote": claim.get("quote", "")[:300],
                     "supported": verdict["supported"],
                     "error_class": verdict["error_class"],

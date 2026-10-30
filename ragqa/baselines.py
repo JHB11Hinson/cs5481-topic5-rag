@@ -186,41 +186,28 @@ def mcnemar_counts(treatment_only: int, baseline_only: int) -> Dict[str, Any]:
     `treatment_only` counts items the treatment got right and the baseline did
     not; `baseline_only` counts the reverse. Items both agree on carry no
     information about a difference and are excluded from the test.
+
+    The test itself lives in `aggregate.mcnemar_exact` so the baseline table and
+    the matrix's significance table cannot disagree about a p-value. It is the
+    exact conditional binomial at every sample size: 60 paired items is small
+    enough that a chi-square approximation buys nothing and can only add error.
     """
+    from .aggregate import mcnemar_exact  # local: keeps the import graph acyclic
+
     treatment_only = int(treatment_only)
     baseline_only = int(baseline_only)
     if treatment_only < 0 or baseline_only < 0:
         raise ValueError("discordant pair counts cannot be negative")
 
-    discordant = treatment_only + baseline_only
-    result: Dict[str, Any] = {
-        "discordant": discordant,
+    exact = mcnemar_exact(treatment_only, baseline_only)
+    return {
+        "discordant": exact["pairs"],
         "treatment_only": treatment_only,
         "baseline_only": baseline_only,
-        "statistic": None,
+        "statistic": exact["statistic"],
+        "p_value": exact["p_value"],
+        "method": "exact_binomial",
     }
-    if discordant == 0:
-        result.update({"p_value": 1.0, "method": "exact_binomial"})
-        return result
-
-    if discordant <= EXACT_MAX_DISCORDANT:
-        # Two-sided exact conditional binomial test at p = 1/2.
-        tail = min(treatment_only, baseline_only)
-        probability = sum(math.comb(discordant, k) for k in range(tail + 1)) / 2.0**discordant
-        result.update({"p_value": min(1.0, 2.0 * probability), "method": "exact_binomial"})
-        return result
-
-    # Continuity-corrected chi-square with one degree of freedom.
-    z = (abs(treatment_only - baseline_only) - 1) / math.sqrt(discordant)
-    statistic = z * z
-    result.update(
-        {
-            "statistic": statistic,
-            "p_value": math.erfc(math.sqrt(statistic / 2.0)),
-            "method": "chi_square_continuity",
-        }
-    )
-    return result
 
 
 def mcnemar_outcomes(pairs: Sequence[Tuple[bool, bool]]) -> Dict[str, Any]:

@@ -252,13 +252,19 @@ def test_mcnemar_with_no_discordant_pairs_is_not_significant():
     assert result["discordant"] == 0, result
 
 
-def test_mcnemar_switches_to_chi_square_with_continuity_for_large_samples():
-    # 40 versus 10 discordant: z = (|40 - 10| - 1) / sqrt(50) = 29 / 7.07107 = 4.10122
-    # chi-square(1) upper tail at z^2 = 16.82: 2 * (1 - Phi(4.10122)) = 4.1e-05.
+def test_mcnemar_stays_exact_on_a_large_paired_sample():
+    # 40 versus 10 discordant: the exact two-sided binomial tail is 2 * P(X <= 10)
+    # with X ~ Binomial(50, 0.5) = 1.9e-05, which is smaller than the chi-square
+    # approximation's 4.1e-05. With 60 items there is no reason to approximate.
     result = baselines.mcnemar_counts(40, 10)
-    assert result["method"] == "chi_square_continuity", result
-    assert abs(result["statistic"] - 16.82) < 1e-9, result
-    assert abs(result["p_value"] - 4.1e-05) < 2e-06, result
+    assert result["method"] == "exact_binomial", result
+    assert result["discordant"] == 50, result
+    assert result["p_value"] < 1e-4, result
+    assert result["p_value"] > 1e-6, result
+    # and it agrees with the shared implementation the matrix table uses
+    from ragqa import aggregate
+
+    assert aggregate.mcnemar_exact(40, 10)["p_value"] == result["p_value"]
 
 
 def test_mcnemar_outcomes_ignores_agreeing_pairs():
