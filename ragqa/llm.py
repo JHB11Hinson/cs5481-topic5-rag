@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import random
 import sqlite3
 import time
 import urllib.error
@@ -102,7 +103,7 @@ class LLMClient:
         cache_path: str = "data/cache/llm.sqlite",
         timeout: int = 120,
         temperature: float = 0.0,
-        max_retries: int = 5,
+        max_retries: int = 8,
         session_header: str = "",
         session_id: str = "",
         reasoning_effort: str = "",
@@ -195,7 +196,11 @@ class LLMClient:
                 # away a 40-minute warm-up over one bad minute of network.
                 retryable = error.status in (429, 500, 502, 503, 504) or error.kind == "transport"
                 if retryable and attempt <= self.max_retries:
-                    time.sleep(min(2 ** attempt, 20))
+                    # The gateway's failures are bursty, not persistent: a dropped TLS
+                    # handshake is usually better ten seconds later. Patience here is
+                    # much cheaper than losing a cell that has already spent its tokens.
+                    delay = min(2 ** attempt, 30) + random.uniform(0, 2)
+                    time.sleep(delay)
                     continue
                 raise
             latency_ms = (time.perf_counter() - began) * 1000.0
