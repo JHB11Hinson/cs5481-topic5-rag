@@ -21,49 +21,42 @@ Abstentions are not sent to the judge: the generator already decided the answer,
 | cell | run | accuracy (all 40) | accuracy (answered) | abstentions | correct/answered | judge calls | ¥ |
 |---|---|---|---|---|---|---|---|
 | `cell-fixed-dense-contextual_prefix` | `grid-fixed-dense-contextual_prefix-20261030T142519-d947855e` | 0.7500 [0.6000, 0.8750] | 0.8824 [0.7647, 0.9706] | 6 of 40 | 30/34 | 34 | 0.0161 |
-| `cell-fixed-dense-late_chunking` | pending | pending | pending | pending | pending | — | — |
-| `cell-fixed-dense-plain` | `grid-fixed-dense-plain-20261030T124637-8ae4eb06` | 0.8000 [0.6750, 0.9250] | 0.8889 [0.7778, 0.9722] | 4 of 40 | 32/36 | 36 | 0.0174 |
-| `cell-fixed-hybrid-contextual_prefix` | `grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950` | 0.8750 [0.7750, 0.9750] | 0.9211 [0.8158, 1.0000] | 2 of 40 | 35/38 | 38 | 0.0176 |
-| `cell-fixed-hybrid-late_chunking` | pending | pending | pending | pending | pending | — | — |
-| `cell-fixed-hybrid-plain` | `grid-fixed-hybrid-plain-20261030T125429-6170ae66` | 0.8750 [0.7750, 0.9750] | 0.9211 [0.8158, 1.0000] | 2 of 40 | 35/38 | 38 | 0.0177 |
-| `cell-fixed-rerank-contextual_prefix` | `grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222` | 0.8750 [0.7750, 0.9750] | 0.8974 [0.7949, 0.9744] | 1 of 40 | 35/39 | 39 | 0.0188 |
-| `cell-fixed-rerank-late_chunking` | pending | pending | pending | pending | pending | — | — |
-| `cell-fixed-rerank-plain` | `grid-fixed-rerank-plain-20261030T125648-57be667d` | 0.8750 [0.7750, 0.9750] | 0.8974 [0.7949, 0.9744] | 1 of 40 | 35/39 | 39 | 0.0182 |
+| `cell-fixed-dense-late_chunking` | `grid-fixed-dense-late_chunking-20261030T161040-76813f02` | 0.4250 [0.2750, 0.5750] | 0.7083 [0.5000, 0.8750] | 16 of 40 | 17/24 | 24 | 0.0117 |
+| `cell-fixed-dense-plain` | `grid-fixed-dense-plain-20261030T124637-8ae4eb06` | 0.8250 [0.7000, 0.9250] | 0.9167 [0.8056, 1.0000] | 4 of 40 | 33/36 | 36 | 0.0173 |
+| `cell-fixed-hybrid-contextual_prefix` | `grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950` | 0.8750 [0.7750, 0.9750] | 0.9211 [0.8158, 1.0000] | 2 of 40 | 35/38 | 38 | 0.0175 |
+| `cell-fixed-hybrid-late_chunking` | `grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39` | 0.8500 [0.7250, 0.9500] | 0.9444 [0.8611, 1.0000] | 4 of 40 | 34/36 | 36 | 0.0166 |
+| `cell-fixed-hybrid-plain` | `grid-fixed-hybrid-plain-20261030T125429-6170ae66` | 0.8750 [0.7750, 0.9750] | 0.9211 [0.8158, 1.0000] | 2 of 40 | 35/38 | 38 | 0.0178 |
+| `cell-fixed-rerank-contextual_prefix` | `grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222` | 0.8750 [0.7750, 0.9750] | 0.8974 [0.7949, 0.9744] | 1 of 40 | 35/39 | 39 | 0.0189 |
+| `cell-fixed-rerank-late_chunking` | `grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0` | 0.9000 [0.8000, 0.9750] | 0.9474 [0.8684, 1.0000] | 2 of 40 | 36/38 | 38 | 0.0179 |
+| `cell-fixed-rerank-plain` | `grid-fixed-rerank-plain-20261030T125648-57be667d` | 0.9000 [0.8000, 0.9750] | 0.9231 [0.8205, 1.0000] | 1 of 40 | 36/39 | 39 | 0.0181 |
 | `cell-recursive_parent_child-dense-contextual_prefix` | `grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3` | 0.8000 [0.6750, 0.9250] | 0.8205 [0.6923, 0.9231] | 1 of 40 | 32/39 | 39 | 0.0188 |
-| `cell-recursive_parent_child-dense-late_chunking` | pending | pending | pending | pending | pending | — | — |
+| `cell-recursive_parent_child-dense-late_chunking` | `grid-recursive_parent_child-dense-late_chunking-20261030T164237-9b6dc31d` | 0.4750 [0.3250, 0.6250] | 0.7308 [0.5385, 0.8846] | 14 of 40 | 19/26 | 26 | 0.0127 |
 | `cell-recursive_parent_child-dense-plain` | `grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e` | 0.8250 [0.7000, 0.9250] | 0.8684 [0.7632, 0.9737] | 2 of 40 | 33/38 | 38 | 0.0181 |
-| `cell-recursive_parent_child-hybrid-contextual_prefix` | `grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64` | 0.8750 [0.7750, 0.9750] | 0.8974 [0.7949, 0.9744] | 1 of 40 | 35/39 | 39 | 0.0192 |
-| `cell-recursive_parent_child-hybrid-late_chunking` | pending | pending | pending | pending | pending | — | — |
-| `cell-recursive_parent_child-hybrid-plain` | `grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e` | 0.9000 [0.8000, 0.9750] | 0.9000 [0.8000, 0.9750] | 0 of 40 | 36/40 | 40 | 0.0191 |
-| `cell-recursive_parent_child-rerank-contextual_prefix` | `grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a` | 0.8250 [0.7000, 0.9250] | 0.8684 [0.7632, 0.9737] | 2 of 40 | 33/38 | 38 | 0.0180 |
-| `cell-recursive_parent_child-rerank-late_chunking` | pending | pending | pending | pending | pending | — | — |
-| `cell-recursive_parent_child-rerank-plain` | `grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910` | 0.9000 [0.8000, 0.9750] | 0.9231 [0.8205, 1.0000] | 1 of 40 | 36/39 | 39 | 0.0181 |
+| `cell-recursive_parent_child-hybrid-contextual_prefix` | `grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64` | 0.8750 [0.7750, 0.9750] | 0.8974 [0.7949, 0.9744] | 1 of 40 | 35/39 | 39 | 0.0191 |
+| `cell-recursive_parent_child-hybrid-late_chunking` | `grid-recursive_parent_child-hybrid-late_chunking-20261030T165835-0cecad68` | 0.9000 [0.8000, 0.9750] | 0.9474 [0.8684, 1.0000] | 2 of 40 | 36/38 | 38 | 0.0178 |
+| `cell-recursive_parent_child-hybrid-plain` | `grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e` | 0.9000 [0.8000, 0.9750] | 0.9000 [0.8000, 0.9750] | 0 of 40 | 36/40 | 40 | 0.0190 |
+| `cell-recursive_parent_child-rerank-contextual_prefix` | `grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a` | 0.8500 [0.7250, 0.9500] | 0.8947 [0.7895, 0.9737] | 2 of 40 | 34/38 | 38 | 0.0178 |
+| `cell-recursive_parent_child-rerank-late_chunking` | `grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b` | 0.8500 [0.7250, 0.9500] | 0.9189 [0.8108, 1.0000] | 3 of 40 | 34/37 | 37 | 0.0171 |
+| `cell-recursive_parent_child-rerank-plain` | `grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910` | 0.9000 [0.8000, 0.9750] | 0.9231 [0.8205, 1.0000] | 1 of 40 | 36/39 | 39 | 0.0180 |
 
 ## Judge spend
 
 | quantity | value |
 |---|---|
 | judge model | `deepseek-v4-pro` |
-| finished configurations | 12 |
-| pending configurations | 6 |
-| judge calls (answers graded) | 457 |
-| judge tokens in / out | 159036 / 14498 |
+| finished configurations | 18 |
+| pending configurations | 0 |
+| judge calls (answers graded) | 656 |
+| judge tokens in / out | 227829 / 20608 |
 | price (USD per Mtok, in / out) | 0.15 / 0.6 |
-| measured spend | $0.0326 / ¥0.2171 |
-| cache hits / misses | 457 / 0 |
+| measured spend | $0.0465 / ¥0.3104 |
+| cache hits / misses | 243 / 413 |
 
 Every response is cached by content hash in `data/cache/llm.correctness.sqlite`, so a second pass over the same configurations issues no requests and returns identical verdicts — the spend above is what the first pass cost, and the cache columns say how much of the work was free.
 
 ## Pending
 
-These configurations have no finished run directory under `D:\DE Project\wt\exp\runs` yet. They are listed as `pending` and contribute no number — a missing run is not a zero.
-
-- `cell-fixed-dense-late_chunking`
-- `cell-fixed-hybrid-late_chunking`
-- `cell-fixed-rerank-late_chunking`
-- `cell-recursive_parent_child-dense-late_chunking`
-- `cell-recursive_parent_child-hybrid-late_chunking`
-- `cell-recursive_parent_child-rerank-late_chunking`
+None: every declared configuration has a finished run.
 
 ## Per-item verdicts
 

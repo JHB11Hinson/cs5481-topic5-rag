@@ -14,63 +14,63 @@
       "chunk_strategy": "fixed",
       "context_mode": "contextual_prefix",
       "correct": 30,
-      "cost_cny": 0.016111,
-      "cost_usd": 0.002415,
+      "cost_cny": 0.016147,
+      "cost_usd": 0.002421,
       "judge_calls": 34,
       "parse_failures": 0,
       "retrieval_mode": "dense",
       "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
       "status": "finished",
       "tokens_in": 11759,
-      "tokens_out": 1086
+      "tokens_out": 1095
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 16,
+      "accuracy_all": 0.425,
+      "accuracy_all_hi": 0.575,
+      "accuracy_all_lo": 0.275,
+      "accuracy_answered": 0.7083,
+      "accuracy_answered_hi": 0.875,
+      "accuracy_answered_lo": 0.5,
+      "answerable": 40,
+      "answered": 24,
       "cell": "cell-fixed-dense-late_chunking",
       "chunk_strategy": "fixed",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 17,
+      "cost_cny": 0.0117,
+      "cost_usd": 0.001754,
+      "judge_calls": 24,
+      "parse_failures": 0,
       "retrieval_mode": "dense",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-fixed-dense-late_chunking-20261030T161040-76813f02",
+      "status": "finished",
+      "tokens_in": 8490,
+      "tokens_out": 801
     },
     {
       "abstentions": 4,
-      "accuracy_all": 0.8,
+      "accuracy_all": 0.825,
       "accuracy_all_hi": 0.925,
-      "accuracy_all_lo": 0.675,
-      "accuracy_answered": 0.8889,
-      "accuracy_answered_hi": 0.972222,
-      "accuracy_answered_lo": 0.777778,
+      "accuracy_all_lo": 0.7,
+      "accuracy_answered": 0.9167,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.805556,
       "answerable": 40,
       "answered": 36,
       "cell": "cell-fixed-dense-plain",
       "chunk_strategy": "fixed",
       "context_mode": "plain",
-      "correct": 32,
-      "cost_cny": 0.017374,
-      "cost_usd": 0.002605,
+      "correct": 33,
+      "cost_cny": 0.017286,
+      "cost_usd": 0.002592,
       "judge_calls": 36,
       "parse_failures": 0,
       "retrieval_mode": "dense",
       "run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
       "status": "finished",
       "tokens_in": 12753,
-      "tokens_out": 1153
+      "tokens_out": 1131
     },
     {
       "abstentions": 2,
@@ -86,39 +86,39 @@
       "chunk_strategy": "fixed",
       "context_mode": "contextual_prefix",
       "correct": 35,
-      "cost_cny": 0.017613,
-      "cost_usd": 0.002641,
+      "cost_cny": 0.017461,
+      "cost_usd": 0.002618,
       "judge_calls": 38,
       "parse_failures": 0,
       "retrieval_mode": "hybrid",
       "run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
       "status": "finished",
       "tokens_in": 13080,
-      "tokens_out": 1131
+      "tokens_out": 1093
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 4,
+      "accuracy_all": 0.85,
+      "accuracy_all_hi": 0.95,
+      "accuracy_all_lo": 0.725,
+      "accuracy_answered": 0.9444,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.861111,
+      "answerable": 40,
+      "answered": 36,
       "cell": "cell-fixed-hybrid-late_chunking",
       "chunk_strategy": "fixed",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 34,
+      "cost_cny": 0.016555,
+      "cost_usd": 0.002482,
+      "judge_calls": 36,
+      "parse_failures": 0,
       "retrieval_mode": "hybrid",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "status": "finished",
+      "tokens_in": 12263,
+      "tokens_out": 1071
     },
     {
       "abstentions": 2,
@@ -134,15 +134,15 @@
       "chunk_strategy": "fixed",
       "context_mode": "plain",
       "correct": 35,
-      "cost_cny": 0.017698,
-      "cost_usd": 0.002653,
+      "cost_cny": 0.017822,
+      "cost_usd": 0.002672,
       "judge_calls": 38,
       "parse_failures": 0,
       "retrieval_mode": "hybrid",
       "run_id": "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
       "status": "finished",
       "tokens_in": 13057,
-      "tokens_out": 1158
+      "tokens_out": 1189
     },
     {
       "abstentions": 1,
@@ -158,63 +158,63 @@
       "chunk_strategy": "fixed",
       "context_mode": "contextual_prefix",
       "correct": 35,
-      "cost_cny": 0.018847,
-      "cost_usd": 0.002826,
+      "cost_cny": 0.018927,
+      "cost_usd": 0.002838,
       "judge_calls": 39,
       "parse_failures": 0,
       "retrieval_mode": "rerank",
       "run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
       "status": "finished",
       "tokens_in": 13878,
-      "tokens_out": 1240
+      "tokens_out": 1260
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 2,
+      "accuracy_all": 0.9,
+      "accuracy_all_hi": 0.975,
+      "accuracy_all_lo": 0.8,
+      "accuracy_answered": 0.9474,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.868421,
+      "answerable": 40,
+      "answered": 38,
       "cell": "cell-fixed-rerank-late_chunking",
       "chunk_strategy": "fixed",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 36,
+      "cost_cny": 0.017908,
+      "cost_usd": 0.002685,
+      "judge_calls": 38,
+      "parse_failures": 0,
       "retrieval_mode": "rerank",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0",
+      "status": "finished",
+      "tokens_in": 13159,
+      "tokens_out": 1185
     },
     {
       "abstentions": 1,
-      "accuracy_all": 0.875,
+      "accuracy_all": 0.9,
       "accuracy_all_hi": 0.975,
-      "accuracy_all_lo": 0.775,
-      "accuracy_answered": 0.8974,
-      "accuracy_answered_hi": 0.974359,
-      "accuracy_answered_lo": 0.794872,
+      "accuracy_all_lo": 0.8,
+      "accuracy_answered": 0.9231,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.820513,
       "answerable": 40,
       "answered": 39,
       "cell": "cell-fixed-rerank-plain",
       "chunk_strategy": "fixed",
       "context_mode": "plain",
-      "correct": 35,
-      "cost_cny": 0.018234,
-      "cost_usd": 0.002734,
+      "correct": 36,
+      "cost_cny": 0.01815,
+      "cost_usd": 0.002721,
       "judge_calls": 39,
       "parse_failures": 0,
       "retrieval_mode": "rerank",
       "run_id": "grid-fixed-rerank-plain-20261030T125648-57be667d",
       "status": "finished",
       "tokens_in": 13321,
-      "tokens_out": 1226
+      "tokens_out": 1205
     },
     {
       "abstentions": 1,
@@ -230,39 +230,39 @@
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "contextual_prefix",
       "correct": 32,
-      "cost_cny": 0.018812,
-      "cost_usd": 0.00282,
+      "cost_cny": 0.01882,
+      "cost_usd": 0.002822,
       "judge_calls": 39,
       "parse_failures": 0,
       "retrieval_mode": "dense",
       "run_id": "grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3",
       "status": "finished",
       "tokens_in": 13679,
-      "tokens_out": 1281
+      "tokens_out": 1283
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 14,
+      "accuracy_all": 0.475,
+      "accuracy_all_hi": 0.625,
+      "accuracy_all_lo": 0.325,
+      "accuracy_answered": 0.7308,
+      "accuracy_answered_hi": 0.884615,
+      "accuracy_answered_lo": 0.538462,
+      "answerable": 40,
+      "answered": 26,
       "cell": "cell-recursive_parent_child-dense-late_chunking",
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 19,
+      "cost_cny": 0.012658,
+      "cost_usd": 0.001898,
+      "judge_calls": 26,
+      "parse_failures": 0,
       "retrieval_mode": "dense",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-recursive_parent_child-dense-late_chunking-20261030T164237-9b6dc31d",
+      "status": "finished",
+      "tokens_in": 9180,
+      "tokens_out": 868
     },
     {
       "abstentions": 2,
@@ -278,15 +278,15 @@
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "plain",
       "correct": 33,
-      "cost_cny": 0.018145,
-      "cost_usd": 0.00272,
+      "cost_cny": 0.018085,
+      "cost_usd": 0.002711,
       "judge_calls": 38,
       "parse_failures": 0,
       "retrieval_mode": "dense",
       "run_id": "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e",
       "status": "finished",
       "tokens_in": 13260,
-      "tokens_out": 1219
+      "tokens_out": 1204
     },
     {
       "abstentions": 1,
@@ -302,39 +302,39 @@
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "contextual_prefix",
       "correct": 35,
-      "cost_cny": 0.019151,
-      "cost_usd": 0.002871,
+      "cost_cny": 0.019107,
+      "cost_usd": 0.002865,
       "judge_calls": 39,
       "parse_failures": 0,
       "retrieval_mode": "hybrid",
       "run_id": "grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64",
       "status": "finished",
       "tokens_in": 13909,
-      "tokens_out": 1308
+      "tokens_out": 1297
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 2,
+      "accuracy_all": 0.9,
+      "accuracy_all_hi": 0.975,
+      "accuracy_all_lo": 0.8,
+      "accuracy_answered": 0.9474,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.868421,
+      "answerable": 40,
+      "answered": 38,
       "cell": "cell-recursive_parent_child-hybrid-late_chunking",
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 36,
+      "cost_cny": 0.01782,
+      "cost_usd": 0.002672,
+      "judge_calls": 38,
+      "parse_failures": 0,
       "retrieval_mode": "hybrid",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-recursive_parent_child-hybrid-late_chunking-20261030T165835-0cecad68",
+      "status": "finished",
+      "tokens_in": 13083,
+      "tokens_out": 1182
     },
     {
       "abstentions": 0,
@@ -350,63 +350,63 @@
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "plain",
       "correct": 36,
-      "cost_cny": 0.019062,
-      "cost_usd": 0.002858,
+      "cost_cny": 0.019038,
+      "cost_usd": 0.002854,
       "judge_calls": 40,
       "parse_failures": 0,
       "retrieval_mode": "hybrid",
       "run_id": "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e",
       "status": "finished",
       "tokens_in": 13916,
-      "tokens_out": 1284
+      "tokens_out": 1278
     },
     {
       "abstentions": 2,
-      "accuracy_all": 0.825,
-      "accuracy_all_hi": 0.925,
-      "accuracy_all_lo": 0.7,
-      "accuracy_answered": 0.8684,
+      "accuracy_all": 0.85,
+      "accuracy_all_hi": 0.95,
+      "accuracy_all_lo": 0.725,
+      "accuracy_answered": 0.8947,
       "accuracy_answered_hi": 0.973684,
-      "accuracy_answered_lo": 0.763158,
+      "accuracy_answered_lo": 0.789474,
       "answerable": 40,
       "answered": 38,
       "cell": "cell-recursive_parent_child-rerank-contextual_prefix",
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "contextual_prefix",
-      "correct": 33,
-      "cost_cny": 0.017962,
-      "cost_usd": 0.002693,
+      "correct": 34,
+      "cost_cny": 0.01783,
+      "cost_usd": 0.002673,
       "judge_calls": 38,
       "parse_failures": 0,
       "retrieval_mode": "rerank",
       "run_id": "grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a",
       "status": "finished",
       "tokens_in": 13093,
-      "tokens_out": 1215
+      "tokens_out": 1182
     },
     {
-      "abstentions": null,
-      "accuracy_all": null,
-      "accuracy_all_hi": null,
-      "accuracy_all_lo": null,
-      "accuracy_answered": null,
-      "accuracy_answered_hi": null,
-      "accuracy_answered_lo": null,
-      "answerable": null,
-      "answered": null,
+      "abstentions": 3,
+      "accuracy_all": 0.85,
+      "accuracy_all_hi": 0.95,
+      "accuracy_all_lo": 0.725,
+      "accuracy_answered": 0.9189,
+      "accuracy_answered_hi": 1.0,
+      "accuracy_answered_lo": 0.810811,
+      "answerable": 40,
+      "answered": 37,
       "cell": "cell-recursive_parent_child-rerank-late_chunking",
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "late_chunking",
-      "correct": null,
-      "cost_cny": null,
-      "cost_usd": null,
-      "judge_calls": null,
-      "parse_failures": null,
+      "correct": 34,
+      "cost_cny": 0.017083,
+      "cost_usd": 0.002561,
+      "judge_calls": 37,
+      "parse_failures": 0,
       "retrieval_mode": "rerank",
-      "run_id": "",
-      "status": "pending",
-      "tokens_in": null,
-      "tokens_out": null
+      "run_id": "grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b",
+      "status": "finished",
+      "tokens_in": 12618,
+      "tokens_out": 1114
     },
     {
       "abstentions": 1,
@@ -422,15 +422,15 @@
       "chunk_strategy": "recursive_parent_child",
       "context_mode": "plain",
       "correct": 36,
-      "cost_cny": 0.018128,
-      "cost_usd": 0.002718,
+      "cost_cny": 0.01802,
+      "cost_usd": 0.002702,
       "judge_calls": 39,
       "parse_failures": 0,
       "retrieval_mode": "rerank",
       "run_id": "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910",
       "status": "finished",
       "tokens_in": 13331,
-      "tokens_out": 1197
+      "tokens_out": 1170
     }
   ],
   "excluded_runs": [
@@ -546,18 +546,18 @@
     "resample_unit": "item",
     "usd_to_cny": 6.67
   },
-  "runs_root": "D:\\DE Project\\wt\\exp\\runs",
+  "runs_root": "runs",
   "totals": {
-    "cache_hits": 457,
-    "cache_misses": 0,
-    "cost_cny": 0.217137,
-    "cost_usd": 0.032554,
-    "finished": 12,
-    "judge_calls": 457,
+    "cache_hits": 243,
+    "cache_misses": 413,
+    "cost_cny": 0.310416,
+    "cost_usd": 0.046539,
+    "finished": 18,
+    "judge_calls": 656,
     "parse_failures": 0,
-    "pending": 6,
-    "tokens_in": 159036,
-    "tokens_out": 14498
+    "pending": 0,
+    "tokens_in": 227829,
+    "tokens_out": 20608
   },
   "verdicts": {
     "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e": [
@@ -586,7 +586,7 @@
         "item_id": "A003",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that the unseal key is needed to decrypt the root key, with additional accurate detail about shards."
+        "reason": "The generated answer correctly states that the unseal key is needed to decrypt the root key, with additional accurate detail."
       },
       {
         "abstained": false,
@@ -604,7 +604,7 @@
         "item_id": "A005",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the token type by its prefix and adds accurate version-specific prefix details."
+        "reason": "The generated answer correctly states that the token type is identified by its prefix and adds accurate version-specific prefix details."
       },
       {
         "abstained": false,
@@ -631,7 +631,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately describes the metric as the duration a server held the leader position before losing it."
+        "reason": "The generated answer accurately restates the reference answer."
       },
       {
         "abstained": false,
@@ -640,7 +640,7 @@
         "item_id": "A009",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference that kv list results are not filtered against ACL policies."
+        "reason": "The generated answer agrees with the reference answer and adds accurate supporting detail."
       },
       {
         "abstained": true,
@@ -667,7 +667,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -685,7 +685,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": true,
@@ -748,7 +748,7 @@
         "item_id": "A021",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only, matching the reference."
+        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only."
       },
       {
         "abstained": false,
@@ -766,7 +766,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and the examples are consistent with that rule."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has long-term support, and the examples are consistent with that rule."
       },
       {
         "abstained": false,
@@ -793,7 +793,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the supported Vault Enterprise versions and adds accurate supporting details."
+        "reason": "The generated answer correctly states the supported versions and adds accurate extra context."
       },
       {
         "abstained": false,
@@ -820,7 +820,7 @@
         "item_id": "A029",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly claims token policies cannot be modified after issuance, whereas the reference says the built-in root policy itself cannot be modified or removed."
+        "reason": "The generated answer incorrectly claims token policies cannot be modified after issuance, whereas the reference says the root policy itself is a built-in policy that cannot be modified or removed."
       },
       {
         "abstained": false,
@@ -829,7 +829,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and that leases are tied to the path."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and that leases are tied to the original path."
       },
       {
         "abstained": true,
@@ -847,7 +847,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer claims client count is based on unique entity assignments, not tokens, contradicting the reference answer that each token adds to client count."
+        "reason": "The generated answer contradicts the reference by saying client count is based on unique entities, not tokens, while the reference says each token adds to client count."
       },
       {
         "abstained": false,
@@ -856,7 +856,7 @@
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states the HMAC-SHA256 hash and that Vault refuses requests when no audit device can record them."
+        "reason": "The generated answer correctly states the HMAC-SHA256 hash and that Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -865,7 +865,7 @@
         "item_id": "A034",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that each node must be unsealed with the required threshold and that partially unsealed nodes are not distributed."
+        "reason": "The generated answer correctly states that each node must be unsealed with the required threshold of shares and that partially unsealed nodes are not distributed across the cluster."
       },
       {
         "abstained": false,
@@ -874,7 +874,7 @@
         "item_id": "A035",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that the data encryption key is protected by a root key, matching the reference answer."
+        "reason": "The generated answer correctly explains that the data encryption key is protected by a root key and adds accurate context about the untrusted storage backend."
       },
       {
         "abstained": false,
@@ -883,7 +883,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference, including the need for root key shares and the purpose of limiting damage."
+        "reason": "The generated answer accurately reflects the reference: sealing limits damage and prevents data access without root key shares, with additional correct detail about unsealing and discarding the in-memory root key."
       },
       {
         "abstained": false,
@@ -892,7 +892,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer introduces memory drain, denial-of-service, and performance degradation claims not stated in the reference answer."
+        "reason": "The generated answer introduces memory drain, cascading node issues, and denial-of-service, which are not stated in the reference answer."
       },
       {
         "abstained": true,
@@ -920,6 +920,368 @@
         "judged": true,
         "parse_failure": false,
         "reason": "The generated answer correctly states there is no mutual trust and adds accurate supporting details."
+      }
+    ],
+    "grid-fixed-dense-late_chunking-20261030T161040-76813f02": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes dev-mode behavior, not the default sealed state stated in the reference."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A003",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the migration is asynchronous and may still be in progress when the call returns."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A005",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference that exactly one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer includes the reference facts and adds accurate detail about performance standby behavior."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes total time a node last maintained leadership, while the reference defines it as how long a server held the leader position before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that kv list results are not filtered against ACL policies."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A010",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference address, port, and lack of TLS."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on the default value and condition."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A013",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A014",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A015",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A016",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's 4 megabytes per blob limit."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only, matching the reference."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A022",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and adds accurate current release details."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A024",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A025",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer includes the exact supported versions from the reference and adds accurate extra context."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly describes reconstructing the root key from threshold shares to unseal Vault, with extra accurate detail."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A028",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A029",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer omits the key fact that every dynamic secret carries a lease, so the issued credentials are revoked with the leases."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer discusses performance and Consul's write behavior but omits the key fact that all archived versions of a KV v2 key must fit within the single 512KB storage entry."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly explains that aliases link multiple logins to one entity, keeping the billed client count down."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states Vault hashes values with HMAC and fails requests when audit devices cannot record them, matching the reference."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A034",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer omits that sealing limits damage by preventing access without root key shares and adds an unstated detail about discarding the in-memory root key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer introduces memory drain, denial-of-service, and cleanup costs not stated in the reference answer."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A039",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes request duration limits, not that the configured storage type limits latency and writes cost more than reads."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A040",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
       }
     ],
     "grid-fixed-dense-plain-20261030T124637-8ae4eb06": [
@@ -984,7 +1346,7 @@
         "item_id": "A007",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds accurate extra detail about forwarding and redirecting."
+        "reason": "The generated answer agrees with the reference and adds accurate extra detail about forwarding."
       },
       {
         "abstained": false,
@@ -1007,11 +1369,11 @@
       {
         "abstained": false,
         "answerable": true,
-        "correct": false,
+        "correct": true,
         "item_id": "A010",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer omits that applications must obtain new leases and adds extra conditions not stated in the reference."
+        "reason": "The generated answer correctly states that applications must reauthenticate and obtain new tokens/leases after promotion."
       },
       {
         "abstained": false,
@@ -1020,7 +1382,7 @@
         "item_id": "A011",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer on address, port, and TLS usage."
+        "reason": "The generated answer matches the reference on both the default address/port and the absence of TLS."
       },
       {
         "abstained": false,
@@ -1029,7 +1391,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -1047,7 +1409,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default value as 90 seconds."
+        "reason": "The generated answer correctly states the default value of 90 seconds."
       },
       {
         "abstained": true,
@@ -1128,7 +1490,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has long-term support, and the examples are consistent with that rule."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has long-term support, and the examples 1.16 and 1.19 are consistent with that rule."
       },
       {
         "abstained": false,
@@ -1164,7 +1526,7 @@
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately describes reconstructing the root key from a threshold of shards and using it to decrypt the encryption key, matching the reference."
+        "reason": "The generated answer correctly explains that a threshold of shards reconstructs the root key, which decrypts the encryption key to unseal the server."
       },
       {
         "abstained": false,
@@ -1173,7 +1535,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states recovery keys are returned instead of unseal keys and are still needed for privileged actions like generating root tokens."
+        "reason": "The generated answer correctly states recovery keys are returned instead of unseal keys and are still needed for privileged actions like generating a root token."
       },
       {
         "abstained": false,
@@ -1182,7 +1544,7 @@
         "item_id": "A029",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer omits that the root policy is built-in and cannot be modified or removed, and adds an unstated claim about non-expiring tokens."
+        "reason": "The generated answer omits that the root policy is built-in and cannot be modified or removed, and adds unverified claims about non-expiry and token policy immutability."
       },
       {
         "abstained": false,
@@ -1191,7 +1553,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes issued credentials because leases are tied to the mount path."
+        "reason": "The generated answer correctly states that remounting revokes issued dynamic credentials because leases are tied to the mount path."
       },
       {
         "abstained": false,
@@ -1200,7 +1562,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states that all archived versions of a single key must fit within the single 512KB storage entry."
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
       },
       {
         "abstained": false,
@@ -1209,7 +1571,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that aliases consolidate multiple logins into one identity so the client is counted once."
+        "reason": "The generated answer correctly explains that consolidating logins into one identity entity prevents separate client counting."
       },
       {
         "abstained": false,
@@ -1245,7 +1607,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer omits that access is cut off to limit damage and that nobody can reach the data without root key shares, and it adds unstated details about discarding the in-memory root key and resetting unsealing."
+        "reason": "The generated answer omits that access is cut off to limit damage and that nobody can reach the data without the root key shares."
       },
       {
         "abstained": false,
@@ -1254,7 +1616,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds specific operational mechanisms (memory drain, DoS, performance degradation) not stated in the reference answer."
+        "reason": "The generated answer adds specific operational consequences (memory drain, DoS, performance degradation) not stated in the reference answer."
       },
       {
         "abstained": false,
@@ -1263,7 +1625,7 @@
         "item_id": "A038",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds correct extra detail."
+        "reason": "The generated answer agrees with the reference and adds correct supporting detail."
       },
       {
         "abstained": false,
@@ -1281,7 +1643,7 @@
         "item_id": "A040",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states there is no mutual trust and adds accurate detail about TLS."
+        "reason": "The generated answer correctly states there is no mutual trust and adds accurate detail about TLS verification."
       }
     ],
     "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950": [
@@ -1328,7 +1690,7 @@
         "item_id": "A005",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the prefix as the indicator and adds accurate version-specific prefix details."
+        "reason": "The generated answer correctly states that the token type is indicated by its prefix and adds accurate version-specific prefix details."
       },
       {
         "abstained": false,
@@ -1364,7 +1726,7 @@
         "item_id": "A009",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference that list results are not filtered against ACL policies."
+        "reason": "The generated answer correctly states that list results are not filtered against ACL policies."
       },
       {
         "abstained": false,
@@ -1373,7 +1735,7 @@
         "item_id": "A010",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer's required actions."
+        "reason": "The generated answer matches the reference answer in substance."
       },
       {
         "abstained": false,
@@ -1391,7 +1753,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -1409,7 +1771,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": true,
@@ -1419,6 +1781,368 @@
         "judged": false,
         "parse_failure": false,
         "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A016",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the smallest accepted value is 2 days."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the gauge metric type and that the value counts distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A022",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community Edition support."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and adds accurate examples."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A024",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A025",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer lists exactly the same values as the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference versions and adds accurate extra context."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer is empty and provides no information."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A028",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states recovery keys are returned and are still needed for privileged actions like generating root tokens."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A029",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the root policy is built-in and cannot be modified or removed, matching the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that remounting revokes existing leases and that leases are tied to the mount path."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly explains that aliases link multiple logins to one identity, preventing separate client counts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately states the HMAC-SHA256 hashing and that Vault refuses requests when no audit device can record them."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A034",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that each node must be unsealed and that partial unseal state is not distributed."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and access requires root key shares."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer adds operational impacts not stated in the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer discusses hierarchical CA intermediates, not why Vault keeps separate encryption keys for separate jobs."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A039",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on both facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A040",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states there is no mutual trust and adds accurate supporting details."
+      }
+    ],
+    "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, matching the reference."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A003",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that an unseal key is needed and adds accurate detail about Shamir seals."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the endpoint is asynchronous and migration continues after the call returns."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A005",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference that exactly one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that the metric measures the duration a server held the leader position before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that kv list results are not filtered by ACL policies."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A010",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer, adding only the correct detail that it is a performance replication secondary."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on address, port, and TLS usage."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A013",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default lease time as 32 days."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A014",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default value as 90 seconds."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A015",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer states the cache is unlimited, but the reference says it holds 131072 entries by default."
       },
       {
         "abstained": false,
@@ -1463,7 +2187,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference on metric type and what the value counts, with only harmless extra context."
+        "reason": "The generated answer correctly identifies the gauge metric type and that the value counts distinct non-entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -1481,7 +2205,7 @@
         "item_id": "A022",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community Edition support."
+        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community edition support."
       },
       {
         "abstained": false,
@@ -1490,7 +2214,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and its examples are consistent with that rule."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and adds accurate examples."
       },
       {
         "abstained": false,
@@ -1517,16 +2241,16 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the supported versions and adds accurate context about the cleanup issue."
+        "reason": "The generated answer matches the reference answer exactly."
       },
       {
         "abstained": false,
         "answerable": true,
-        "correct": false,
+        "correct": true,
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer is empty and provides no information."
+        "reason": "The generated answer accurately describes reconstructing the root key from a threshold of shards and using it to decrypt the encryption key."
       },
       {
         "abstained": false,
@@ -1535,7 +2259,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states recovery keys are returned and are still needed for privileged actions like generating root credentials."
+        "reason": "The generated answer correctly states recovery keys are returned and still needed for privileged actions like generating a root token."
       },
       {
         "abstained": false,
@@ -1544,7 +2268,7 @@
         "item_id": "A029",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the root policy is built-in and cannot be modified or removed, matching the reference answer."
+        "reason": "The generated answer accurately states that a root token has the root policy attached and that this policy cannot be modified or removed."
       },
       {
         "abstained": false,
@@ -1553,7 +2277,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and that leases are tied to the mount path."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and therefore the issued credentials."
       },
       {
         "abstained": false,
@@ -1562,7 +2286,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states that all archived versions of a single key must fit within the single 512KB storage entry."
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
       },
       {
         "abstained": false,
@@ -1571,7 +2295,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately explains that aliases link multiple logins to one identity, preventing separate client counts."
+        "reason": "The generated answer agrees with the reference and adds correct supporting detail about aliases and identity entities."
       },
       {
         "abstained": false,
@@ -1580,7 +2304,7 @@
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states the HMAC-SHA256 hashing and that Vault refuses requests when no audit device can record them."
+        "reason": "The generated answer correctly states the HMAC-SHA256 hash and that Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -1589,7 +2313,7 @@
         "item_id": "A034",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that each node must be unsealed and that partial unseal state is not distributed."
+        "reason": "The generated answer agrees that unsealing one node does not unseal the whole cluster and adds correct detail about joining nodes."
       },
       {
         "abstained": true,
@@ -1607,7 +2331,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents access without root key shares."
+        "reason": "The generated answer accurately conveys that sealing quickly limits damage and that data cannot be accessed without root key shares."
       },
       {
         "abstained": false,
@@ -1616,25 +2340,25 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer describes memory drain, performance degradation, and operational work, but does not state that unbounded lease growth can cause serious issues with the underlying storage and then with Vault itself."
+        "reason": "The generated answer adds operational impacts not stated in the reference answer."
       },
       {
-        "abstained": false,
+        "abstained": true,
         "answerable": true,
         "correct": false,
         "item_id": "A038",
-        "judged": true,
+        "judged": false,
         "parse_failure": false,
-        "reason": "The generated answer discusses PKI/CA hierarchy, not why Vault keeps separate encryption keys per job for targeted rotation."
+        "reason": "the system abstained on an answerable item"
       },
       {
-        "abstained": false,
+        "abstained": true,
         "answerable": true,
-        "correct": true,
+        "correct": false,
         "item_id": "A039",
-        "judged": true,
+        "judged": false,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer on both facts."
+        "reason": "the system abstained on an answerable item"
       },
       {
         "abstained": false,
@@ -1681,7 +2405,7 @@
         "item_id": "A004",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration may still be in progress when the call returns."
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration may still be in progress after the call returns."
       },
       {
         "abstained": false,
@@ -1690,7 +2414,7 @@
         "item_id": "A005",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the prefix indicates token type and adds accurate version-specific prefixes."
+        "reason": "The generated answer correctly states that the token type is identified by its prefix and adds accurate version-specific prefix details."
       },
       {
         "abstained": false,
@@ -1708,7 +2432,7 @@
         "item_id": "A007",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that only the active server processes requests and the standby redirects them to an active Vault server."
+        "reason": "The generated answer matches the reference and adds a correct detail about forwarding or redirecting."
       },
       {
         "abstained": false,
@@ -1717,7 +2441,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately describes the metric as the duration a server held the leader position before losing it."
+        "reason": "The generated answer matches the reference answer and adds correct clarifying detail."
       },
       {
         "abstained": false,
@@ -1753,7 +2477,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -1771,7 +2495,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -1798,7 +2522,7 @@
         "item_id": "A017",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer's 4 megabytes per blob limit."
+        "reason": "The generated answer matches the reference answer's stated maximum of 4 megabytes per blob."
       },
       {
         "abstained": false,
@@ -1825,7 +2549,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference: gauge type and counts distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly states the metric type is gauge and the value counts distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -1834,7 +2558,7 @@
         "item_id": "A021",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only, not Community Edition."
+        "reason": "The generated answer correctly states that lease count quotas cap the number of leases and are not available in Community Edition."
       },
       {
         "abstained": false,
@@ -1852,7 +2576,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes LTS, and adds accurate examples."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and adds accurate extra detail about 1.16 and 1.19."
       },
       {
         "abstained": false,
@@ -1888,7 +2612,7 @@
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately describes unsealing via threshold reconstruction of the root key."
+        "reason": "The generated answer accurately describes unsealing via threshold shards reconstructing the root key to decrypt the encryption key."
       },
       {
         "abstained": false,
@@ -1897,7 +2621,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that recovery keys are returned instead of unseal keys and are still needed for privileged actions like generating a root token."
+        "reason": "The generated answer correctly states that recovery keys are returned instead of unseal keys and that recovery keys are still needed for privileged operations such as generating a root token."
       },
       {
         "abstained": false,
@@ -1915,7 +2639,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and the credentials are revoked because leases are tied to the path."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and that credentials are revoked because leases are tied to the mount path."
       },
       {
         "abstained": true,
@@ -1951,7 +2675,7 @@
         "item_id": "A034",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that each node must be unsealed and partially unsealed nodes are not distributed."
+        "reason": "The generated answer correctly states that each node must be unsealed with the required threshold and that partially unsealed nodes are not distributed."
       },
       {
         "abstained": true,
@@ -1969,7 +2693,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference: sealing limits damage and prevents data access without root key shares."
+        "reason": "The generated answer accurately conveys the reference's points about quick damage limitation and requiring root key shares for access."
       },
       {
         "abstained": false,
@@ -1987,7 +2711,7 @@
         "item_id": "A038",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer describes tokenization transformation separation, not the reference answer's reason about storing different encryption keys for different purposes and targeted rotation."
+        "reason": "The generated answer describes tokenization transformation separation, not the reference answer's reason about different encryption keys for different purposes and targeted rotation."
       },
       {
         "abstained": false,
@@ -1996,7 +2720,7 @@
         "item_id": "A039",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference on both the limiting factor and the higher cost of writes."
+        "reason": "The generated answer matches the reference on both the limiting factor and the relative cost of writes versus reads."
       },
       {
         "abstained": false,
@@ -2016,7 +2740,7 @@
         "item_id": "A001",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default sealed state and adds accurate extra detail about dev-mode."
+        "reason": "The generated answer correctly states the default sealed state and adds accurate detail about the dev-mode exception."
       },
       {
         "abstained": false,
@@ -2025,7 +2749,7 @@
         "item_id": "A002",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, and adds accurate detail about tracking and expiry."
+        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, matching the reference."
       },
       {
         "abstained": false,
@@ -2043,7 +2767,7 @@
         "item_id": "A004",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns."
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns, with accurate extra detail."
       },
       {
         "abstained": false,
@@ -2061,7 +2785,7 @@
         "item_id": "A006",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that only one recovery token can exist at a time."
+        "reason": "The generated answer matches the reference that exactly one recovery token can exist at a time."
       },
       {
         "abstained": false,
@@ -2079,7 +2803,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference answer's meaning."
+        "reason": "The generated answer correctly states that the metric measures the duration a server held the leader position before losing it."
       },
       {
         "abstained": false,
@@ -2097,7 +2821,7 @@
         "item_id": "A010",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer, adding only the correct detail that it is a performance replication secondary."
+        "reason": "The generated answer matches the reference answer, with only an acceptable extra qualifier about performance replication."
       },
       {
         "abstained": false,
@@ -2133,7 +2857,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -2142,7 +2866,7 @@
         "item_id": "A015",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default cache size of 131072 entries."
+        "reason": "The generated answer correctly states the default is 131072 entries."
       },
       {
         "abstained": false,
@@ -2151,7 +2875,7 @@
         "item_id": "A016",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer and adds the equivalent notation."
+        "reason": "The generated answer matches the reference answer of 2 days."
       },
       {
         "abstained": false,
@@ -2187,7 +2911,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the metric type as gauge and that the value counts distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -2241,7 +2965,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly lists the supported Vault Enterprise versions and adds accurate supporting detail."
+        "reason": "The generated answer includes all supported versions from the reference and adds accurate explanatory detail."
       },
       {
         "abstained": false,
@@ -2250,7 +2974,7 @@
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the unseal key decrypts the root key; the shards reconstruct the root key, which is then used to decrypt the encryption key."
+        "reason": "The generated answer incorrectly says the unseal key decrypts the root key, while the reference says the shards reconstruct the plaintext root key, which then decrypts the encryption key."
       },
       {
         "abstained": false,
@@ -2286,7 +3010,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the cap is per version, while the reference says all archived versions of a key must fit together in one 512KB storage entry."
+        "reason": "The generated answer incorrectly says the cap applies per version, while the reference says all archived versions of a key must fit together in one 512KB storage entry."
       },
       {
         "abstained": false,
@@ -2304,7 +3028,7 @@
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference on both the HMAC-SHA256 hash and Vault not responding when no audit device can record requests."
+        "reason": "The generated answer matches the reference: HMAC-SHA256 hash instead of values, and Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -2340,7 +3064,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds operational consequences not stated in the reference answer."
+        "reason": "The generated answer introduces memory drain, cluster-wide denial-of-service, and performance degradation, none of which are stated in the reference answer."
       },
       {
         "abstained": true,
@@ -2368,6 +3092,368 @@
         "judged": true,
         "parse_failure": false,
         "reason": "The generated answer correctly states there is no mutual trust and adds accurate supporting details."
+      }
+    ],
+    "grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the sealed state and adds accurate extra detail about dev mode."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A003",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that an unseal key is needed to decrypt the root key and adds accurate supporting detail."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A005",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that the token type is indicated by its prefix and adds accurate version-specific prefix details."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that only one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference on both the active server processing requests and the standby redirecting them."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that the metric measures the duration a server held the leader position before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer that list results are not ACL-filtered."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A010",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that applications must reauthenticate and obtain new leases from the newly promoted primary."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on address, port, and TLS usage."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default of 1GB for logshipper_buffer_size when host memory cannot be read."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A013",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default lease time as 32 days."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A014",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer of 90 seconds."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A015",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's value of 131,072 entries."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A016",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the smallest value is 2 days."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's stated maximum of 4 megabytes per blob."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are not available in Community Edition."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A022",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community edition support."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and the listed versions are consistent with that rule."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A024",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A025",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer lists exactly the same four values as the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer includes all supported versions from the reference and adds accurate extra context."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately describes reconstructing the root key from a threshold of shards and using it to decrypt the encryption key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A028",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states recovery keys are returned and still needed for privileged actions like generating a root token."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A029",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that a root token has the root policy attached and that this policy cannot be modified or removed."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that remounting revokes existing leases and therefore the issued credentials, matching the reference."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately explains that tokens and unique authentications affect client count and that aliases linking logins to one identity prevent separate counting."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately reflects both the HMAC-SHA256 hashing and the no-response behavior when audit logging is unavailable."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A034",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately states that each node must be unsealed and unsealing one node does not bring the whole cluster up."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference and adds accurate extra detail about sealing."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer adds operational details not present in the reference answer, which only states it can cause serious issues with the underlying storage and then Vault itself."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes unseal/recovery key separation with HSMs, not the reference answer's reason about separate encryption keys for different purposes and targeted rotation."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A039",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A040",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
       }
     ],
     "grid-fixed-rerank-plain-20261030T125648-57be667d": [
@@ -2477,7 +3563,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -2495,7 +3581,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -2549,7 +3635,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the metric type as gauge and the value as distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -2576,7 +3662,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and adds accurate examples."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and adds accurate examples."
       },
       {
         "abstained": false,
@@ -2603,7 +3689,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer states the same supported Vault Enterprise versions and adds accurate context about 2.0.x/2.1.x."
+        "reason": "The generated answer states the same supported Vault Enterprise versions as the reference and adds accurate context."
       },
       {
         "abstained": false,
@@ -2648,7 +3734,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states that all archived versions of a single key must fit within the single 512KB storage entry."
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
       },
       {
         "abstained": false,
@@ -2657,16 +3743,16 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that linking logins to one identity entity prevents separate identity counts, consistent with the reference."
+        "reason": "The generated answer correctly explains that linking logins to one identity entity prevents separate identity counts."
       },
       {
         "abstained": false,
         "answerable": true,
-        "correct": false,
+        "correct": true,
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds the condition 'if audit devices are enabled' and states Vault refuses requests when no enabled device can log, whereas the reference says Vault does not respond when audit devices are not enabled to record them."
+        "reason": "The generated answer accurately states the HMAC-SHA256 hashing and that Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -2675,7 +3761,7 @@
         "item_id": "A034",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference: each node must be unsealed individually with the required threshold."
+        "reason": "The generated answer correctly states that each node must be unsealed individually and that unsealing one node does not bring the whole cluster up."
       },
       {
         "abstained": true,
@@ -2693,7 +3779,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects that sealing limits damage and prevents data access without root key shares."
+        "reason": "The generated answer accurately reflects the reference: sealing limits damage and prevents data access without root key shares."
       },
       {
         "abstained": false,
@@ -2702,7 +3788,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds operational consequences not stated in the reference answer."
+        "reason": "The generated answer introduces memory drain, cluster-wide denial-of-service, and performance degradation, none of which are stated in the reference answer."
       },
       {
         "abstained": false,
@@ -2776,7 +3862,7 @@
         "item_id": "A005",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that the token type is identified by its prefix and adds accurate version-specific prefix details."
+        "reason": "The generated answer correctly identifies the prefix as the indicator and adds accurate version-specific prefix details."
       },
       {
         "abstained": false,
@@ -2830,7 +3916,7 @@
         "item_id": "A011",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default address 127.0.0.1:8200 and that it uses HTTP rather than HTTPS/TLS."
+        "reason": "The generated answer correctly states the dev server listens on 127.0.0.1:8200 over HTTP, which implies no TLS."
       },
       {
         "abstained": false,
@@ -2839,7 +3925,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB."
+        "reason": "The generated answer correctly states the default is 1GB."
       },
       {
         "abstained": false,
@@ -2848,7 +3934,7 @@
         "item_id": "A013",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default lease time as 32 days or 768 hours, matching the reference."
+        "reason": "The generated answer matches the reference answer and adds correct extra detail."
       },
       {
         "abstained": false,
@@ -2866,7 +3952,7 @@
         "item_id": "A015",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default cache size of 131072 entries."
+        "reason": "The generated answer correctly states the default is 131072 entries and adds accurate detail about the cache_size parameter."
       },
       {
         "abstained": true,
@@ -2911,7 +3997,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the metric type as gauge and the value as distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -2965,7 +4051,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly lists the supported Vault Enterprise versions and adds accurate supporting detail."
+        "reason": "The generated answer includes the same supported versions as the reference and adds accurate supporting detail."
       },
       {
         "abstained": false,
@@ -2974,7 +4060,7 @@
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the reconstructed unseal key decrypts the root key, but the reference says the shards reconstruct the root key itself, which then decrypts the encryption key."
+        "reason": "The generated answer incorrectly says the unseal key decrypts the root key, whereas the reference says the shards reconstruct the root key and the root key decrypts the encryption key."
       },
       {
         "abstained": false,
@@ -3010,7 +4096,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the cap is per version, while the reference says all archived versions of a key must fit in one 512KB storage entry."
+        "reason": "The generated answer says the cap applies per version, but the reference says all archived versions of a key must fit in one 512KB storage entry."
       },
       {
         "abstained": false,
@@ -3055,7 +4141,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer omits the key fact that nobody can access data without root key shares and adds unstated details about resetting the unseal process."
+        "reason": "The generated answer omits the key fact that nobody can access the data without the root key shares and adds details not in the reference."
       },
       {
         "abstained": false,
@@ -3064,7 +4150,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds specific operational consequences not stated in the reference answer."
+        "reason": "The generated answer adds operational consequences not stated in the reference answer, which only mentions issues with underlying storage and Vault itself."
       },
       {
         "abstained": false,
@@ -3092,6 +4178,368 @@
         "judged": true,
         "parse_failure": false,
         "reason": "The generated answer matches the reference answer."
+      }
+    ],
+    "grid-recursive_parent_child-dense-late_chunking-20261030T164237-9b6dc31d": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer adds a dev-mode condition and says unsealed, contradicting the reference that it starts sealed."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A003",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer states multiple shares are needed, but the reference says an unseal key is needed."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the migration may still be in progress when the call returns."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A005",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that exactly one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer says it measures total time, but the reference says it measures how long a server held the leader position before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that kv list results are not filtered against ACL policies."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A010",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on address, port, and TLS usage."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default is 1GB."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A013",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A014",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A015",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A016",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's stated maximum of 4 megabytes per blob."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A022",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and adds accurate extra detail."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A024",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A025",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference versions exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly explains that the threshold of shards reconstructs the root key to unseal the server."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A028",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A029",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that remounting revokes existing leases and that dynamic secrets carry leases, matching the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer discusses performance and Consul behavior but does not state that all archived versions of a KV v2 key must fit within the single 512KB storage entry."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly explains that aliases map multiple logins to one entity, while tokens without an entity are counted as unique clients."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states Vault writes an HMAC hash instead of the value and that requests fail when audit devices cannot record them."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A034",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer discusses sealing, unsealing, and Shamir's Secret Sharing, but does not state that the data encryption key is encrypted with a second key so it is protected by the root key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately describes sealing as stopping operations and discarding the in-memory root key, which aligns with cutting off access to limit damage."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes lease explosions and denial-of-service, but the reference answer states it can cause serious issues with underlying storage and then Vault itself."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A039",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A040",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer omits the key assumption that there is no mutual trust between client and server."
       }
     ],
     "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e": [
@@ -3129,7 +4577,7 @@
         "item_id": "A004",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration may still be in progress when the call returns."
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns."
       },
       {
         "abstained": false,
@@ -3147,7 +4595,7 @@
         "item_id": "A006",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that only one recovery token can exist at a time."
+        "reason": "The generated answer matches the reference that exactly one recovery token can exist at a time."
       },
       {
         "abstained": false,
@@ -3156,7 +4604,7 @@
         "item_id": "A007",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds accurate extra detail about active/standby behavior."
+        "reason": "The generated answer agrees with the reference and adds correct extra detail about active/standby behavior."
       },
       {
         "abstained": false,
@@ -3165,7 +4613,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the metric measures the duration a server held the leader position before losing it, matching the reference."
+        "reason": "The generated answer correctly states the metric measures how long a server held the leader position before losing it, matching the reference."
       },
       {
         "abstained": false,
@@ -3183,7 +4631,7 @@
         "item_id": "A010",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer, with only an additional correct qualifier about performance replication."
+        "reason": "The generated answer matches the reference answer and adds a correct clarifying detail about performance replication."
       },
       {
         "abstained": false,
@@ -3201,7 +4649,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -3228,7 +4676,7 @@
         "item_id": "A015",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 131,072 entries and adds accurate detail about the cache_size parameter."
+        "reason": "The generated answer matches the reference answer and adds correct extra detail."
       },
       {
         "abstained": true,
@@ -3327,7 +4775,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer exactly."
+        "reason": "The generated answer matches the reference answer on all supported Vault Enterprise versions."
       },
       {
         "abstained": false,
@@ -3354,7 +4802,7 @@
         "item_id": "A029",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer says token policies cannot be modified after issuance, but the reference says the root policy itself cannot be modified or removed."
+        "reason": "The generated answer says policies cannot be modified after issuance, but the reference says the root policy itself is a built-in policy that cannot be modified or removed."
       },
       {
         "abstained": false,
@@ -3363,7 +4811,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and invalidates the issued dynamic credentials, with the reason that leases are tied to the mount path."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and invalidates the issued dynamic credentials, matching the reference."
       },
       {
         "abstained": false,
@@ -3381,7 +4829,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that multiple accounts map to one entity with aliases, which is how Vault counts clients."
+        "reason": "The generated answer correctly explains that multiple accounts are mapped to one entity with aliases, which is how Vault counts clients."
       },
       {
         "abstained": false,
@@ -3390,7 +4838,7 @@
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference on both the HMAC-SHA256 hash and Vault not responding when no audit device can record requests."
+        "reason": "The generated answer correctly states the HMAC-SHA256 hash and that Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -3417,7 +4865,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds accurate extra detail about deleting the root key and requiring unseal."
+        "reason": "The generated answer agrees with the reference and adds accurate detail about deleting the root key and requiring unseal."
       },
       {
         "abstained": false,
@@ -3435,7 +4883,7 @@
         "item_id": "A038",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds correct extra detail about HSM unseal and recovery keys."
+        "reason": "The generated answer agrees with the reference that Vault uses separate keys for different purposes and adds correct extra detail about HSM unseal and recovery keys."
       },
       {
         "abstained": true,
@@ -3464,7 +4912,7 @@
         "item_id": "A001",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that a Vault server starts in a sealed state, with the additional accurate detail that this is the default."
+        "reason": "The generated answer correctly states that a Vault server starts in a sealed state, with the extra detail 'by default' not contradicting the reference."
       },
       {
         "abstained": false,
@@ -3473,7 +4921,7 @@
         "item_id": "A002",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, and adds accurate detail about tracking and expiry."
+        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, and adds accurate detail about lease tracking and token expiry."
       },
       {
         "abstained": false,
@@ -3491,7 +4939,7 @@
         "item_id": "A004",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns, with accurate extra detail."
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the move may still be in progress when the call returns, with additional accurate details."
       },
       {
         "abstained": false,
@@ -3500,7 +4948,7 @@
         "item_id": "A005",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that the token type is identified by its prefix and adds accurate extra detail about the specific prefixes and version changes."
+        "reason": "The generated answer correctly states that the token type is identified by its prefix and adds accurate version-specific prefix details."
       },
       {
         "abstained": false,
@@ -3536,7 +4984,7 @@
         "item_id": "A009",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that list results are not filtered and adds a valid caution about key names."
+        "reason": "The generated answer correctly states that list results are not filtered against ACL policies."
       },
       {
         "abstained": false,
@@ -3545,7 +4993,7 @@
         "item_id": "A010",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that applications must reauthenticate and obtain new leases from the newly promoted primary."
+        "reason": "The generated answer correctly states that applications must reauthenticate and obtain new leases, and adds accurate supporting detail."
       },
       {
         "abstained": false,
@@ -3554,7 +5002,7 @@
         "item_id": "A011",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default address, port, and absence of TLS, with accurate extra detail about opting into TLS."
+        "reason": "The generated answer correctly states the default address, port, and that TLS is not used by default."
       },
       {
         "abstained": false,
@@ -3563,7 +5011,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -3572,7 +5020,7 @@
         "item_id": "A013",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference answer and adds correct context."
+        "reason": "The generated answer matches the reference answer on the default lease time and adds correct context."
       },
       {
         "abstained": false,
@@ -3581,7 +5029,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -3635,7 +5083,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the metric type as gauge and the value as distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -3662,7 +5110,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference and adds correct examples and current LTS details."
+        "reason": "The generated answer agrees with the reference and adds correct examples of LTS releases."
       },
       {
         "abstained": false,
@@ -3698,7 +5146,7 @@
         "item_id": "A027",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the reconstructed unseal key decrypts the root key, whereas the reference says the shards reconstruct the root key itself, which then decrypts the encryption key."
+        "reason": "The generated answer incorrectly says the reconstructed unseal key decrypts the root key, whereas the shards reconstruct the root key itself."
       },
       {
         "abstained": false,
@@ -3707,7 +5155,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states recovery keys are returned instead of unseal keys and are still needed for privileged actions like generating root credentials."
+        "reason": "The generated answer correctly states recovery keys are returned instead of unseal keys and are later required for privileged actions like generating root credentials."
       },
       {
         "abstained": false,
@@ -3716,7 +5164,7 @@
         "item_id": "A029",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that a root token has the built-in root policy, which cannot be modified or removed, and adds accurate extra detail."
+        "reason": "The generated answer correctly states that a root token has the built-in root policy, which cannot be modified or removed."
       },
       {
         "abstained": false,
@@ -3725,7 +5173,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and that leases are tied to the mount path."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and ties revocation to the path."
       },
       {
         "abstained": false,
@@ -3743,7 +5191,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately explains that aliases linking logins to one identity prevent separate client counts."
+        "reason": "The generated answer accurately explains that tokens from unique authentications increase client count and that aliases linking logins to one identity prevent separate counting."
       },
       {
         "abstained": false,
@@ -3779,7 +5227,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents data access without root key shares, with additional correct detail."
+        "reason": "The generated answer accurately reflects the reference by stating sealing limits damage and prevents data access without root key shares, with additional correct detail."
       },
       {
         "abstained": false,
@@ -3788,7 +5236,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds operational consequences not stated in the reference answer, which only mentions issues with underlying storage and Vault itself."
+        "reason": "The generated answer adds operational details not stated in the reference answer and omits the reference's point about issues with underlying storage and Vault itself."
       },
       {
         "abstained": false,
@@ -3797,7 +5245,7 @@
         "item_id": "A038",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer discusses PKI mount separation and permissions, not the reference answer's reason about separate encryption keys and targeted rotation."
+        "reason": "The generated answer discusses PKI mount separation and permissions, not the reference answer's point about separate encryption keys and targeted rotation."
       },
       {
         "abstained": false,
@@ -3807,6 +5255,368 @@
         "judged": true,
         "parse_failure": false,
         "reason": "The generated answer matches the reference answer on both facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A040",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states there is no mutual trust and adds accurate supporting details."
+      }
+    ],
+    "grid-recursive_parent_child-hybrid-late_chunking-20261030T165835-0cecad68": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that a Vault server starts in a sealed state."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A003",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that an unseal key is needed to decrypt the root key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the endpoint is asynchronous and migration continues after the call returns."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A005",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the prefix as the indicator and adds accurate version-specific prefix details."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that only one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that only the active server processes all requests and the standby redirects requests to an active Vault server, with additional accurate detail."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that the metric measures the duration a server held the leader position before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer agrees with the reference that kv list results are not filtered against ACL policies."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A010",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference address, port, and lack of TLS."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A013",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A014",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer of 90 seconds."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A015",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A016",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer of 2 days."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's stated maximum of 4 megabytes per blob."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are not available in Community edition."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A022",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community Edition support."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and identifies 1.16 and 1.19 as LTS releases."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A024",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A025",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer lists exactly the same four values as the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer includes the exact supported versions from the reference and adds a correct prerequisite detail."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately describes reconstructing the root key from a threshold of shards and using it to decrypt the encryption key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A028",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states recovery keys are returned and are still needed for privileged actions like generating a root token."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A029",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that the root policy identifies root access and cannot be modified or removed."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that remounting revokes existing leases and that dynamic credentials are lease-managed, so issued credentials are revoked."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer discusses performance and Consul behavior but does not state that all archived versions of a KV v2 key must fit within the single 512KB storage entry."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately explains that aliases link multiple logins to one identity, preventing separate client counts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately states the HMAC-SHA256 hashing and that Vault refuses requests when no audit device can record them."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A034",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that each node must be unsealed with the required threshold of shares."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately reflects the reference: sealing limits damage and prevents data access without root key shares."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer adds operational impacts not stated in the reference answer, which only mentions issues with underlying storage and Vault itself."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A039",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference on both the limiting factor and the relative cost of writes versus reads."
       },
       {
         "abstained": false,
@@ -3835,7 +5645,7 @@
         "item_id": "A002",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, and adds accurate detail about tracking and expiration."
+        "reason": "The generated answer correctly states that all leases created with the revoked service token are revoked, matching the reference."
       },
       {
         "abstained": false,
@@ -3898,7 +5708,7 @@
         "item_id": "A009",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference answer and adds accurate supporting detail."
+        "reason": "The generated answer agrees with the reference that kv list results are not filtered against ACL policies."
       },
       {
         "abstained": false,
@@ -3916,7 +5726,7 @@
         "item_id": "A011",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference on both the address/port and the absence of TLS."
+        "reason": "The generated answer matches the reference on both the default address/port and the absence of TLS."
       },
       {
         "abstained": false,
@@ -3925,7 +5735,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -3943,7 +5753,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -4006,7 +5816,7 @@
         "item_id": "A021",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference: lease count quotas cap leases and are Enterprise only, not Community."
+        "reason": "The generated answer correctly identifies lease count quotas and states they are Enterprise only, not Community."
       },
       {
         "abstained": false,
@@ -4069,7 +5879,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states recovery keys are returned instead of unseal keys and are still needed for privileged actions like generating root credentials."
+        "reason": "The generated answer correctly states recovery keys are returned and are still needed for privileged actions like generating root tokens and rekeying."
       },
       {
         "abstained": false,
@@ -4087,7 +5897,7 @@
         "item_id": "A030",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that remounting revokes existing leases and thus already-issued dynamic credentials, with a compatible explanation."
+        "reason": "The generated answer correctly states that remounting revokes existing leases and thus already-issued dynamic credentials, with a consistent explanation."
       },
       {
         "abstained": false,
@@ -4096,7 +5906,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly says the cap applies per version, while the reference says all archived versions of a key must fit in one 512KB storage entry."
+        "reason": "The generated answer incorrectly says the cap applies per version, while the reference says all archived versions of a key must fit within one 512KB storage entry."
       },
       {
         "abstained": false,
@@ -4105,7 +5915,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately explains that linking logins to one identity entity keeps the client count down, consistent with the reference."
+        "reason": "The generated answer accurately reflects the reference explanation and adds correct supporting detail."
       },
       {
         "abstained": false,
@@ -4132,7 +5942,7 @@
         "item_id": "A035",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that the root key protects the internal encryption key, which matches the reference answer's meaning."
+        "reason": "The generated answer correctly explains that the root key protects the internal encryption key, which matches the reference answer's intent."
       },
       {
         "abstained": false,
@@ -4141,7 +5951,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents data access without root key shares."
+        "reason": "The generated answer correctly states that sealing limits damage and prevents data access without root key shares, and adds accurate detail about deleting the root key from memory."
       },
       {
         "abstained": false,
@@ -4251,7 +6061,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately describes the metric as the duration a server held the leader position before losing it."
+        "reason": "The generated answer accurately describes the metric as the duration a server held leadership before losing it."
       },
       {
         "abstained": false,
@@ -4260,7 +6070,7 @@
         "item_id": "A009",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference that list results are not filtered against ACL policies."
+        "reason": "The generated answer correctly states that list results are not filtered against ACL policies."
       },
       {
         "abstained": false,
@@ -4287,7 +6097,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB."
+        "reason": "The generated answer correctly states the default is 1GB."
       },
       {
         "abstained": false,
@@ -4382,11 +6192,11 @@
       {
         "abstained": false,
         "answerable": true,
-        "correct": false,
+        "correct": true,
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer incorrectly states 1.16.x is an extended maintenance release and misidentifies the current LTS release."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year includes long-term support, and its examples are consistent with that rule."
       },
       {
         "abstained": false,
@@ -4413,7 +6223,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer states the same supported versions and adds accurate context about the known issue."
+        "reason": "The generated answer includes all supported versions from the reference and adds accurate extra context."
       },
       {
         "abstained": false,
@@ -4458,7 +6268,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states that all archived versions of a single key must fit within the single 512KB storage entry."
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
       },
       {
         "abstained": false,
@@ -4467,7 +6277,7 @@
         "item_id": "A032",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately explains that aliases map multiple logins to one identity, preventing separate token-based client counts."
+        "reason": "The generated answer accurately reflects the reference explanation that aliases link multiple logins to one identity, preventing separate token-based client counts."
       },
       {
         "abstained": false,
@@ -4494,7 +6304,7 @@
         "item_id": "A035",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds an unstated claim about the root key being stored alongside Vault data and encrypted by the unseal key, which is not in the reference answer."
+        "reason": "The generated answer adds an unstated unseal-key mechanism and an untrusted-backend rationale not present in the reference answer."
       },
       {
         "abstained": false,
@@ -4503,7 +6313,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately reflects the reference: sealing cuts off access quickly to limit damage and prevents data access without root key shares."
+        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents data access without root key shares."
       },
       {
         "abstained": false,
@@ -4512,7 +6322,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer adds operational details not present in the reference answer, such as memory drain, cascading to other nodes, and denial-of-service."
+        "reason": "The generated answer adds operational impacts not stated in the reference answer."
       },
       {
         "abstained": false,
@@ -4522,6 +6332,368 @@
         "judged": true,
         "parse_failure": false,
         "reason": "The generated answer describes unseal/recovery key separation, not the reference's point about separate encryption keys per purpose and targeted rotation."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A039",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference on both the limiting factor and the relative cost of writes versus reads."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A040",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states there is no mutual trust and adds accurate supporting details."
+      }
+    ],
+    "grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b": [
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A001",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the server starts sealed and adds accurate extra detail about initial uninitialized state."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A002",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A003",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that an unseal key is needed to decrypt the root key."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A004",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the move may not be finished when the call returns."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A005",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the prefix as the indicator and adds accurate version-specific prefix details."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A006",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that only one recovery token can exist at a time."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A007",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A008",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately describes the metric as the duration a server held leadership before losing it."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A009",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A010",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer in meaning and facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A011",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference on both the default address/port and the absence of TLS."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A012",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A013",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A014",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states the default value as 90 seconds."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A015",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A016",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A017",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer's 4 megabytes per blob limit."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A018",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A019",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer on all stated facts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A020",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A021",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies lease count quotas and states they are unavailable in Community and available in Enterprise."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A022",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly identifies rate limit quotas and confirms Community Edition support."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A023",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and its examples are consistent with that rule."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A024",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer matches the reference answer exactly."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A025",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer lists exactly the same four values as the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A026",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer states the same supported Vault Enterprise versions as the reference answer and adds accurate clarifying detail."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A027",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer is empty and provides no information."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A028",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that recovery keys are returned instead of unseal keys and are still needed for privileged quorum operations."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A029",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A030",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately states that remounting revokes existing leases and that dynamic credentials are tied to those leases."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A031",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A032",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately explains that aliases linking logins to one identity prevent separate client counts."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A033",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately states the HMAC-SHA256 hashing and that Vault refuses requests when no audit device can record them."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A034",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer correctly states that each node must be unsealed with the required threshold and that partial unsealing is not distributed."
+      },
+      {
+        "abstained": true,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A035",
+        "judged": false,
+        "parse_failure": false,
+        "reason": "the system abstained on an answerable item"
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": true,
+        "item_id": "A036",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents data access without root key shares."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A037",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer introduces memory drain, denial-of-service, and cleanup costs not stated in the reference answer."
+      },
+      {
+        "abstained": false,
+        "answerable": true,
+        "correct": false,
+        "item_id": "A038",
+        "judged": true,
+        "parse_failure": false,
+        "reason": "The generated answer describes unseal vs recovery keys with an HSM, not why Vault keeps separate keys for separate jobs."
       },
       {
         "abstained": false,
@@ -4577,7 +6749,7 @@
         "item_id": "A004",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the endpoint is asynchronous and the migration continues after the call returns."
+        "reason": "The generated answer correctly states the endpoint is asynchronous and the mount is not fully moved when the call returns."
       },
       {
         "abstained": false,
@@ -4595,7 +6767,7 @@
         "item_id": "A006",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states that only one recovery token can exist at a time."
+        "reason": "The generated answer matches the reference that exactly one recovery token can exist at a time."
       },
       {
         "abstained": false,
@@ -4613,7 +6785,7 @@
         "item_id": "A008",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the metric measures how long a server held the leader position before losing it, with additional accurate detail."
+        "reason": "The generated answer correctly states the metric measures how long a server held the leader position before losing it."
       },
       {
         "abstained": false,
@@ -4649,7 +6821,7 @@
         "item_id": "A012",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states the default of 1GB for the replication log shipper buffer size."
+        "reason": "The generated answer correctly states the default of 1GB for the log shipper buffer size."
       },
       {
         "abstained": false,
@@ -4667,7 +6839,7 @@
         "item_id": "A014",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer matches the reference value of 90 seconds."
+        "reason": "The generated answer matches the reference answer of 90 seconds."
       },
       {
         "abstained": false,
@@ -4721,7 +6893,7 @@
         "item_id": "A020",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly identifies the metric type as gauge and that the value counts distinct non entities that created a token during the reporting period."
+        "reason": "The generated answer correctly identifies the metric type as gauge and the value as counting distinct non entities that created a token during the reporting period."
       },
       {
         "abstained": false,
@@ -4748,7 +6920,7 @@
         "item_id": "A023",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference that since 1.16 the first major release of each calendar year has LTS, and adds correct specific examples."
+        "reason": "The generated answer correctly states that since 1.16 the first major release of each calendar year has LTS, and adds accurate examples."
       },
       {
         "abstained": false,
@@ -4775,7 +6947,7 @@
         "item_id": "A026",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer states the same supported Vault Enterprise versions as the reference answer and adds accurate explanatory detail."
+        "reason": "The generated answer correctly lists the supported Vault Enterprise versions and adds accurate explanatory detail."
       },
       {
         "abstained": false,
@@ -4793,7 +6965,7 @@
         "item_id": "A028",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly states recovery keys are returned and are still needed for privileged actions like generating root credentials."
+        "reason": "The generated answer correctly states that recovery keys are returned instead of unseal keys and are later required for privileged actions such as generating root credentials."
       },
       {
         "abstained": false,
@@ -4820,7 +6992,7 @@
         "item_id": "A031",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states that all archived versions of a single key must fit within the single 512KB storage entry."
+        "reason": "The generated answer is empty, so it cannot be evaluated as correct."
       },
       {
         "abstained": false,
@@ -4838,7 +7010,7 @@
         "item_id": "A033",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer accurately states the HMAC-SHA256 hash substitution and that Vault refuses requests when no audit device can record them."
+        "reason": "The generated answer accurately states the HMAC-SHA256 hash and that Vault refuses requests when no audit device can record them."
       },
       {
         "abstained": false,
@@ -4856,7 +7028,7 @@
         "item_id": "A035",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer correctly explains that the root key protects the internal encryption key, matching the reference answer's meaning."
+        "reason": "The generated answer correctly explains that the root key protects the internal encryption key, which matches the reference answer."
       },
       {
         "abstained": false,
@@ -4865,7 +7037,7 @@
         "item_id": "A036",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer agrees with the reference that sealing quickly limits damage and prevents data access without root key shares, with only additional correct detail."
+        "reason": "The generated answer accurately reflects the reference: sealing quickly limits damage and prevents data access without root key shares."
       },
       {
         "abstained": false,
@@ -4874,7 +7046,7 @@
         "item_id": "A037",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer describes memory drain, denial-of-service, and TTL load smoothing, which are not stated in the reference answer."
+        "reason": "The generated answer describes memory drain, cluster denial-of-service, and TTL load smoothing, which are not stated in the reference answer."
       },
       {
         "abstained": false,
@@ -4883,7 +7055,7 @@
         "item_id": "A038",
         "judged": true,
         "parse_failure": false,
-        "reason": "The generated answer describes HSM unseal/recovery keys, not the reference's reason about separate encryption keys per purpose and targeted rotation."
+        "reason": "The generated answer describes HSM unseal/recovery keys, not the reference's explanation about separate encryption keys per purpose and targeted rotation."
       },
       {
         "abstained": false,
