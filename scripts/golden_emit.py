@@ -5,15 +5,22 @@ longer matches the corpus is the one failure mode that silently devalues every
 number downstream.
 
     python scripts/golden_emit.py golden/spec_v0.json golden/v0.jsonl
+
+The corpus path can be overridden with `--corpus` or `RAGQA_CORPUS`, which is what
+lets a worktree (where `data/` is not checked out) still emit a set against the one
+shared snapshot.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 
-CORPUS = "data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl"
+CORPUS = os.environ.get(
+    "RAGQA_CORPUS", "data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl"
+)
 PROVENANCE = {
     "drafted_by": "human",
     "verified_by": "human",
@@ -63,8 +70,19 @@ def extract(text: str, keyword: str, mode: str) -> str:
 
 
 def main(argv):
-    spec_path = argv[1] if len(argv) > 1 else "golden/spec_v0.json"
-    out_path = argv[2] if len(argv) > 2 else "golden/v0.jsonl"
+    global CORPUS
+    rest = [arg for arg in argv[1:] if not arg.startswith("--")]
+    flags = [arg for arg in argv[1:] if arg.startswith("--")]
+    spec_path = rest[0] if rest else "golden/spec_v0.json"
+    out_path = rest[1] if len(rest) > 1 else "golden/v0.jsonl"
+    drafted_by = None
+    for flag in flags:
+        if flag.startswith("--corpus="):
+            CORPUS = flag.split("=", 1)[1]
+        elif flag.startswith("--drafted-by="):
+            drafted_by = flag.split("=", 1)[1]
+        else:
+            raise SystemExit(f"unknown flag {flag!r}")
     corpus = load_corpus()
     spec = json.load(open(spec_path, encoding="utf-8"))
 
@@ -82,8 +100,13 @@ def main(argv):
                 quote = extract(corpus[doc_id], reference["keyword"], reference.get("mode", "sentence"))
                 evidence.append({"doc_id": doc_id, "quote": quote})
             row["evidence"] = evidence
-        row["provenance"] = dict(PROVENANCE)
+        provenance = dict(PROVENANCE)
+        if drafted_by:
+            provenance["drafted_by"] = drafted_by
+        provenance.update(item.get("provenance") or {})
+        row["provenance"] = provenance
         rows.append(row)
+
 
     with open(out_path, "w", encoding="utf-8", newline="\n") as handle:
         for row in rows:
