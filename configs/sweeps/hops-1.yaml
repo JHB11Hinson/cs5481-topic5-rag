@@ -2,7 +2,8 @@
 # or `python scripts/run_sweeps.py --emit`; edit `ragqa/sweeps.py`, never this file.
 #
 #   sweep base: configs/grid/cell-recursive_parent_child-rerank-plain.yaml
-#               (recursive_parent_child / rerank / plain) + golden.limit 40
+#               (recursive_parent_child / rerank / plain) + the answerable
+#               stratum of golden v1 (40 items, no near-misses)
 #   point     : retrieval.hops = 1
 #   differs   : retrieval.hop_rewrite_model, retrieval.trigger_threshold
 #   invariants: rerank_top = max(k, 12) (ADR-0011); same corpus, same golden
@@ -52,8 +53,8 @@ generate:
   model_id: llm
   provider: llm
 golden:
-  items_path: golden/v1.jsonl
-  limit: 40
+  items_path: golden/v1-answerable.jsonl
+  limit: null
 index:
   backend: qdrant
   path: data/index

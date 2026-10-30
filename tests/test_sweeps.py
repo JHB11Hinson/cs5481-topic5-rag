@@ -27,13 +27,15 @@ REFERENCE_CELL = os.path.join(
     "configs", "grid", "cell-recursive_parent_child-rerank-plain.yaml"
 )
 
-#: spec.md rows 2-4: every sweep runs over the 40 answerable items of golden v1.
-#: The golden set lists answerable items (`A###`) before near-misses (`U###`), so a
-#: limit of 40 selects exactly that subset -- which is what `sweeps.check` guards.
-ITEM_LIMIT = 40
+#: spec.md rows 2-4: every sweep runs over the 40 answerable items of golden v1,
+#: selected by the `answerable` flag into a derived file rather than by taking the
+#: first 40 lines. The old positional limit happened to select the same items and
+#: would have silently stopped doing so on any reordering of v1.
+ANSWERABLE_ITEMS = 40
+ANSWERABLE_GOLDEN = "golden/v1-answerable.jsonl"
 
-#: Differences from the *sweep base* (the reference cell plus `golden.limit: 40`),
-#: restated by hand. `run.name` is a derived label and is asserted separately.
+#: Differences from the *sweep base* (the reference cell on the derived answerable
+#: golden set), restated by hand. `run.name` is a derived label, asserted separately.
 EXPECTED_DIFF = {
     "k-05": {"retrieval.k"},
     "k-10": set(),
@@ -113,16 +115,17 @@ def test_every_cell_loads_and_differs_from_the_sweep_base_in_one_parameter():
         for name in sorted(EXPECTED_DIFF):
             cfg = _load(name, out)
             values = _values(cfg)
-            assert values["golden.limit"] == ITEM_LIMIT, name
+            assert values["golden.limit"] is None, name
+            assert values["golden.items_path"] == ANSWERABLE_GOLDEN, name
 
             # The whole key diff against the sweep base, asserted as a set.
             assert _diff(values, base) == EXPECTED_DIFF[name] | {"run.name"}, (
                 name,
                 sorted(_diff(values, base) - EXPECTED_DIFF[name] - {"run.name"}),
             )
-            # And against the reference cell the same diff plus the item-set limit.
+            # And against the reference cell the same diff plus the golden stratum.
             assert _diff(values, reference) == (
-                EXPECTED_DIFF[name] | {"golden.limit", "run.name"}
+                EXPECTED_DIFF[name] | {"golden.items_path", "run.name"}
             ), (name, sorted(_diff(values, reference)))
 
             # The derived label tracks the point and nothing else.
@@ -161,8 +164,9 @@ def test_corpus_golden_set_mode_and_prices_are_design_wide_constants():
         for key in CONSTANT_KEYS:
             seen = {values[name][key] for name in values}
             assert len(seen) == 1, (key, seen)
-        assert values["k-40"]["golden.limit"] == ITEM_LIMIT
-        assert values["k-40"]["golden.items_path"] == "golden/v1.jsonl"
+        # The stratum file, not the full set: 40 answerable items and no near-misses.
+        assert values["k-40"]["golden.items_path"] == ANSWERABLE_GOLDEN, values["k-40"]
+        assert values["k-40"]["golden.limit"] is None, values["k-40"]
         # Retrieval depth is swept only by the k family; the other two inherit 10.
         for name in ("chunk-1024", "hops-3"):
             assert values[name]["retrieval.k"] == 10, name
@@ -360,7 +364,7 @@ def test_resume_skips_a_finished_point_and_force_reruns_it():
         assert status["hops-2"]["status"] == "finished", status["hops-2"]
         assert status["hops-2"]["run_dir"] == path
         assert status["hops-1"]["status"] == "pending"
-        assert sweeps.projection(list(status.values()))["remaining_calls"] == 9 * ITEM_LIMIT
+        assert sweeps.projection(list(status.values()))["remaining_calls"] == 9 * ANSWERABLE_ITEMS
 
         forced = sweeps.plan([out], out_root=runs, force=True)
         assert all(entry["status"] == "pending" for entry in forced)
@@ -562,3 +566,85 @@ def test_curve_reports_a_loop_that_never_fires_as_stopping_at_the_first_hop():
         assert sweeps.break_even_hop(rows) == 1, sweeps.break_even_hop(rows)
     finally:
         shutil.rmtree(base, ignore_errors=True)
+
+
+# --- the golden stratum (finding 7a) ---------------------------------------
+
+
+def test_emit_writes_the_answerable_stratum_of_golden_v1():
+    """Selected by the `answerable` flag, not by position in the file."""
+    out = _tmpdir()
+    golden = os.path.join(out, "v1-answerable.jsonl")
+    try:
+        summary = sweeps.write_answerable_golden(out=golden)
+        assert summary["items"] == ANSWERABLE_ITEMS, summary
+        assert summary["negatives"] == 0, summary
+
+        import json
+
+        seeded = [
+            json.loads(line)
+            for line in open("golden/v1.jsonl", encoding="utf-8")
+            if line.strip()
+        ]
+        expected = [item["id"] for item in seeded if item.get("answerable", True)]
+        written = [
+            json.loads(line) for line in open(golden, encoding="utf-8") if line.strip()
+        ]
+        assert [item["id"] for item in written] == expected, "wrong items or wrong order"
+        assert len(expected) == ANSWERABLE_ITEMS, len(expected)
+        assert all(item.get("answerable", True) for item in written)
+    finally:
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def test_check_refuses_a_positional_item_limit():
+    """`golden.limit` selects by line order, which is not a stratum."""
+    out = _tmpdir()
+    stdout, stderr = io.StringIO(), io.StringIO()
+    try:
+        sweeps.emit(out)
+        victim = os.path.join(out, "k-10.yaml")
+        text = open(victim, encoding="utf-8").read()
+        with open(victim, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text.replace("limit: null", "limit: 40"))
+        problems = sweeps._golden_problems("k-10", _load("k-10", out))
+        assert len(problems) == 1, problems
+        assert "position in the file" in problems[0], problems[0]
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            assert sweeps.check([out]) != 0
+        assert "position in the file" in stderr.getvalue(), stderr.getvalue()
+    finally:
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def test_the_curve_says_how_many_near_miss_items_each_point_had():
+    """A rate with no denominator prints n/a, never 0.0000.
+
+    The sweep cells measure on the 40 answerable items, so every point has zero
+    near-misses: the old table printed 0.0 for its abstention columns, which reads
+    as a measurement of 0/0.
+    """
+    row = {column: None for column in sweeps.CURVE_COLUMNS}
+    row.update(
+        {
+            "label": "k-10",
+            "family": "k",
+            "status": "finished",
+            "run_id": "sweep-k-10-20260101T000000-abcdef12",
+            "answers": 40,
+            "negatives": 0,
+            "over_abstain_rate": 0.05,
+            "abstention_recall_on_near_misses": 0.0,
+            "under_abstain_rate": 0.0,
+        }
+    )
+    assert "negatives" in sweeps.CURVE_COLUMNS
+    assert sweeps._md_table_cell(row, "negatives") == "0"
+    assert sweeps._md_table_cell(row, "abstention_recall_on_near_misses") == "n/a (0 near-miss)"
+    assert sweeps._md_table_cell(row, "under_abstain_rate") == "n/a (0 near-miss)"
+    assert sweeps._md_table_cell(row, "over_abstain_rate") == "0.0500"
+
+    row["negatives"] = 20
+    row["abstention_recall_on_near_misses"] = 0.0
+    assert sweeps._md_table_cell(row, "abstention_recall_on_near_misses") == "0.0000"
