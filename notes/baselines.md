@@ -170,15 +170,28 @@ Three things, and only one of them is free:
    chunk becomes reachable. Given that the reference cell's hit@10 is already 1.000
    on golden v0 (`real-llm-...113604`), this buys nothing there — it is a bet that
    v1's harder items are the ones where chunking hurts.
-3. **A broken citation handle.** This is the cost the money column hides. The
-   prompt for this cell contains no chunk ids — there are none to contain — so a
-   claim comes back citing a document id. `verify.check_claims` looks that id up in
-   the retrieved chunks, does not find it, and records `chunk_not_retrieved`;
-   `generate.py` files the claim under `doc_id: ""`. Expected signature in the
-   table: **citation precision 0, `no-cite` unchanged (the claims exist, they are
-   just unsupported), and `over-abstain` set by the model's own judgement** rather
-   than by any verifier. If the run shows anything else, the reasoning above is
-   wrong and the note has to be rewritten.
+3. **A weaker citation handle, and it has to be an honest one.** The prompt for
+   this cell contains no chunk ids — there are none to contain — so a claim comes
+   back citing the document. The first version of the cell therefore handed the
+   prompt an *empty* retrieval block while the verifier still checked claims
+   against the retrieved chunks: no claim could resolve to anything, so citation
+   precision and recall were 0 by construction rather than by measurement, and a
+   parroted zero is not evidence about a baseline.
+
+   `run.item_context` now builds one **synthetic** hit per item — the top-ranked
+   chunk's document, truncated to `baseline.long_context_max_chars`, `rank` 1,
+   `chunk_id` `document:<doc_id>` — and hands that same list to the generator and
+   to `verify.check_claims`. A claim citing the document is checkable containment
+   against the text the model was actually shown, so the cell measures what it
+   claims to measure: the citation *granularity* is a document instead of a chunk,
+   not the absence of a handle. `predictions.jsonl` marks the entry
+   `"synthetic": true` under `prompt_context`, because no chunker produced it and
+   a reader must not mistake it for a retrieved chunk; `retrieved` keeps the real
+   retrieval, so hit@k is still the retriever's own number.
+
+   Proof at the seam (`generate.provider: stub`, fixture corpus, `long_context`
+   on): citation precision 1.0, recall 0.75, one claim asserted and located inside
+   the synthetic hit, where the same configuration used to report 0.0/0.0.
 
 ## The embedding swap
 

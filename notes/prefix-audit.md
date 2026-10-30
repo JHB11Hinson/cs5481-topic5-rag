@@ -91,8 +91,10 @@ Rows 2, 4 and 6 are the three a human should check first, because they are where
 
 | run | chunks | cache hits | cache misses | tokens in | tokens out | cost | prefix p50 |
 |---|---|---|---|---|---|---|---|
-| first warm-up (interrupted twice, resumed) | 2,203 | 1,300 | 903 | 336,389 | 36,405 | ¥0.373 | 205 chars |
+| first warm-up (interrupted twice, resumed) | 2,203 | 1,300 | 903 | 336,389 | 36,405 | ¥0.482 | 205 chars |
 | rerun with the cache warm | 2,203 | 2,203 | 0 | 0 | 0 | ¥0.000 | 213 chars |
+
+**The earlier warm-up figure was ¥0.37298, and it was wrong.** `run.py` priced the prefix component's 36,405 completion tokens at `price_in` instead of `price_out`, so the figure under-counted output tokens by the price ratio — 0.60 / 0.15 = 4x on the 4x-cheaper input side, i.e. it charged ¥0.00546 for output that actually cost ¥0.02184. Repriced from the same token counts: 336,389 / 1e6 × 0.15 + 36,405 / 1e6 × 0.60 = 0.072301 USD = **¥0.48225**, which is what `notes/prefix-stats/warmup.json` now records.
 
 The rerun is the evidence the ticket asks for: 100% hits, no tokens, no money, and the same strings, so the A/B is a comparison rather than two samples. The length column is a real measurement on both rows: the summaries in `notes/prefix-stats/` measure every chunk the invocation served, cached or freshly generated, so a 100%-hit rerun reports 213 / 396 characters rather than nothing. The p50 differs from the warm-up row (205) because the warm-up number was computed over the 903 chunks it paid for and the rerun covers all 2,203 — the misses were not a random sample of the chunk set. The two interruptions were a killed job (before periodic flushing existed, which cost 195 paid prefixes) and one TLS handshake timeout, after which transport failures became retryable (`ragqa/llm.py`).
 
