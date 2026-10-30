@@ -1,6 +1,6 @@
 {
   "budget_tokens": 512,
-  "chunks_root": "D:\\DE Project\\wt\\exp\\data\\chunks",
+  "chunks_root": "data/chunks",
   "golden_path": "golden/v1.jsonl",
   "pairs": [
     {
@@ -138,84 +138,138 @@
       }
     },
     {
-      "abstentions_delta": null,
-      "abstentions_fixed": null,
-      "abstentions_recursive": null,
-      "citation_discordant_fixed_only": null,
-      "citation_discordant_recursive_only": null,
-      "citation_p_value": null,
-      "citation_precision_delta": null,
-      "citation_precision_fixed": null,
-      "citation_precision_recursive": null,
-      "citation_recall_delta": null,
-      "citation_recall_fixed": null,
-      "citation_recall_recursive": null,
-      "cny_per_1k_questions_delta": null,
-      "cny_per_1k_questions_fixed": null,
-      "cny_per_1k_questions_recursive": null,
+      "cache": {
+        "fixed": 63,
+        "recursive": 65
+      },
       "context_mode": "late_chunking",
-      "fixed_chunks": null,
-      "fixed_llm_cache_misses": null,
-      "fixed_mean_tokens": null,
-      "fixed_mechanism_source": null,
-      "fixed_over_budget": null,
-      "fixed_over_budget_structural_share": null,
-      "fixed_over_budget_with_fence": null,
-      "fixed_over_budget_with_table": null,
-      "fixed_p95_tokens": null,
-      "fixed_parents": null,
-      "fixed_run_id": null,
-      "fixed_share_containing_code_fence": null,
-      "fixed_share_containing_table_row": null,
-      "fixed_share_ending_mid_sentence": null,
-      "fixed_share_over_budget": null,
-      "hit_at_10_delta": null,
-      "hit_at_10_fixed": null,
-      "hit_at_10_recursive": null,
-      "hit_discordant_fixed_only": null,
-      "hit_discordant_recursive_only": null,
-      "hit_p_value": null,
-      "latency_p95_ms_delta": null,
-      "latency_p95_ms_fixed": null,
-      "latency_p95_ms_recursive": null,
-      "missing": [
-        "fixed",
-        "recursive_parent_child"
-      ],
-      "mrr_delta": null,
-      "mrr_fixed": null,
-      "mrr_recursive": null,
-      "ndcg_at_10_delta": null,
-      "ndcg_at_10_fixed": null,
-      "ndcg_at_10_recursive": null,
-      "over_abstain_rate_delta": null,
-      "over_abstain_rate_fixed": null,
-      "over_abstain_rate_recursive": null,
-      "paired_items": null,
-      "recursive_chunks": null,
-      "recursive_llm_cache_misses": null,
-      "recursive_mean_tokens": null,
-      "recursive_mechanism_source": null,
-      "recursive_over_budget": null,
-      "recursive_over_budget_structural_share": null,
-      "recursive_over_budget_with_fence": null,
-      "recursive_over_budget_with_table": null,
-      "recursive_p95_tokens": null,
-      "recursive_parents": null,
-      "recursive_run_id": null,
-      "recursive_share_containing_code_fence": null,
-      "recursive_share_containing_table_row": null,
-      "recursive_share_ending_mid_sentence": null,
-      "recursive_share_over_budget": null,
+      "fixed_run_id": "grid-fixed-dense-late_chunking-20261030T161040-76813f02",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 2,
+          "discordant": 5,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 3
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 40,
+          "statistic": 0.0,
+          "treatment_only": 0
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -2.0,
+          "fixed": 16,
+          "recursive": 14
+        },
+        "citation_precision": {
+          "delta": -0.0217,
+          "fixed": 1.0,
+          "recursive": 0.9783
+        },
+        "citation_recall": {
+          "delta": 0.025,
+          "fixed": 0.6,
+          "recursive": 0.625
+        },
+        "cny_per_1k_questions": {
+          "delta": 0.2921,
+          "fixed": 4.7134,
+          "recursive": 5.0055
+        },
+        "hit_at_10": {
+          "delta": 0.0,
+          "fixed": 0.275,
+          "recursive": 0.275
+        },
+        "latency_p95_ms": {
+          "delta": 13603.633,
+          "fixed": 20394.697,
+          "recursive": 33998.33
+        },
+        "mrr": {
+          "delta": 0.0046,
+          "fixed": 0.1468,
+          "recursive": 0.1514
+        },
+        "ndcg_at_10": {
+          "delta": 0.0041,
+          "fixed": 0.1752,
+          "recursive": 0.1793
+        },
+        "over_abstain_rate": {
+          "delta": -0.05,
+          "fixed": 0.4,
+          "recursive": 0.35
+        },
+        "span_hit_rate": {
+          "delta": -0.0217,
+          "fixed": 1.0,
+          "recursive": 0.9783
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-dense-late_chunking-20261030T164237-9b6dc31d",
       "retrieval_mode": "dense",
-      "span_hit_rate_delta": null,
-      "span_hit_rate_fixed": null,
-      "span_hit_rate_recursive": null,
-      "status": "pending",
-      "table_fixed_hits": null,
-      "table_items": null,
-      "table_p_value": null,
-      "table_recursive_hits": null
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 4,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 4
+      }
     },
     {
       "cache": {
@@ -486,84 +540,138 @@
       }
     },
     {
-      "abstentions_delta": null,
-      "abstentions_fixed": null,
-      "abstentions_recursive": null,
-      "citation_discordant_fixed_only": null,
-      "citation_discordant_recursive_only": null,
-      "citation_p_value": null,
-      "citation_precision_delta": null,
-      "citation_precision_fixed": null,
-      "citation_precision_recursive": null,
-      "citation_recall_delta": null,
-      "citation_recall_fixed": null,
-      "citation_recall_recursive": null,
-      "cny_per_1k_questions_delta": null,
-      "cny_per_1k_questions_fixed": null,
-      "cny_per_1k_questions_recursive": null,
+      "cache": {
+        "fixed": 62,
+        "recursive": 62
+      },
       "context_mode": "late_chunking",
-      "fixed_chunks": null,
-      "fixed_llm_cache_misses": null,
-      "fixed_mean_tokens": null,
-      "fixed_mechanism_source": null,
-      "fixed_over_budget": null,
-      "fixed_over_budget_structural_share": null,
-      "fixed_over_budget_with_fence": null,
-      "fixed_over_budget_with_table": null,
-      "fixed_p95_tokens": null,
-      "fixed_parents": null,
-      "fixed_run_id": null,
-      "fixed_share_containing_code_fence": null,
-      "fixed_share_containing_table_row": null,
-      "fixed_share_ending_mid_sentence": null,
-      "fixed_share_over_budget": null,
-      "hit_at_10_delta": null,
-      "hit_at_10_fixed": null,
-      "hit_at_10_recursive": null,
-      "hit_discordant_fixed_only": null,
-      "hit_discordant_recursive_only": null,
-      "hit_p_value": null,
-      "latency_p95_ms_delta": null,
-      "latency_p95_ms_fixed": null,
-      "latency_p95_ms_recursive": null,
-      "missing": [
-        "fixed",
-        "recursive_parent_child"
-      ],
-      "mrr_delta": null,
-      "mrr_fixed": null,
-      "mrr_recursive": null,
-      "ndcg_at_10_delta": null,
-      "ndcg_at_10_fixed": null,
-      "ndcg_at_10_recursive": null,
-      "over_abstain_rate_delta": null,
-      "over_abstain_rate_fixed": null,
-      "over_abstain_rate_recursive": null,
-      "paired_items": null,
-      "recursive_chunks": null,
-      "recursive_llm_cache_misses": null,
-      "recursive_mean_tokens": null,
-      "recursive_mechanism_source": null,
-      "recursive_over_budget": null,
-      "recursive_over_budget_structural_share": null,
-      "recursive_over_budget_with_fence": null,
-      "recursive_over_budget_with_table": null,
-      "recursive_p95_tokens": null,
-      "recursive_parents": null,
-      "recursive_run_id": null,
-      "recursive_share_containing_code_fence": null,
-      "recursive_share_containing_table_row": null,
-      "recursive_share_ending_mid_sentence": null,
-      "recursive_share_over_budget": null,
+      "fixed_run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 0,
+          "discordant": 3,
+          "method": "exact_binomial",
+          "p_value": 0.25,
+          "pairs": 40,
+          "statistic": 1.333333,
+          "treatment_only": 3
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 2,
+          "method": "exact_binomial",
+          "p_value": 0.5,
+          "pairs": 40,
+          "statistic": 0.5,
+          "treatment_only": 2
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": -2.0,
+          "fixed": 4,
+          "recursive": 2
+        },
+        "citation_precision": {
+          "delta": -0.0463,
+          "fixed": 0.9828,
+          "recursive": 0.9365
+        },
+        "citation_recall": {
+          "delta": 0.075,
+          "fixed": 0.875,
+          "recursive": 0.95
+        },
+        "cny_per_1k_questions": {
+          "delta": -0.0633,
+          "fixed": 6.774,
+          "recursive": 6.7107
+        },
+        "hit_at_10": {
+          "delta": 0.05,
+          "fixed": 0.825,
+          "recursive": 0.875
+        },
+        "latency_p95_ms": {
+          "delta": 626.757,
+          "fixed": 17102.826,
+          "recursive": 17729.583
+        },
+        "mrr": {
+          "delta": 0.0073,
+          "fixed": 0.3909,
+          "recursive": 0.3982
+        },
+        "ndcg_at_10": {
+          "delta": 0.0158,
+          "fixed": 0.4979,
+          "recursive": 0.5137
+        },
+        "over_abstain_rate": {
+          "delta": -0.05,
+          "fixed": 0.1,
+          "recursive": 0.05
+        },
+        "span_hit_rate": {
+          "delta": -0.0463,
+          "fixed": 0.9828,
+          "recursive": 0.9365
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-hybrid-late_chunking-20261030T165835-0cecad68",
       "retrieval_mode": "hybrid",
-      "span_hit_rate_delta": null,
-      "span_hit_rate_fixed": null,
-      "span_hit_rate_recursive": null,
-      "status": "pending",
-      "table_fixed_hits": null,
-      "table_items": null,
-      "table_p_value": null,
-      "table_recursive_hits": null
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
     },
     {
       "cache": {
@@ -875,7 +983,6 @@
       "latency_p95_ms_fixed": null,
       "latency_p95_ms_recursive": null,
       "missing": [
-        "fixed",
         "recursive_parent_child"
       ],
       "mrr_delta": null,
@@ -1053,6 +1160,6 @@
     "pairing": "same retrieval mode and context mode, chunk.strategy the only factor",
     "test": "exact conditional McNemar on per-item outcomes (ragqa.baselines)"
   },
-  "runs_root": "D:\\DE Project\\wt\\exp\\runs",
-  "verdict": "The largest movement in hit@10 across the 6 finished pair(s) is +0.0500 in `dense` / `contextual_prefix` (paired McNemar p = 0.5000). Atomicity itself did happen: 87% of the recursive chunks that exceed the budget carry a table row or a code fence, so the splitter kept them whole at the cost of the token budget, and the share of chunks ending mid-sentence falls from 0.5745 to 0.1865. The one thing chunk strategy does move is how often an answer carries a supported citation: 1 of 6 pairs shift significantly, the largest being +7 items in `dense/contextual_prefix` (p = 0.0156), and the sign is not the same in every pair \u2014 so the mechanism buys citation coverage rather than retrieval quality. The `table_content` items \u2014 the golden questions whose answer sits in a table \u2014 are retrieved by both strategies at the ceiling in every finished pair, so the paired test has no discordant pair to work with and cannot show an effect either way. On this corpus the atomic-table hypothesis is not testable on the questions it was meant to help: keeping tables whole did not change which of them were found."
+  "runs_root": "runs",
+  "verdict": "The largest movement in hit@10 across the 8 finished pair(s) is +0.0500 in `dense` / `contextual_prefix` (paired McNemar p = 0.5000). Atomicity itself did happen: 87% of the recursive chunks that exceed the budget carry a table row or a code fence, so the splitter kept them whole at the cost of the token budget, and the share of chunks ending mid-sentence falls from 0.5745 to 0.1865. The one thing chunk strategy does move is how often an answer carries a supported citation: 1 of 8 pairs shift significantly, the largest being +7 items in `dense/contextual_prefix` (p = 0.0156), and the sign is not the same in every pair \u2014 so the mechanism buys citation coverage rather than retrieval quality. The `table_content` items \u2014 the golden questions whose answer sits in a table \u2014 do not move significantly in any pair, so keeping tables atomic did not measurably help the questions it was meant to help. On this corpus the atomic-table hypothesis does not survive: chunk strategy changes how chunks are built and how often an answer is cited, not how well retrieval works."
 }
