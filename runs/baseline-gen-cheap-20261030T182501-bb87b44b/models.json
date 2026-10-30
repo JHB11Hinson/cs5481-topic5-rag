@@ -1,0 +1,13 @@
+{
+  "embed": {
+    "context_mode": "plain",
+    "id": "BAAI/bge-m3",
+    "provider": "bge-m3",
+    "version": "local"
+  },
+  "generate": {
+    "id": "gpt-6-luna",
+    "provider": "llm"
+  },
+  "judge": null
+}

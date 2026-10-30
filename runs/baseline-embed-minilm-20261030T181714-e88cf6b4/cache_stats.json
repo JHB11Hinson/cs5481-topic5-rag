@@ -1,0 +1,11 @@
+{
+  "embed_cache_hits": 0,
+  "embed_cache_misses": 2203,
+  "llm_cache_hits": 0,
+  "llm_cache_misses": 63,
+  "llm_tokens_in": 329671,
+  "llm_tokens_out": 34264,
+  "note": "embedding cache: embeddings.sqlite; LLM cache: llm.sqlite",
+  "prefix_cache_hits": 0,
+  "prefix_cache_misses": 0
+}

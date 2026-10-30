@@ -3,10 +3,10 @@
 Every file in this directory is produced by one command. Editing anything here by hand creates a number that no run directory backs, which is the one thing this bundle exists to prevent. Change the code or the runs, then regenerate.
 
 ```
-python -m ragqa aggregate --runs "D:\DE Project\wt\exp\runs" --out reports
+python -m ragqa aggregate --runs "runs" --out reports
 ```
 
-That is the exact command used to produce this snapshot: 12 of 18 cells finished, 6 printed as `missing`.
+That is the exact command used to produce this snapshot: 18 of 18 cells finished, 0 printed as `missing`.
 
 ## What each file answers
 
