@@ -3,39 +3,67 @@
 Ticket 14. Four comparison cells, each a normal run directory with an id — never a
 notebook, never a branch (ADR-0003). This note says what each cell isolates, what
 the window actually costs, what the paired test will say, and — since the cells
-have **not** been run yet — which of the four arguments is already dead on the
-evidence in the tree.
+have **not** produced a completed run yet — which of the four arguments is already
+dead on the evidence in the tree.
 
-Everything numeric below comes from a named artifact:
+Everything numeric below comes from a named artifact, and the two kinds are kept
+apart: **measured** means a run directory or a live API response; **projected**
+means arithmetic over a measured run and the corpus.
 
-| source | what it holds |
-|---|---|
-| `runs/real-llm-20261030T113604-a5c0a3e4` | the reference cell's measured run on golden v0 (20 items, 10 answerable), deepseek-v4.1-flash generation |
-| `runs/real-rerank-20261030T095541-a6eb2d5e` | the same retrieval with the stub generator; used only to smoke-test the table |
-| `reports/baselines/window-cost.json` | prompt shapes and their token/¥ cost, derived from that run plus the corpus by `scripts/run_baselines.py --measure-window` (regenerate it rather than trusting this copy) |
-| `reports/baselines/generator-probe.json` | the generator probe: price per model, contract pass/fail, USD per question on this workload |
-| `reports/baselines/model-catalog-2026-10-30.json` | the gateway's own price list, as fetched |
-| `data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl` | the corpus the document-length distribution is measured on |
+| source | kind | what it holds |
+|---|---|---|
+| `runs/real-llm-20261030T113604-a5c0a3e4` | measured | the reference pipeline on golden **v0** (20 items, 10 answerable), deepseek-v4.1-flash, hit@10 = 1.000, ¥10.1184 per 1,000 questions |
+| `runs/real-rerank-20261030T095541-a6eb2d5e` | measured | the same retrieval with the stub generator; used only to smoke-test the table on real artifacts |
+| `reports/baselines/window-cost.json` | projected | prompt shapes and their token/¥ cost, built from that run plus the corpus by `scripts/run_baselines.py --measure-window` (regenerate it rather than trusting this copy) |
+| `reports/baselines/generator-probe.json` | measured | the generator probe: live price per model, contract pass/fail, USD per question on this workload |
+| `reports/baselines/model-catalog-2026-10-30.json` | measured | the gateway's own price list, as fetched |
+| `data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl` | measured | the corpus the document-length distribution is measured on |
 
-## Status
+## Status: verified, not run
 
-`golden/v1.jsonl` — the 40-answerable set the four cells are defined on — is not on
-this branch yet. So every cell below is `--dry-run` verified and none has spent
-money. The dry run reports:
+`golden/v1.jsonl` is on the branch now (60 items, 40 answerable) and the four
+cells plus the reference are `--dry-run` verified against it. No cell has a
+completed run, so `reports/baselines/table.{md,json}` is deliberately absent: a
+table with no runs in it would be a lie about what was measured.
+
+Two attempts are worth recording rather than hiding. The first was blocked by the
+ticket's own dependency — v1 landed late — and the second was stopped on purpose:
+the run started while the 18-cell matrix owned the GPU, and with both resident a
+6 GB card sat at 5.8 / 6.1 GB while the matrix cell crawled. The matrix is the
+report's headline evidence and it goes first. Anything that embeds 2,203 chunks
+and then answers 300 questions needs the card to itself.
+
+The dry run against the real set:
 
 ```
-cell           config                                  items   ans   calls  state
-closed-book    configs\baselines\closed-book.yaml        60*   40*     60*  pending
-long-context   configs\baselines\long-context.yaml       60*   40*     60*  pending
-embed-minilm   configs\baselines\embed-minilm.yaml       60*   40*     60*  pending
-gen-cheap      configs\baselines\gen-cheap.yaml          60*   40*     60*  pending
-Projected generation calls: 240 (4 cells x items)
+cell               config                                                    items   ans   calls  state
+baseline-reference configs/ctx-plain.yaml (retargeted at the baselines' golden set)  60    40      60  pending
+closed-book        configs/baselines/closed-book.yaml                           60    40      60  pending
+long-context       configs/baselines/long-context.yaml                          60    40      60  pending
+embed-minilm       configs/baselines/embed-minilm.yaml                          60    40      60  pending
+gen-cheap          configs/baselines/gen-cheap.yaml                             60    40      60  pending
+
+Projected generation calls: 300 (5 cells x items)
 ```
 
-`*` marks the ADR-0005 set size standing in for a file that is not there; the
-count becomes measured the moment v1 lands. Nothing in `reports/baselines/table.*`
-exists yet, because a table with no runs in it would be a lie about what was
-measured.
+So, precisely: the corpus distribution, the prompt-shape costs, the model catalog
+and the generator probe in this note are **measured**; the four cells' retrieval,
+citation, abstention, latency and cost columns, and every McNemar number, are
+**pending** and will be filled by
+
+```bash
+python scripts/run_baselines.py --with-reference
+python scripts/run_baselines.py --report --reference-dir runs/<baseline-reference-run-id>
+```
+
+`--with-reference` is opt-in and exists for exactly this reason: the four cells
+must be paired against a cell that answered the same items, and
+`configs/ctx-plain.yaml` still points at golden v0. The flag derives that
+configuration with a new run name and the baselines' golden set — identity keys
+only, asserted in `tests/test_baselines.py` — so the headline comparison cannot
+quietly acquire a second factor. Without the flag the runner executes exactly the
+four baselines and nothing else.
+
 
 ## The four cells
 
@@ -220,8 +248,15 @@ counts are printed next to p so a reader can check the test was applied to
 something. Worked example from the closed-book fixture: 5 discordant pairs all
 against the baseline gives p = 2·C(5,0)/2⁵ = 0.0625 — *not* significant at 0.05,
 which is the honest outcome for ten answerable items and precisely why ADR-0005
-insists on 40. At 40 items the same 5:0 split is p = 0.0625 too; 6:0 is 0.031, and
-the set size was chosen to make differences of that size visible at all.
+insists on 40. At 40 answerable items, 6:0 gives p = 2/2⁶ = 0.031 and clears the
+threshold while 5:0 still does not: that is the smallest unanimous difference the
+set can detect, and detectability of differences that size is what the set size
+buys.
+
+The numbers themselves are not in this note yet, on purpose. Hand-writing a
+2×2 for a run that has not happened is exactly how a note ends up disagreeing
+with its own run directory; the table prints the counts when the cells run, and
+`mcnemar_counts` is the only place the p-values come from.
 
 ## Honest verdict, as far as the evidence goes today
 
@@ -230,11 +265,13 @@ the set size was chosen to make differences of that size visible at all.
    against ¥9.54 per 1,000. If the report claims RAG wins on cost, the table will
    contradict it. The cost that long context really pays is the citation handle.
 2. **The headline comparison may be uninformative by construction.** Closed book
-   under this prompt will abstain on nearly everything, so RAG-versus-no-RAG on
-   citation support will look overwhelming (something like 5:0 to 9:0 discordant)
-   for a reason that is a property of the prompt, not of retrieval. It is still
-   worth running — it bounds what the context block buys and it is the number a
-   reader expects — but the *interesting* baselines are the other three.
+   under this prompt should abstain on nearly everything, so RAG-versus-no-RAG on
+   citation support should come out overwhelming (of the order of 5:0 to 9:0
+   discordant) for a reason that is a property of the prompt, not of retrieval.
+   That is a prediction, not a result, and it is the first thing to check when the
+   run lands. It is still worth running — it bounds what the context block buys and
+   it is the number a reader expects — but the *interesting* baselines are the other
+   three.
 3. **What a baseline win would mean.** If `embed-minilm` ties on hit@10, the
    1,024-dimension model is unearned and the report should say so, because that is
    a 5× cheaper index for the same recall. If `gen-cheap` ties on citation
@@ -251,13 +288,19 @@ the set size was chosen to make differences of that size visible at all.
 ## Regenerate
 
 ```bash
-python scripts/run_baselines.py --dry-run                 # plan, a count, zero spend
+python scripts/run_baselines.py --dry-run                            # plan, a count, zero spend
 python scripts/run_baselines.py --measure-window runs/<ref-run-id>   # window-cost.json, no model calls
-python -m ragqa.run --config configs/ctx-plain.yaml       # the reference cell, same golden set
-python scripts/run_baselines.py                           # the four cells, ~4 x 40 calls
-python scripts/run_baselines.py --report --reference-dir runs/<ctx-plain-run-id>
-python -m ragqa.selftest                                  # 110 tests
+python scripts/run_baselines.py --with-reference                     # 5 cells x 60 items, GPU to itself
+python scripts/run_baselines.py --report --reference-dir runs/<baseline-reference-run-id>
+python -m ragqa.selftest                                             # 155 tests
 ```
+
+The run order inside `--with-reference` matters on a shared card: the reference
+cell goes first so a failure there costs one cell rather than five, and
+`embed-minilm` goes third so the 384-dimension collection it builds is replaced by
+a 1,024-dimension one before the last cell finishes. Every cell rebuilds its
+collection anyway (`QdrantIndex.add` deletes and recreates), so a run is never
+reading another run's vectors.
 
 `--report` writes `reports/baselines/table.md` and `table.json`: one row per
 configuration (run id, hit@k, citation precision/recall for the containment layer
