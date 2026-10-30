@@ -1,0 +1,18 @@
+{
+  "backfilled": "checksums computed from files present at backfill time",
+  "checksums": {
+    "chunks.jsonl": {
+      "bytes": 4267,
+      "sha256": "c1fc1f9afc76dcbfa835bcbc3b483321d5360a0dad775b6834acda2d475f6503"
+    },
+    "corpus_snapshot.json": {
+      "bytes": 1029,
+      "sha256": "f6700bfb5fa10068f85328ff53dff0db9027414ecb67507dfea55fdd06bca225"
+    }
+  },
+  "excluded_from_git": [
+    "chunks.jsonl",
+    "corpus_snapshot.json"
+  ],
+  "rebuild": "python scripts/fetch_artifacts.py --run <this directory>"
+}
