@@ -42,6 +42,19 @@ def _percentile(values: List[float], fraction: float) -> float:
     return float(ordered[int(round(fraction * (len(ordered) - 1)))])
 
 
+def _file_digest(path: str) -> Dict[str, Any]:
+    """sha256 and size of one artifact, or a marker when it was never written."""
+    import os
+
+    if not os.path.exists(path):
+        return {"sha256": "", "bytes": 0}
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return {"sha256": digest.hexdigest(), "bytes": os.path.getsize(path)}
+
+
 def run_id_for(cfg: config_mod.Config) -> str:
     stamp = time.strftime("%Y%m%dT%H%M%S", time.gmtime())
     digest = hashlib.sha256(
@@ -50,7 +63,9 @@ def run_id_for(cfg: config_mod.Config) -> str:
     return f"{cfg['run.name']}-{stamp}-{digest}"
 
 
-def _llm_client(cfg: config_mod.Config, suffix: str = "") -> LLMClient:
+def _llm_client(
+    cfg: config_mod.Config, suffix: str = "", reasoning_effort: str = ""
+) -> LLMClient:
     return LLMClient(
         base_url=cfg["llm.base_url"],
         cache_path=cfg["llm.cache_path"] + suffix,
@@ -58,15 +73,19 @@ def _llm_client(cfg: config_mod.Config, suffix: str = "") -> LLMClient:
         temperature=float(cfg["llm.temperature"]),
         session_header=cfg["llm.session_header"],
         session_id=cfg["llm.session_id"],
+        reasoning_effort=reasoning_effort,
     )
 
 
 def _make_prefixer(cfg: config_mod.Config) -> context_mod.PrefixGenerator:
     concurrency = max(1, int(cfg["context.prefix_concurrency"]))
-    client = _llm_client(cfg, ".prefix")
+    effort = cfg["context.prefix_reasoning_effort"]
+    client = _llm_client(cfg, ".prefix", reasoning_effort=effort)
     factory = None
     if concurrency > 1:
-        factory = lambda: _llm_client(cfg, ".prefix")  # noqa: E731 - one handle per thread
+        factory = lambda: _llm_client(  # noqa: E731 - one handle per thread
+            cfg, ".prefix", reasoning_effort=effort
+        )
     return context_mod.PrefixGenerator(
         client=client,
         model=cfg["context.prefix_model"],
@@ -75,6 +94,7 @@ def _make_prefixer(cfg: config_mod.Config) -> context_mod.PrefixGenerator:
         prompt_version=cfg["context.prefix_prompt_version"],
         concurrency=concurrency,
         client_factory=factory,
+        effort_salt=effort,
     )
 
 
@@ -190,8 +210,10 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
     max_hops = int(cfg["retrieval.hops"])
     rewriter = None
     if max_hops > 1:
+        # Rewriting is mechanical: no thinking channel, so a hop costs tokens for
+        # queries rather than for deliberation.
         rewriter = agentic.Rewriter(
-            _llm_client(cfg, ".rewrite"),
+            _llm_client(cfg, ".rewrite", reasoning_effort="none"),
             model=cfg["retrieval.hop_rewrite_model"] or cfg["llm.model_generate"],
         )
 
@@ -482,6 +504,22 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
         },
     )
     contract.write_json("metrics.json", metrics)
+
+    # Large, re-derivable artifacts stay out of git (ADR-0003, spec item 5). The
+    # checksums are committed so `scripts/fetch_artifacts.py` can rebuild a file and
+    # prove it is the same one the numbers came from, instead of asking a reader to
+    # trust a rebuild.
+    contract.write_json(
+        "artifacts.json",
+        {
+            "excluded_from_git": ["chunks.jsonl", "corpus_snapshot.json"],
+            "checksums": {
+                name: _file_digest(str(contract.path / name))
+                for name in ("chunks.jsonl", "corpus_snapshot.json")
+            },
+            "rebuild": "python scripts/fetch_artifacts.py --run <this directory>",
+        },
+    )
 
     if prefixer is not None:
         prefixer.close()

@@ -49,9 +49,12 @@ DEFAULTS: Dict[str, Any] = {
     # (model, prompt hash) so a rerun is free and byte-identical.
     "context.prefix_model": "",
     "context.prefix_prompt_version": "v1",
-    "context.prefix_max_tokens": 120,
+    "context.prefix_max_tokens": 200,
     "context.prefix_concurrency": 4,
     "context.prefix_neighbours": 1,
+    # A prefix is mechanical work: leaving the thinking channel on burns 10-20x the
+    # output tokens and can return empty content inside a small budget.
+    "context.prefix_reasoning_effort": "none",
     "context.prefix_cache_path": "data/cache/prefixes.sqlite",
     # Late chunking (ticket 09): documents are encoded whole, but the window is
     # capped well below the model's 8,192 so the 6 GB card keeps headroom.
@@ -71,6 +74,8 @@ DEFAULTS: Dict[str, Any] = {
     "llm.timeout": 120,
     "llm.temperature": 0.0,
     "llm.max_tokens": 900,
+    # Empty means the provider default (thinking on). Mechanical calls pass "none".
+    "llm.reasoning_effort": "",
     "llm.context_chunks": 8,
     "llm.session_header": "x-opencode-session",
     "llm.session_id": "",

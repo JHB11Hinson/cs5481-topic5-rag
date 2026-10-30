@@ -1,0 +1,48 @@
+# Mechanism check for ticket 07: contextual prefixes on the fixture corpus, stub
+# generation so only the prefix path is under test. One cheap-model call per chunk,
+# then a rerun that must report 100% cache hits.
+run:
+  name: smoke-prefix
+  out_root: runs
+
+corpus:
+  source: fixtures/smoke/docs.jsonl
+  snapshot_id: fixture-smoke-v1
+
+chunk:
+  strategy: recursive_parent_child
+  size: 32
+  overlap: 8
+  parent_size: 64
+
+embed:
+  provider: stub
+  model_id: stub-hashing
+  dim: 256
+
+index:
+  backend: memory
+
+retrieval:
+  mode: hybrid
+  k: 3
+
+context:
+  mode: contextual_prefix
+  prefix_model: deepseek-v4.1-flash
+  prefix_prompt_version: v1
+  prefix_max_tokens: 120
+  prefix_concurrency: 2
+  prefix_neighbours: 1
+  prefix_cache_path: data/cache/prefixes.sqlite
+
+generate:
+  provider: stub
+  model_id: stub-generator
+  abstain_score_threshold: 0.01
+  min_claim_overlap: 0.12
+  max_claims: 2
+
+golden:
+  items_path: fixtures/smoke/golden.jsonl
+  limit: 5
