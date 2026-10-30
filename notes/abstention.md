@@ -187,6 +187,14 @@ above keeps both.
 
 ## Regenerate
 
+A run family whose name does not name a retrieval mode (`ctx-plain-*`,
+`ctx-prefix-*`, `ctx-late-*`) is skipped with a warning and listed in
+`working-points.json` under `unrouted_runs`: those runs vary the *context* mode on
+top of `retrieval.mode: rerank`, so their score scale is rerank's, but pooling them
+with `real-rerank-*` would mix configurations in one curve. Sweeping them needs
+either a run name that carries the mode or a `ModeSpec` entry — a one-line change
+in `MODES`, no change to the arithmetic.
+
 ```bash
 python -m ragqa sweep abstention --runs runs --out reports            # from this repo
 python -m ragqa sweep abstention --runs "D:/DE Project/Project/runs" --out reports  # from a worktree without runs/

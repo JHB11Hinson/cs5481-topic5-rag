@@ -48,6 +48,7 @@ from __future__ import annotations
 import csv
 import json
 import statistics
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -747,6 +748,13 @@ def sweep_command(runs_root, out, modes: Optional[Sequence[str]] = None) -> int:
     if not order:
         print(f"abstention sweep: no run directories recognised under {runs_root}")
         return 2
+
+    for name in skipped:
+        print(
+            f"abstention sweep: skipping {name}: its name does not map to a registered "
+            f"score scale {list(MODES)}; add a ModeSpec or rename the run's family",
+            file=sys.stderr,
+        )
 
     directory = out / "abstention"
     directory.mkdir(parents=True, exist_ok=True)
