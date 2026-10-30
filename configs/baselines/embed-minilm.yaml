@@ -1,0 +1,84 @@
+# Baseline 3 of 4: smaller embedding model (ticket 14).
+#
+# First stage swapped from BAAI/bge-m3 (1024 dimensions, 8 k token window,
+# multilingual) to sentence-transformers/all-MiniLM-L6-v2 (384 dimensions, 256
+# tokens) — the model a project reaches for when the GPU budget is one laptop.
+# Everything downstream is untouched: same chunks, same index backend, same
+# generator, same prompt.
+#
+# Two keys move with the model, and both are consequences of it rather than
+# extra variables:
+#
+# * `embed.max_seq_length: 256`. ragqa/embed.py assigns `max_seq_length` to the
+#   sentence-transformer verbatim, and MiniLM has 256 positions. Leaving the
+#   reference cell's 1024 would make every chunk longer than 256 tokens a
+#   position-index error.
+# * `retrieval.mode: dense`. The cross-encoder reranker is removed, because a
+#   reranker is exactly the component that repairs a weak first stage: leaving it
+#   in would show "the embedding model does not matter" when what actually
+#   happened is that a 568 M-parameter cross-encoder re-scored the top 12. The
+#   cell exists to measure the dense retrieval that a small model produces, so
+#   reranking is switched off and `retrieval.reranker` / `rerank_top` stay in the
+#   file as inert values rather than being deleted.
+#
+# ADR-0011 still applies: k = 10 with no rerank means the dense stage itself
+# returns 10 candidates, so hit@10 measures retrieval rather than truncation.
+run:
+  name: baseline-embed-minilm
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: recursive_parent_child
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: bge-m3
+  model_id: sentence-transformers/all-MiniLM-L6-v2
+  device: cuda
+  batch_size: 8
+  max_seq_length: 256
+  cache_path: data/cache/embeddings.sqlite
+
+index:
+  backend: qdrant
+  path: data/index
+
+retrieval:
+  mode: dense
+  k: 10
+  rrf_k: 60
+  reranker: BAAI/bge-reranker-v2-m3
+  rerank_top: 12
+  rerank_max_length: 512
+
+context:
+  mode: plain
+
+generate:
+  provider: llm
+  model_id: llm
+  abstain_score_threshold: -100.0
+  min_claim_overlap: 0.12
+  max_claims: 3
+
+llm:
+  base_url: https://opencode.ai/zen/go/v1
+  session_header: x-opencode-session
+  model_generate: deepseek-v4.1-flash
+  model_judge: deepseek-v4-pro
+  cache_path: data/cache/llm.sqlite
+  timeout: 180
+  temperature: 0.0
+  max_tokens: 900
+  context_chunks: 8
+  price_in_usd_per_mtok: 0.15
+  price_out_usd_per_mtok: 0.60
+
+golden:
+  items_path: golden/v1.jsonl

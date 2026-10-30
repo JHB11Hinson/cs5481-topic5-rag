@@ -1,0 +1,636 @@
+{
+  "answerable": 10,
+  "chars_per_token": 4.009,
+  "corpus": {
+    "documents": 1268,
+    "longest": [
+      {
+        "chars": 195456,
+        "doc_id": "api-docs/secret/pki"
+      },
+      {
+        "chars": 76571,
+        "doc_id": "api-docs/secret/transit"
+      },
+      {
+        "chars": 72469,
+        "doc_id": "docs/deploy/kubernetes/helm/configuration"
+      }
+    ],
+    "max": 195456,
+    "mean_chars": 4434.5,
+    "p50": 1573,
+    "p90": 10985,
+    "p95": 16677,
+    "p99": 33231,
+    "total_chars": 5622957
+  },
+  "items": 20,
+  "measured_tokens_in_mean": 7478.9,
+  "measured_tokens_out_mean": 658.6,
+  "outlier_note": "tokens_in covers two calls (corrective retry), not a longer prompt",
+  "per_item": [
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 751,
+      "item_id": "A001",
+      "rag_prompt_chars": 24677,
+      "tokens_in_measured": 5933,
+      "tokens_out_measured": 1029,
+      "top_doc_chars": 7605,
+      "top_doc_id": "docs/commands/server",
+      "windows": {
+        "12000": {
+          "context_chars": 7605,
+          "prompt_chars": 8456,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 7605,
+          "prompt_chars": 8456,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 7605,
+          "prompt_chars": 8456,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 783,
+      "item_id": "A002",
+      "rag_prompt_chars": 26932,
+      "tokens_in_measured": 14166,
+      "tokens_out_measured": 2128,
+      "top_doc_chars": 6571,
+      "top_doc_id": "docs/secrets/kv/kv-v2/setup",
+      "windows": {
+        "12000": {
+          "context_chars": 6571,
+          "prompt_chars": 7454,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 6571,
+          "prompt_chars": 7454,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 6571,
+          "prompt_chars": 7454,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 765,
+      "item_id": "A003",
+      "rag_prompt_chars": 29710,
+      "tokens_in_measured": 7636,
+      "tokens_out_measured": 886,
+      "top_doc_chars": 5181,
+      "top_doc_id": "docs/commands/operator/init",
+      "windows": {
+        "12000": {
+          "context_chars": 5181,
+          "prompt_chars": 6046,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 5181,
+          "prompt_chars": 6046,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 5181,
+          "prompt_chars": 6046,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 742,
+      "item_id": "A004",
+      "rag_prompt_chars": 22434,
+      "tokens_in_measured": 5609,
+      "tokens_out_measured": 372,
+      "top_doc_chars": 2240,
+      "top_doc_id": "docs/concepts/dev-server",
+      "windows": {
+        "12000": {
+          "context_chars": 2240,
+          "prompt_chars": 3082,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 2240,
+          "prompt_chars": 3082,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 2240,
+          "prompt_chars": 3082,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 749,
+      "item_id": "A005",
+      "rag_prompt_chars": 25631,
+      "tokens_in_measured": 6458,
+      "tokens_out_measured": 247,
+      "top_doc_chars": 2188,
+      "top_doc_id": "docs/agent-and-proxy/autoauth/methods/cert",
+      "windows": {
+        "12000": {
+          "context_chars": 2188,
+          "prompt_chars": 3037,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 2188,
+          "prompt_chars": 3037,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 2188,
+          "prompt_chars": 3037,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 773,
+      "item_id": "A006",
+      "rag_prompt_chars": 30666,
+      "tokens_in_measured": 7218,
+      "tokens_out_measured": 987,
+      "top_doc_chars": 14815,
+      "top_doc_id": "docs/enterprise/replication",
+      "windows": {
+        "12000": {
+          "context_chars": 12000,
+          "prompt_chars": 12873,
+          "truncated": true
+        },
+        "20000": {
+          "context_chars": 14815,
+          "prompt_chars": 15688,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 14815,
+          "prompt_chars": 15688,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 778,
+      "item_id": "A007",
+      "rag_prompt_chars": 21578,
+      "tokens_in_measured": 5420,
+      "tokens_out_measured": 347,
+      "top_doc_chars": 4598,
+      "top_doc_id": "docs/enterprise/entropy-augmentation",
+      "windows": {
+        "12000": {
+          "context_chars": 4598,
+          "prompt_chars": 5476,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 4598,
+          "prompt_chars": 5476,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 4598,
+          "prompt_chars": 5476,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 786,
+      "item_id": "A008",
+      "rag_prompt_chars": 23755,
+      "tokens_in_measured": 5763,
+      "tokens_out_measured": 838,
+      "top_doc_chars": 679,
+      "top_doc_id": "partials/telemetry-metrics/vault/identity/nonentity/active/reporting_period",
+      "windows": {
+        "12000": {
+          "context_chars": 679,
+          "prompt_chars": 1565,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 679,
+          "prompt_chars": 1565,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 679,
+          "prompt_chars": 1565,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 789,
+      "item_id": "A009",
+      "rag_prompt_chars": 26426,
+      "tokens_in_measured": 13294,
+      "tokens_out_measured": 2750,
+      "top_doc_chars": 5181,
+      "top_doc_id": "docs/commands/operator/init",
+      "windows": {
+        "12000": {
+          "context_chars": 5181,
+          "prompt_chars": 6070,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 5181,
+          "prompt_chars": 6070,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 5181,
+          "prompt_chars": 6070,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": true,
+      "closed_book_prompt_chars": 767,
+      "item_id": "A010",
+      "rag_prompt_chars": 26984,
+      "tokens_in_measured": 6502,
+      "tokens_out_measured": 1178,
+      "top_doc_chars": 19391,
+      "top_doc_id": "docs/concepts/seal",
+      "windows": {
+        "12000": {
+          "context_chars": 12000,
+          "prompt_chars": 12867,
+          "truncated": true
+        },
+        "20000": {
+          "context_chars": 19391,
+          "prompt_chars": 20258,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 19391,
+          "prompt_chars": 20258,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 760,
+      "item_id": "U001",
+      "rag_prompt_chars": 29724,
+      "tokens_in_measured": 7777,
+      "tokens_out_measured": 268,
+      "top_doc_chars": 5181,
+      "top_doc_id": "docs/commands/operator/init",
+      "windows": {
+        "12000": {
+          "context_chars": 5181,
+          "prompt_chars": 6041,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 5181,
+          "prompt_chars": 6041,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 5181,
+          "prompt_chars": 6041,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 742,
+      "item_id": "U002",
+      "rag_prompt_chars": 27355,
+      "tokens_in_measured": 5710,
+      "tokens_out_measured": 203,
+      "top_doc_chars": 13292,
+      "top_doc_id": "docs/internals/replication",
+      "windows": {
+        "12000": {
+          "context_chars": 12000,
+          "prompt_chars": 12842,
+          "truncated": true
+        },
+        "20000": {
+          "context_chars": 13292,
+          "prompt_chars": 14134,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 13292,
+          "prompt_chars": 14134,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 723,
+      "item_id": "U003",
+      "rag_prompt_chars": 24686,
+      "tokens_in_measured": 6164,
+      "tokens_out_measured": 178,
+      "top_doc_chars": 4649,
+      "top_doc_id": "docs/commands/operator/rekey",
+      "windows": {
+        "12000": {
+          "context_chars": 4649,
+          "prompt_chars": 5472,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 4649,
+          "prompt_chars": 5472,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 4649,
+          "prompt_chars": 5472,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 721,
+      "item_id": "U004",
+      "rag_prompt_chars": 30169,
+      "tokens_in_measured": 6890,
+      "tokens_out_measured": 185,
+      "top_doc_chars": 8657,
+      "top_doc_id": "docs/secrets/consul",
+      "windows": {
+        "12000": {
+          "context_chars": 8657,
+          "prompt_chars": 9478,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 8657,
+          "prompt_chars": 9478,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 8657,
+          "prompt_chars": 9478,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 740,
+      "item_id": "U005",
+      "rag_prompt_chars": 32911,
+      "tokens_in_measured": 8433,
+      "tokens_out_measured": 659,
+      "top_doc_chars": 5464,
+      "top_doc_id": "docs/deploy/kubernetes/vso/sources/vault/auth/aws",
+      "windows": {
+        "12000": {
+          "context_chars": 5464,
+          "prompt_chars": 6304,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 5464,
+          "prompt_chars": 6304,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 5464,
+          "prompt_chars": 6304,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 734,
+      "item_id": "U006",
+      "rag_prompt_chars": 32793,
+      "tokens_in_measured": 8170,
+      "tokens_out_measured": 104,
+      "top_doc_chars": 9765,
+      "top_doc_id": "docs/updates/deprecation",
+      "windows": {
+        "12000": {
+          "context_chars": 9765,
+          "prompt_chars": 10599,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 9765,
+          "prompt_chars": 10599,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 9765,
+          "prompt_chars": 10599,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 768,
+      "item_id": "U007",
+      "rag_prompt_chars": 33032,
+      "tokens_in_measured": 7960,
+      "tokens_out_measured": 124,
+      "top_doc_chars": 8404,
+      "top_doc_id": "docs/deploy/kubernetes/injector",
+      "windows": {
+        "12000": {
+          "context_chars": 8404,
+          "prompt_chars": 9272,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 8404,
+          "prompt_chars": 9272,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 8404,
+          "prompt_chars": 9272,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 761,
+      "item_id": "U008",
+      "rag_prompt_chars": 28453,
+      "tokens_in_measured": 7797,
+      "tokens_out_measured": 311,
+      "top_doc_chars": 60945,
+      "top_doc_id": "docs/deploy/kubernetes/vso/api-reference",
+      "windows": {
+        "12000": {
+          "context_chars": 12000,
+          "prompt_chars": 12861,
+          "truncated": true
+        },
+        "20000": {
+          "context_chars": 20000,
+          "prompt_chars": 20861,
+          "truncated": true
+        },
+        "70000": {
+          "context_chars": 60945,
+          "prompt_chars": 61806,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 761,
+      "item_id": "U009",
+      "rag_prompt_chars": 29717,
+      "tokens_in_measured": 6628,
+      "tokens_out_measured": 276,
+      "top_doc_chars": 4238,
+      "top_doc_id": "docs/upgrade/vault-ha-upgrade",
+      "windows": {
+        "12000": {
+          "context_chars": 4238,
+          "prompt_chars": 5099,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 4238,
+          "prompt_chars": 5099,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 4238,
+          "prompt_chars": 5099,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "answerable": false,
+      "closed_book_prompt_chars": 728,
+      "item_id": "U010",
+      "rag_prompt_chars": 25449,
+      "tokens_in_measured": 6051,
+      "tokens_out_measured": 102,
+      "top_doc_chars": 5692,
+      "top_doc_id": "docs/about-vault/what-is-vault",
+      "windows": {
+        "12000": {
+          "context_chars": 5692,
+          "prompt_chars": 6520,
+          "truncated": false
+        },
+        "20000": {
+          "context_chars": 5692,
+          "prompt_chars": 6520,
+          "truncated": false
+        },
+        "70000": {
+          "context_chars": 5692,
+          "prompt_chars": 6520,
+          "truncated": false
+        }
+      }
+    }
+  ],
+  "price_in_usd_per_mtok": 0.15,
+  "price_out_usd_per_mtok": 0.6,
+  "ratio_range": [
+    0.208737,
+    0.525991
+  ],
+  "retry_outlier_items": [
+    "A002",
+    "A009"
+  ],
+  "shapes": {
+    "closed_book": {
+      "cny_per_1k_questions": 2.8244,
+      "prompt_chars_mean": 756.0,
+      "prompt_tokens_mean": 188.6,
+      "prompt_tokens_total": 3771.4,
+      "usd_for_these_items": 0.008469
+    },
+    "long_context_12000": {
+      "cny_per_1k_questions": 4.5249,
+      "items_full": 16,
+      "items_truncated": 4,
+      "prompt_chars_mean": 7570.7,
+      "prompt_tokens_mean": 1888.3,
+      "prompt_tokens_total": 37765.3,
+      "usd_for_these_items": 0.013568
+    },
+    "long_context_20000": {
+      "cny_per_1k_questions": 4.7682,
+      "items_full": 19,
+      "items_truncated": 1,
+      "prompt_chars_mean": 8545.6,
+      "prompt_tokens_mean": 2131.4,
+      "prompt_tokens_total": 42628.4,
+      "usd_for_these_items": 0.014297
+    },
+    "long_context_70000": {
+      "cny_per_1k_questions": 5.2791,
+      "items_full": 20,
+      "items_truncated": 0,
+      "prompt_chars_mean": 10592.9,
+      "prompt_tokens_mean": 2642.0,
+      "prompt_tokens_total": 52840.8,
+      "usd_for_these_items": 0.015829
+    },
+    "retrieval_k10_8chunks": {
+      "cny_per_1k_questions": 9.5366,
+      "prompt_chars_mean": 27654.1,
+      "prompt_tokens_mean": 6897.4,
+      "prompt_tokens_total": 137948.3,
+      "usd_for_these_items": 0.028595
+    }
+  },
+  "source_corpus": "D:\\DE Project\\Project\\data\\corpus\\vault-1.21.x-1817bdfe\\docs_structured.jsonl",
+  "source_run": "real-llm-20261030T113604-a5c0a3e4",
+  "tokens_per_char": 0.249417,
+  "top_doc_chars": {
+    "max": 60945,
+    "min": 679,
+    "p50": 5692,
+    "p95": 19391
+  }
+}

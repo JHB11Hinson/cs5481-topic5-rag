@@ -1,0 +1,77 @@
+# Baseline 1 of 4: closed book (ticket 14).
+#
+# Same generator, same prompt, same golden items as configs/ctx-plain.yaml — the
+# only change is `baseline.closed_book: true`, which empties the retrieval block
+# handed to the generator. Retrieval still runs, because recall has to be printed
+# next to correctness: a closed-book answer that happens to be right, on a
+# question whose evidence was retrieved anyway, is not evidence that the index
+# was unnecessary.
+#
+# Read the result as a lower bound on parametric knowledge, not as a measurement
+# of it: the shared system prompt orders the model to use only the supplied
+# context and to answer "not found" when there is none. That is the point of
+# keeping the prompt fixed — it isolates what the context block buys — but it
+# means a closed-book run can look abstemious for reasons that have nothing to do
+# with what the model knows.
+run:
+  name: baseline-closed-book
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: recursive_parent_child
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: bge-m3
+  model_id: BAAI/bge-m3
+  device: cuda
+  batch_size: 8
+  max_seq_length: 1024
+  cache_path: data/cache/embeddings.sqlite
+
+index:
+  backend: qdrant
+  path: data/index
+
+retrieval:
+  mode: rerank
+  k: 10
+  rrf_k: 60
+  reranker: BAAI/bge-reranker-v2-m3
+  rerank_top: 12
+  rerank_max_length: 512
+
+context:
+  mode: plain
+
+generate:
+  provider: llm
+  model_id: llm
+  abstain_score_threshold: -100.0
+  min_claim_overlap: 0.12
+  max_claims: 3
+
+llm:
+  base_url: https://opencode.ai/zen/go/v1
+  session_header: x-opencode-session
+  model_generate: deepseek-v4.1-flash
+  model_judge: deepseek-v4-pro
+  cache_path: data/cache/llm.sqlite
+  timeout: 180
+  temperature: 0.0
+  max_tokens: 900
+  context_chunks: 8
+  price_in_usd_per_mtok: 0.15
+  price_out_usd_per_mtok: 0.60
+
+baseline:
+  closed_book: true
+
+golden:
+  items_path: golden/v1.jsonl

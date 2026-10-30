@@ -1,0 +1,99 @@
+# Baseline 4 of 4: cheaper generator (ticket 14).
+#
+# Retrieval stays at full strength — bge-m3, Qdrant, hybrid + cross-encoder
+# rerank, k = 10 — and only the reader changes: deepseek-v4.1-flash
+# ($0.15 / $0.60 per Mtok) becomes gpt-6-luna ($0.10 / $0.50).
+#
+# "Cheapest working" is a measurement, not a sticker price. Every model the
+# gateway lists with an input price at or below $0.15 was asked one miniature
+# version of this project's own task — the same system prompt, one context chunk,
+# the same JSON contract, max_tokens 900 — and scored on whether the contract
+# came back and what a question would cost at *this* workload's token mix
+# (7,479 prompt + 659 completion tokens, from the reference cell's own run).
+# Evidence: reports/baselines/generator-probe.json and model-catalog-2026-10-30.json.
+#
+#   model                      price/Mtok   USD/question   verdict
+#   beam-free                  0.00 / 0.00  0.000000       passed, excluded (see below)
+#   muse-spark-1.2-contributor 0.10 / 0.20  0.000821       passed, but burned 908 permille
+#                                                          of the output budget on a
+#                                                          one-sentence answer
+#   claude-haiku-5-5           0.10 / 0.50  0.001019       passed
+#   gpt-6-luna                 0.10 / 0.50  0.001019       passed, chosen
+#   glm-5.3-flash              0.15 / 0.50  0.001364       passed
+#   deepseek-v4.1-flash        0.15 / 0.60  0.001430       the reference cell
+#   muse-spark-1.3-contributor 0.10 / 0.20  0.000821       FAILED: empty content, then a
+#                                                          timeout at the full budget
+#   hy3                        0.14 / 0.58  0.001348       FAILED: upstream 400
+#
+# claude-haiku-5-5 ties gpt-6-luna exactly on price; the tie-break is probe output
+# tokens, 86 against 53. Note that input price decides 91% of the mix, so a model
+# with a cheaper output price alone (mimo-v2.6-flash, $0.14 / $0.28) still costs
+# more per question here.
+#
+# Excluded on purpose: beam-free, listed at $0.00 / $0.00, which passed the same
+# probe. A zero price collapses the cost axis this cell exists to move, and a
+# promotional free tier cannot be relied on for a run whose numbers go in the
+# report. Swapping it in is a one-line change to `llm.model_generate` and the two
+# prices below.
+#
+# The prices belong to the swap: leaving the reference cell's rate in place would
+# report deepseek's price against luna's tokens and the cost column would be a lie.
+run:
+  name: baseline-gen-cheap
+  out_root: runs
+
+corpus:
+  source: data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl
+  snapshot_id: vault-1.21.x-1817bdfe
+
+chunk:
+  strategy: recursive_parent_child
+  size: 512
+  overlap: 64
+  parent_size: 1024
+
+embed:
+  provider: bge-m3
+  model_id: BAAI/bge-m3
+  device: cuda
+  batch_size: 8
+  max_seq_length: 1024
+  cache_path: data/cache/embeddings.sqlite
+
+index:
+  backend: qdrant
+  path: data/index
+
+retrieval:
+  mode: rerank
+  k: 10
+  rrf_k: 60
+  reranker: BAAI/bge-reranker-v2-m3
+  rerank_top: 12
+  rerank_max_length: 512
+
+context:
+  mode: plain
+
+generate:
+  provider: llm
+  model_id: llm
+  abstain_score_threshold: -100.0
+  min_claim_overlap: 0.12
+  max_claims: 3
+
+llm:
+  base_url: https://opencode.ai/zen/go/v1
+  session_header: x-opencode-session
+  model_generate: gpt-6-luna
+  model_judge: deepseek-v4-pro
+  cache_path: data/cache/llm.sqlite
+  timeout: 180
+  temperature: 0.0
+  max_tokens: 900
+  context_chunks: 8
+  price_in_usd_per_mtok: 0.10
+  price_out_usd_per_mtok: 0.50
+
+golden:
+  items_path: golden/v1.jsonl
