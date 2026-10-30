@@ -43,3 +43,14 @@ def test_overlap_is_clamped_so_the_window_always_advances():
 
 def test_an_empty_document_still_returns_one_window():
     assert LateChunkingEmbedder.windows_for(_geometry(), 0) == [(0, 0)]
+
+def test_embedding_a_query_with_the_late_encoder_is_refused_loudly():
+    """The matrix lost six cells to an AttributeError that could have been a sentence."""
+    late = LateChunkingEmbedder.__new__(LateChunkingEmbedder)
+    try:
+        late.embed(["what is the default"])
+    except NotImplementedError as error:
+        assert "query" in str(error)
+        assert "run.py" in str(error)
+    else:
+        raise AssertionError("a query was embedded by the document-level encoder")

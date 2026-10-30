@@ -299,6 +299,12 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                 vectors_by_id[child["chunk_id"]] = vector
         ordered_vectors = [vectors_by_id[c["chunk_id"]] for c in children]
         embed_stats = dict(getattr(embedder, "last_stats", {}))
+        # Documents are pooled from token states; queries are not documents. They go
+        # through the same sentence encoder the other two levels use, so the factor
+        # changes only how a *document* is represented — a query vector that differed
+        # between levels would confound the comparison it is meant to isolate. The
+        # encoder has no `embed` of its own, which is why this is a second object.
+        query_embedder = embed.make(cfg)
         context_stats.update(
             {
                 "window_tokens": int(cfg["context.window_tokens"]),
@@ -306,12 +312,14 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
                 "windows": embed_stats.get("windows", 0),
                 "documents_over_window": embed_stats.get("documents_over_window", 0),
                 "peak_vram_gb": round(embed_stats.get("peak_vram_bytes", 0) / 1e9, 2),
+                "query_embedder": query_embedder.model_id,
             }
         )
     else:
         embedder = embed.make(cfg)
         ordered_vectors = embedder.embed(index_texts)
         embed_stats = dict(getattr(embedder, "last_stats", {}))
+        query_embedder = embedder
 
     collection = (
         f"{cfg['corpus.snapshot_id']}-{cfg['chunk.strategy']}-{mode}"
@@ -347,7 +355,7 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
         )
 
     def retrieve_for_query(query: str) -> List[Dict[str, Any]]:
-        query_vector = embedder.embed([query])[0]
+        query_vector = query_embedder.embed([query])[0]
         return retrieve.retrieve(
             store,
             chunks_by_id,

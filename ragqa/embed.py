@@ -349,6 +349,23 @@ class LateChunkingEmbedder:
         self.last_stats["documents"] += 1
         return [vector.tolist() for vector in out if vector is not None]
 
+    def embed(self, texts: Sequence[str]) -> List[List[float]]:
+        """Not this class's job — and a loud reminder of why.
+
+        A late-chunked index holds vectors pooled from document token spans; a query
+        has no document span, so it must go through the ordinary sentence encoder or
+        the contextualization levels would be compared against queries embedded in
+        different spaces. `run.py` builds a second encoder for that (`query_embedder`).
+        This method exists so that reaching for `embed` here fails with a sentence a
+        reader can act on, instead of `AttributeError: no attribute 'embed'` — which
+        cost six matrix cells one evening.
+        """
+        raise NotImplementedError(
+            "LateChunkingEmbedder pools vectors from document spans and cannot embed a "
+            "query; build a chunk-level embedder for queries (see ragqa/run.py, "
+            "`query_embedder`)."
+        )
+
     def close(self) -> None:
         self.cache.close()
 
