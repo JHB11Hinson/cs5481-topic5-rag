@@ -1,0 +1,260 @@
+{
+  "cells": [
+    {
+      "cell": "cell-fixed-dense-plain",
+      "config_digest": "a5e43f75",
+      "config_file": "cell-fixed-dense-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "plain",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-fixed-dense-plain-*-a5e43f75",
+      "run_name": "grid-fixed-dense-plain"
+    },
+    {
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "config_digest": "1dab65a8",
+      "config_file": "cell-fixed-dense-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-fixed-dense-contextual_prefix-*-1dab65a8",
+      "run_name": "grid-fixed-dense-contextual_prefix"
+    },
+    {
+      "cell": "cell-fixed-dense-late_chunking",
+      "config_digest": "e9a9c0da",
+      "config_file": "cell-fixed-dense-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-fixed-dense-late_chunking-*-e9a9c0da",
+      "run_name": "grid-fixed-dense-late_chunking"
+    },
+    {
+      "cell": "cell-fixed-hybrid-plain",
+      "config_digest": "5131a618",
+      "config_file": "cell-fixed-hybrid-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "plain",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-fixed-hybrid-plain-*-5131a618",
+      "run_name": "grid-fixed-hybrid-plain"
+    },
+    {
+      "cell": "cell-fixed-hybrid-contextual_prefix",
+      "config_digest": "cb56ce79",
+      "config_file": "cell-fixed-hybrid-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-fixed-hybrid-contextual_prefix-*-cb56ce79",
+      "run_name": "grid-fixed-hybrid-contextual_prefix"
+    },
+    {
+      "cell": "cell-fixed-hybrid-late_chunking",
+      "config_digest": "f5f7a91f",
+      "config_file": "cell-fixed-hybrid-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-fixed-hybrid-late_chunking-*-f5f7a91f",
+      "run_name": "grid-fixed-hybrid-late_chunking"
+    },
+    {
+      "cell": "cell-fixed-rerank-plain",
+      "config_digest": "fa10bb12",
+      "config_file": "cell-fixed-rerank-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "plain",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-fixed-rerank-plain-*-fa10bb12",
+      "run_name": "grid-fixed-rerank-plain"
+    },
+    {
+      "cell": "cell-fixed-rerank-contextual_prefix",
+      "config_digest": "fd6c356c",
+      "config_file": "cell-fixed-rerank-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-fixed-rerank-contextual_prefix-*-fd6c356c",
+      "run_name": "grid-fixed-rerank-contextual_prefix"
+    },
+    {
+      "cell": "cell-fixed-rerank-late_chunking",
+      "config_digest": "bf421091",
+      "config_file": "cell-fixed-rerank-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "fixed",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-fixed-rerank-late_chunking-*-bf421091",
+      "run_name": "grid-fixed-rerank-late_chunking"
+    },
+    {
+      "cell": "cell-recursive_parent_child-dense-plain",
+      "config_digest": "5c9cd0aa",
+      "config_file": "cell-recursive_parent_child-dense-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "plain",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-dense-plain-*-5c9cd0aa",
+      "run_name": "grid-recursive_parent_child-dense-plain"
+    },
+    {
+      "cell": "cell-recursive_parent_child-dense-contextual_prefix",
+      "config_digest": "65ed2974",
+      "config_file": "cell-recursive_parent_child-dense-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-dense-contextual_prefix-*-65ed2974",
+      "run_name": "grid-recursive_parent_child-dense-contextual_prefix"
+    },
+    {
+      "cell": "cell-recursive_parent_child-dense-late_chunking",
+      "config_digest": "b28e9f1c",
+      "config_file": "cell-recursive_parent_child-dense-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "dense"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-dense-late_chunking-*-b28e9f1c",
+      "run_name": "grid-recursive_parent_child-dense-late_chunking"
+    },
+    {
+      "cell": "cell-recursive_parent_child-hybrid-plain",
+      "config_digest": "20cbcac3",
+      "config_file": "cell-recursive_parent_child-hybrid-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "plain",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-hybrid-plain-*-20cbcac3",
+      "run_name": "grid-recursive_parent_child-hybrid-plain"
+    },
+    {
+      "cell": "cell-recursive_parent_child-hybrid-contextual_prefix",
+      "config_digest": "4eae15ec",
+      "config_file": "cell-recursive_parent_child-hybrid-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-hybrid-contextual_prefix-*-4eae15ec",
+      "run_name": "grid-recursive_parent_child-hybrid-contextual_prefix"
+    },
+    {
+      "cell": "cell-recursive_parent_child-hybrid-late_chunking",
+      "config_digest": "5b4c55d7",
+      "config_file": "cell-recursive_parent_child-hybrid-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "hybrid"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-hybrid-late_chunking-*-5b4c55d7",
+      "run_name": "grid-recursive_parent_child-hybrid-late_chunking"
+    },
+    {
+      "cell": "cell-recursive_parent_child-rerank-plain",
+      "config_digest": "58ef115d",
+      "config_file": "cell-recursive_parent_child-rerank-plain.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "plain",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-rerank-plain-*-58ef115d",
+      "run_name": "grid-recursive_parent_child-rerank-plain"
+    },
+    {
+      "cell": "cell-recursive_parent_child-rerank-contextual_prefix",
+      "config_digest": "c4fa3510",
+      "config_file": "cell-recursive_parent_child-rerank-contextual_prefix.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "contextual_prefix",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-rerank-contextual_prefix-*-c4fa3510",
+      "run_name": "grid-recursive_parent_child-rerank-contextual_prefix"
+    },
+    {
+      "cell": "cell-recursive_parent_child-rerank-late_chunking",
+      "config_digest": "4dd5dab0",
+      "config_file": "cell-recursive_parent_child-rerank-late_chunking.yaml",
+      "expected_items": 60,
+      "factors": {
+        "chunk_strategy": "recursive_parent_child",
+        "context_mode": "late_chunking",
+        "retrieval_mode": "rerank"
+      },
+      "run_id_pattern": "grid-recursive_parent_child-rerank-late_chunking-*-4dd5dab0",
+      "run_name": "grid-recursive_parent_child-rerank-late_chunking"
+    }
+  ],
+  "factor_keys": {
+    "chunk_strategy": "chunk.strategy",
+    "context_mode": "context.mode",
+    "retrieval_mode": "retrieval.mode"
+  },
+  "factors": {
+    "chunk.strategy": [
+      "fixed",
+      "recursive_parent_child"
+    ],
+    "context.mode": [
+      "plain",
+      "contextual_prefix",
+      "late_chunking"
+    ],
+    "retrieval.mode": [
+      "dense",
+      "hybrid",
+      "rerank"
+    ]
+  },
+  "schema": "ragqa.grid/1"
+}
