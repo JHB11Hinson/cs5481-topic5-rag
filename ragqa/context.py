@@ -65,6 +65,10 @@ def prompt_for(
     return "\n\n".join(parts)
 
 
+class EmptyPrefixError(RuntimeError):
+    """The model returned no usable prefix, so the cell would not be a prefix cell."""
+
+
 def sanitize(prefix: str) -> str:
     """One line, no markdown furniture, bounded length."""
     text = normalize(prefix or "").strip().strip('"').strip("'")
@@ -76,7 +80,12 @@ def sanitize(prefix: str) -> str:
 
 
 class PrefixCache:
-    """SQLite keyed by (model, prompt_version, sha256(prompt))."""
+    """SQLite keyed by (model, prompt_version, sha256(prompt)).
+
+    `prefix_chars` is stored beside the prefix so a rerun that hits the cache can
+    still report the length distribution of the chunks it served, instead of
+    measuring only the calls it happened to pay for.
+    """
 
     def __init__(self, path: str):
         directory = os.path.dirname(os.path.abspath(path))
@@ -87,9 +96,19 @@ class PrefixCache:
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS prefixes ("
             " key TEXT PRIMARY KEY, model TEXT NOT NULL, prompt_version TEXT NOT NULL,"
-            " prefix TEXT NOT NULL, tokens_in INTEGER, tokens_out INTEGER)"
+            " prefix TEXT NOT NULL, tokens_in INTEGER, tokens_out INTEGER,"
+            " prefix_chars INTEGER)"
         )
+        self._migrate()
         self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Add `prefix_chars` to a database created before it existed."""
+        columns = {
+            str(row[1]) for row in self._conn.execute("PRAGMA table_info(prefixes)").fetchall()
+        }
+        if "prefix_chars" not in columns:
+            self._conn.execute("ALTER TABLE prefixes ADD COLUMN prefix_chars INTEGER")
 
     @staticmethod
     def key(model: str, prompt_version: str, prompt: str) -> str:
@@ -103,13 +122,34 @@ class PrefixCache:
         ).fetchone()
         return row[0] if row else None
 
+    def get_chars(self, key: str) -> Optional[int]:
+        """The stored prefix length, or the length of the stored prefix itself."""
+        row = self._conn.execute(
+            "SELECT prefix_chars, prefix FROM prefixes WHERE key = ?", (key,)
+        ).fetchone()
+        if row is None:
+            return None
+        stored, prefix = row
+        if stored is not None:
+            return int(stored)
+        # A row written before the column existed: its length is still knowable.
+        return len(prefix or "")
+
     def put(self, key: str, model: str, prompt_version: str, prefix: str,
             tokens_in: int, tokens_out: int) -> None:
         self._conn.execute(
             "INSERT OR REPLACE INTO prefixes"
-            " (key, model, prompt_version, prefix, tokens_in, tokens_out)"
-            " VALUES (?, ?, ?, ?, ?, ?)",
-            (key, model, prompt_version, prefix, int(tokens_in), int(tokens_out)),
+            " (key, model, prompt_version, prefix, tokens_in, tokens_out, prefix_chars)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                key,
+                model,
+                prompt_version,
+                prefix,
+                int(tokens_in),
+                int(tokens_out),
+                len(prefix or ""),
+            ),
         )
 
     def flush(self) -> None:
@@ -184,6 +224,9 @@ class PrefixGenerator:
         neighbours: int = 1,
     ) -> Dict[str, Any]:
         began = time.perf_counter()
+        # Lengths are measured over the chunks this invocation actually served, so
+        # they are reset here rather than accumulated across calls.
+        self.last_stats["prefix_chars"] = []
         by_doc: Dict[str, List[Dict[str, Any]]] = {}
         for chunk in chunks:
             by_doc.setdefault(chunk["doc_id"], []).append(chunk)
@@ -209,10 +252,16 @@ class PrefixGenerator:
                 )
                 key = PrefixCache.key(self.model, self._version(), prompt)
                 cached = self.cache.get(key)
-                if cached is not None:
+                if cached:
                     chunk["prefix"] = cached
+                    self.last_stats["prefix_chars"].append(
+                        int(self.cache.get_chars(key) or len(cached))
+                    )
                     hits += 1
                     continue
+                # An empty cached row is not a prefix: serve it as a miss and pay for
+                # a real one, so a database written before blanks were refused cannot
+                # keep making a prefix cell behave like the plain cell.
                 jobs.append((chunk, prompt, key))
 
         self.last_stats["hits"] = hits
@@ -256,6 +305,16 @@ class PrefixGenerator:
 
     def _store(self, chunk: Dict[str, Any], key: str, result: Dict[str, Any]) -> None:
         prefix = sanitize(result.get("text", ""))
+        if not prefix:
+            # Never cache a blank prefix: it would leave `contextual_text` identical
+            # to `text`, which turns a declared prefix cell into the plain cell and
+            # makes every comparison against it a comparison with itself.
+            raise EmptyPrefixError(
+                f"{chunk.get('chunk_id', '?')}: the model returned no usable prefix "
+                f"({str(result.get('text', ''))[:80]!r}); the thinking channel can eat a "
+                "small max_tokens budget, so raise context.prefix_max_tokens or keep "
+                "context.prefix_reasoning_effort at 'none'"
+            )
         chunk["prefix"] = prefix
         tokens_in = int(result.get("tokens_in", 0) or 0)
         tokens_out = int(result.get("tokens_out", 0) or 0)
@@ -266,7 +325,9 @@ class PrefixGenerator:
 
     def summary(self) -> Dict[str, Any]:
         lengths = sorted(self.last_stats.get("prefix_chars") or [])
-        p50 = lengths[len(lengths) // 2] if lengths else 0
+        # None, not 0: a run that measured nothing has no length distribution, and 0
+        # reads as "every prefix was empty", which is the bug this guards against.
+        p50 = lengths[len(lengths) // 2] if lengths else None
         return {
             "model": self.model,
             "prompt_version": self._version(),
@@ -276,7 +337,8 @@ class PrefixGenerator:
             "tokens_in": self.last_stats.get("tokens_in", 0),
             "tokens_out": self.last_stats.get("tokens_out", 0),
             "prefix_p50_chars": p50,
-            "prefix_max_chars": lengths[-1] if lengths else 0,
+            "prefix_max_chars": lengths[-1] if lengths else None,
+            "prefix_measured_chunks": len(lengths),
             "seconds": self.last_stats.get("seconds", 0.0),
         }
 

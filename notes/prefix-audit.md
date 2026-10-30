@@ -92,7 +92,7 @@ Rows 2, 4 and 6 are the three a human should check first, because they are where
 | run | chunks | cache hits | cache misses | tokens in | tokens out | cost | prefix p50 |
 |---|---|---|---|---|---|---|---|
 | first warm-up (interrupted twice, resumed) | 2,203 | 1,300 | 903 | 336,389 | 36,405 | ¥0.373 | 205 chars |
-| rerun with the cache warm | 2,203 | 2,203 | 0 | 0 | 0 | ¥0.000 | — |
+| rerun with the cache warm | 2,203 | 2,203 | 0 | 0 | 0 | ¥0.000 | 213 chars |
 
-The rerun is the evidence the ticket asks for: 100% hits, no tokens, no money, and the same strings, so the A/B is a comparison rather than two samples. The two interruptions were a killed job (before periodic flushing existed, which cost 195 paid prefixes) and one TLS handshake timeout, after which transport failures became retryable (`ragqa/llm.py`).
+The rerun is the evidence the ticket asks for: 100% hits, no tokens, no money, and the same strings, so the A/B is a comparison rather than two samples. The length column is a real measurement on both rows: the summaries in `notes/prefix-stats/` measure every chunk the invocation served, cached or freshly generated, so a 100%-hit rerun reports 213 / 396 characters rather than nothing. The p50 differs from the warm-up row (205) because the warm-up number was computed over the 903 chunks it paid for and the rerun covers all 2,203 — the misses were not a random sample of the chunk set. The two interruptions were a killed job (before periodic flushing existed, which cost 195 paid prefixes) and one TLS handshake timeout, after which transport failures became retryable (`ragqa/llm.py`).
 
