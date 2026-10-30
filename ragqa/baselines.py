@@ -321,8 +321,15 @@ def load_run(path: str) -> Dict[str, Any]:
     }
 
 
-def item_outcomes(run: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    """Per-item binary outcomes, computed from the run's own artifacts."""
+def per_item_outcomes(run: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Per-item binary outcomes for one run, computed from its own artifacts.
+
+    Named `per_item_outcomes` rather than `item_outcomes` because
+    `aggregate.item_outcomes` is a different function: that one takes a run's loaded
+    items and returns a bundle with recomputed rates, this one takes a `load_run`
+    result and returns one record per item. Two functions with one name across two
+    modules is how a reader ends up calling the wrong one.
+    """
     misses = set(run["metrics"].get("retrieval", {}).get("misses") or [])
     outcomes: Dict[str, Dict[str, Any]] = {}
     for item_id, prediction in run["predictions"].items():
@@ -372,7 +379,7 @@ def _cny_per_1k(run: Dict[str, Any]) -> float:
 def _row(run: Dict[str, Any], reference: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     metrics = run["metrics"]
     grounding = metrics.get("grounding") or {}
-    outcomes = item_outcomes(run)
+    outcomes = per_item_outcomes(run)
     answerable = {item for item, entry in outcomes.items() if entry["answerable"]}
     tokens_in, tokens_out = _tokens(run)
 
@@ -448,8 +455,8 @@ def _row(run: Dict[str, Any], reference: Optional[Dict[str, Any]]) -> Dict[str, 
 
 def _paired(run, reference, metric: str) -> Tuple[List[str], List[Tuple[bool, bool]]]:
     field = OUTCOME_FIELD[metric]
-    left = item_outcomes(reference)
-    right = item_outcomes(run)
+    left = per_item_outcomes(reference)
+    right = per_item_outcomes(run)
     shared = [
         item
         for item in sorted(set(left) & set(right))

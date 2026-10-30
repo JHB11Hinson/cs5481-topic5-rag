@@ -15,8 +15,12 @@ user_session_timeout = 1296000  # 15 days
 # Enable third parties caching (e.g LangChain cache)
 cache = false
 
-# Authorized origins
-allow_origins = ["*"]
+# Authorized origins. The demo is a local single-screen app served on
+# localhost:8000 (CHAINLIT_PORT overrides the port, not the host), so the
+# wildcard this vendored file shipped with is replaced by the two origins it
+# actually runs on. Add your own host if you put it behind a proxy; do not widen
+# it back to "*".
+allow_origins = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
 [features]
 # Process and display HTML in messages. This can be a security risk (see https://stackoverflow.com/questions/19603097/why-is-it-dangerous-to-render-user-generated-html-or-javascript)
@@ -31,9 +35,12 @@ auto_tag_thread = true
 # Allow users to edit their own messages
 edit_message = true
 
-# Authorize users to spontaneously upload files with messages
+# File uploads. The demo answers questions from an index built at start-up and
+# never reads an uploaded file, so the widget is off rather than advertising a
+# 500 MB "*/*" intake the pipeline would ignore. If a future version accepts
+# documents, enable it with `accept` narrowed to the formats actually parsed.
 [features.spontaneous_file_upload]
-    enabled = true
+    enabled = false
     # Define accepted file types using MIME types
     # Examples:
     # 1. For specific file types:
@@ -43,9 +50,9 @@ edit_message = true
     # 3. For specific file extensions:
     #    accept = { "application/octet-stream" = [".xyz", ".pdb"] }
     # Note: Using "*/*" is not recommended as it may cause browser warnings
-    accept = ["*/*"]
-    max_files = 20
-    max_size_mb = 500
+    accept = ["text/markdown", "text/plain", "application/pdf"]
+    max_files = 1
+    max_size_mb = 10
 
 [features.audio]
     # Sample rate of the audio

@@ -722,6 +722,9 @@ def load_run_items(run_dir: str, golden: Dict[str, Dict[str, Any]]) -> Optional[
 def item_outcomes(items: Dict[str, Dict[str, Any]], misses: Optional[Iterable[str]] = None) -> Dict[str, Any]:
     """Per-item vectors and the recomputed headline rates, from the artifacts.
 
+    Returns a bundle (items, hits, ranks, rates), not the per-item records:
+    `baselines.per_item_outcomes` is the other function, and it returns the records.
+
     A hit is decided by locating the golden evidence quote inside returned chunk
     text after normalisation -- the same rule `evaluate` uses, applied to the same
     rows -- so the matrix and `metrics.json` can be compared rather than trusted.
