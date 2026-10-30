@@ -146,13 +146,16 @@ would have inflated every projection by ~10%.
 
 **The window is the cheaper cell, not the expensive one.** The reference cell pastes
 eight chunks averaging 3.4 k chars each — 27,654 chars — while one document capped
-at 20,000 chars pastes a third of that in tokens. So the obvious argument against
-long context ("it costs too much per question") is measurably false at this corpus
-scale, and the report must not make it. Long context would cost more only if the
-cap had to be raised past roughly 65 k chars, which is what full coverage of this
-corpus would demand (max document 195,456 chars, i.e. ~49 k prompt tokens for that
-one item). Note also that the RAG prompt holds 8 chunks while recall is measured at
-k=10: `llm.context_chunks` is 8, so two of the ten retrieved chunks never reach the
+at 20,000 chars pastes a third of that in tokens. Raising the cap does not rescue
+the intuition: the 70,000 row is the *no-truncation* case (it holds all 20
+documents), and even there the prompt averages 2,642 tokens, 38% of the reference
+cell's 6,897. The reason is structural — this corpus's documents are short (mean
+4,435 chars) and the reference cell pastes eight of them at once. Long context
+would only become the expensive cell on a corpus of long documents, or with more
+than about eight chunks pasted. So the obvious argument against it ("it costs too
+much per question") is measurably false here, and the report must not make it.
+Note also that the RAG prompt holds 8 chunks while recall is measured at k=10:
+`llm.context_chunks` is 8, so two of the ten retrieved chunks never reach the
 model.
 
 ## Long context: what the window buys
@@ -261,9 +264,12 @@ with its own run directory; the table prints the counts when the cells run, and
 ## Honest verdict, as far as the evidence goes today
 
 1. **One argument is already dead.** Long context is not the expensive baseline:
-   2,131 prompt tokens per question against the reference cell's 6,897, ¥4.77
-   against ¥9.54 per 1,000. If the report claims RAG wins on cost, the table will
-   contradict it. The cost that long context really pays is the citation handle.
+   a projected 2,131 prompt tokens per question against the reference cell's 6,897,
+   ¥4.77 against ¥9.54 per 1,000 (`window-cost.json`), and the no-truncation row is
+   still only 2,642. Those are projections with an 8% error bar, but the gap is
+   3× — an error bar cannot close it. If the report claims RAG wins on cost, its
+   own table will contradict it. What long context really costs is the citation
+   handle.
 2. **The headline comparison may be uninformative by construction.** Closed book
    under this prompt should abstain on nearly everything, so RAG-versus-no-RAG on
    citation support should come out overwhelming (of the order of 5:0 to 9:0
