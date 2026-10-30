@@ -227,14 +227,24 @@ class PrefixGenerator:
             return chunk, key, result
 
         if jobs:
+            stored = 0
             if self.concurrency > 1 and self.client_factory is not None:
                 with ThreadPoolExecutor(max_workers=self.concurrency) as pool:
                     for chunk, key, result in pool.map(run, jobs):
                         self._store(chunk, key, result)
+                        stored += 1
+                        if stored % 50 == 0:
+                            # Persist progress: a warm-up over 2,203 chunks takes tens
+                            # of minutes, and an interrupted run must not throw away
+                            # everything it already paid for.
+                            self.cache.flush()
             else:
                 for job in jobs:
                     chunk, key, result = run(job)
                     self._store(chunk, key, result)
+                    stored += 1
+                    if stored % 50 == 0:
+                        self.cache.flush()
         self.cache.flush()
 
         for chunk in chunks:

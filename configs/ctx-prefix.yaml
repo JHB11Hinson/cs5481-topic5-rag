@@ -40,7 +40,7 @@ context:
   prefix_model: deepseek-v4.1-flash
   prefix_prompt_version: v1
   prefix_max_tokens: 200
-  prefix_concurrency: 4
+  prefix_concurrency: 8
   prefix_neighbours: 1
   prefix_reasoning_effort: none
   prefix_cache_path: data/cache/prefixes.sqlite
