@@ -1,0 +1,4 @@
+label,family,x,status,run_id,recall_at_k,mrr,ndcg_at_10,citation_precision,citation_recall,span_hit_rate,over_abstain_rate,p50_ms,p95_ms,tokens,cny_per_1k,answers,hops,mean_hops,stop_hit_first_round,stop_hit_after_rewrite,stop_cap_reached,stop_abstained,delta_recall,delta_citation_precision,delta_p50_ms,delta_cny_per_1k,incremental_cny_per_recall_point
+hops-1,hops,1,pending,,,,,,,,,,,,,,1,,,,,,,,,,
+hops-2,hops,2,pending,,,,,,,,,,,,,,2,,,,,,,,,,
+hops-3,hops,3,pending,,,,,,,,,,,,,,3,,,,,,,,,,

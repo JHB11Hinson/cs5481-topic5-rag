@@ -11,6 +11,10 @@ produce a run directory. Everything a reader or an experimenter wants to do
     python -m ragqa grid run --out configs/grid
     python -m ragqa verify --run runs/<run_id>
     python -m ragqa sweep abstention --runs runs
+    python -m ragqa sweep emit --configs configs/sweeps
+    python -m ragqa sweep check configs/sweeps
+    python -m ragqa sweep run --dry-run
+    python -m ragqa sweep curve hops --runs runs --reports reports/sweeps
     python -m ragqa aggregate --runs runs --out reports
     python -m ragqa serve --config configs/grid/cell-....yaml
 
@@ -74,12 +78,35 @@ def _verify(args: argparse.Namespace) -> int:
 
 
 def _sweep(args: argparse.Namespace) -> int:
-    from . import abstain
-
     if args.what == "abstention":
+        from . import abstain
+
         return abstain.sweep_command(
             runs_root=args.runs, out=args.out, modes=args.modes
         )
+
+    # Ticket 13's sensitivity sweeps. Imported lazily like the abstention sweep, so
+    # a missing optional dependency only breaks the command that needs it.
+    from . import sweeps
+
+    if args.what == "emit":
+        written = sweeps.emit(args.configs)
+        print("emitted %d sweep configuration(s) into %s" % (len(written), args.configs))
+        return 0
+    if args.what == "check":
+        return sweeps.check(args.paths or [args.configs])
+    if args.what == "run":
+        return sweeps.run(
+            args.paths or [args.configs],
+            dry_run=args.dry_run,
+            force=args.force,
+            out_root=args.runs,
+        )
+    if args.what == "curve":
+        target = args.paths[0] if args.paths else "all"
+        if target == "all":
+            return sweeps.curves(args.runs, args.reports)
+        return sweeps.curve(target, runs_root=args.runs, out=args.reports)
     raise SystemExit(f"unknown sweep target {args.what!r}")
 
 
@@ -128,10 +155,24 @@ def build_parser() -> argparse.ArgumentParser:
     verify.set_defaults(func=_verify)
 
     sweep = sub.add_parser("sweep", help="post-hoc sweeps over finished runs")
-    sweep.add_argument("what", choices=["abstention"])
+    sweep.add_argument(
+        "what",
+        choices=["abstention", "emit", "check", "run", "curve"],
+        help="abstention: the score-threshold sweep; emit/check/run/curve: the "
+        "sensitivity sweeps (ticket 13)",
+    )
+    sweep.add_argument(
+        "paths",
+        nargs="*",
+        help="sweep configuration files or directories; for `curve`, the family name",
+    )
     sweep.add_argument("--runs", default="runs")
     sweep.add_argument("--out", default="reports")
     sweep.add_argument("--modes", nargs="*", default=None)
+    sweep.add_argument("--configs", default="configs/sweeps")
+    sweep.add_argument("--reports", default="reports/sweeps")
+    sweep.add_argument("--dry-run", action="store_true")
+    sweep.add_argument("--force", action="store_true")
     sweep.set_defaults(func=_sweep)
 
     aggregate = sub.add_parser("aggregate", help="runs/ -> report tables and figures")
