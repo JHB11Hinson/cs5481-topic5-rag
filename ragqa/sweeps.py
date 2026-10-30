@@ -32,40 +32,30 @@ Three inherited rules this module enforces rather than documents:
 
 The hop trigger, in arithmetic
 ------------------------------
-The trigger was derived from the rerank abstention curve as it stood when these
-cells were declared: raw 0.75925 was that curve's working point. **It is no longer
-the one on disk.** The v1 re-sweep in `reports/abstention/working-points.json`
-(mode `rerank`, 40 answerable + 20 near-miss items of golden v1) puts the rerank
-working point at raw 0.426134, so the trigger below now sits *above* the abstention
-point instead of below it. The cells keep 0.5771 rather than being re-derived and
-re-run: the hop runs exist, its cell digests are how they resume, and re-emiting the
-parameter would orphan them mid-matrix. Read the hop curve as measured at that fixed
-trigger, and read the mismatch as the one thing this ticket did not re-derive.
+The trigger is the rerank abstention working point of the same golden set: raw
+0.426134, the chosen threshold in `reports/abstention/working-points.json` (mode
+`rerank`, 40 answerable + 20 near-miss items of golden v1). That is the right
+number for a hop trigger because it is the exact point at which the system would
+otherwise give up: a round whose best score sits below it is a round whose evidence
+the calibration says is not sufficient, which is precisely the round worth spending
+one rewrite on.
 
-Below the working point the curve has its own resolution: 18 points over [0.2, 0.9]
-is one step of 0.0270 in raw score for this mode. The lowest point on that curve is
-t = 0.2, raw 0.5771, and it is the point at which the calibration stops supporting
-"this round found relevant evidence" at all:
+An earlier version of this note derived the trigger from the grid *floor* of the v0
+curve (raw 0.5771, 0.182 below that curve's working point) and, when the sweep
+moved to golden v1, the trigger ended up above the abstention point it was meant to
+precede. It is now the abstention point itself, on the same score scale, and
+`HOP_TRIGGER_SOURCE` records where it came from so a later sweep move is visible
+rather than silent.
 
-- all 10/10 answerable calibration items scored above 0.75925 and therefore above
-  0.5771 as well -- nothing the calibration measured as answerable sits that low;
-- only 6/10 near-misses clear 0.5771, so a top score below it is below the range
-  that even demographically-adjacent, unanswerable questions reach;
-- a round that cannot put a single hit above 0.5771 has produced nothing resembling
-  any observed answer or near-miss, which is the runtime meaning of "plausibly
-  failed".
+Consequences worth stating in the report:
 
-So `HOP_TRIGGER = 0.5771`, identical in all three hop cells, 0.182 below the
-abstention working point. Consequences worth stating in the report:
-
-- every rewrite is spent strictly below the calibrated abstention line, so a
-  question that hops = 1 would have answered is never rewritten and ΔRecall is
-  attributable to the loop rather than to a threshold change;
-- a rewrite stops as soon as a fused round clears 0.5771 (ADR-0016 keeps each hit's
-  own score), which is below the 0.75925 answer gate: an item can therefore stop
-  after a rewrite and still be abstained on. `hop_stats.json`'s stop reason records
-  which round produced the hit, and the abstain decision is read from the metrics,
-  never inferred from the stop reason;
+- a rewrite is spent exactly on the rounds the system would abstain on, never on a
+  round it would have answered, so ?Recall is attributable to the loop rather than
+  to a threshold change;
+- a rewrite stops as soon as a fused round clears 0.426134 (ADR-0016 keeps each
+  hit's own score). A rewritten round that clears it can therefore end above the
+  abstention line and turn an abstention into an answer: that is the mechanism
+  working, and `hop_stats.json`'s stop reason records which round produced the hit;
 - if the loop never fires -- `hit_after_rewrite` zero in the histogram -- the hop
   curve is flat by construction and the honest reading is that the loop does not
   pay for itself on this corpus. `break_even_hop` says so rather than inventing a
@@ -107,25 +97,24 @@ ITEM_LIMIT = ANSWERABLE_ITEMS
 #: already calls it with `reasoning_effort: "none"` (ADR-0014).
 HOP_REWRITE_MODEL = "deepseek-v4.1-flash"
 
-#: Raw cross-encoder score at the grid floor of the rerank curve *as it stood when
-#: these cells were declared* (t = 0.2 of the v0 calibration). The v1 curve's floor
-#: is lower, so this number is now above the abstention working point -- see the
-#: module docstring; it is held fixed rather than re-derived, so the hop runs that
-#: exist stay the runs that were measured.
-HOP_TRIGGER = 0.5771
+#: The rerank abstention working point of golden v1, in raw cross-encoder score:
+#: `reports/abstention/working-points.json`, mode `rerank`, `raw_threshold`. The hop
+#: cells fire a rewrite exactly where the system would otherwise abstain, on the
+#: same score scale, so the trigger and the decision it precedes cannot disagree.
+HOP_TRIGGER = 0.426134
 
-#: The fit the trigger was derived from, kept so the number stays checkable after the
-#: published calibration moved on. `HOP_TRIGGER_SOURCE["fitted_mean"] + fitted_stdev *
-#: Phi^-1(grid_floor_t)` reproduces `HOP_TRIGGER`; the v1 curve in
-#: `reports/abstention/working-points.json` no longer does, and the module docstring
-#: records that divergence instead of hiding it.
+#: Where the trigger came from, recorded so the number stays checkable against the
+#: published curve. It is the rerank *working point* (t = 0.2 of the v1 curve), not
+#: the grid floor: `working_point_raw` here must equal `HOP_TRIGGER`, and
+#: `tests/test_sweeps.py` fails if the published sweep ever moves away from it.
 HOP_TRIGGER_SOURCE: Dict[str, Any] = {
-    "curve": "reports/abstention/rerank-pr.csv, v0 calibration (10 answerable + 10 near-miss)",
-    "working_point_raw": 0.75925,
-    "fitted_mean": 0.793426,
-    "fitted_stdev": 0.256976,
-    "grid_floor_t": 0.2,
-    "grid_floor_raw": 0.5771,
+    "curve": "reports/abstention/working-points.json, mode rerank, golden v1",
+    "population": "40 answerable + 20 near-miss items",
+    "working_point_t": 0.2,
+    "working_point_raw": 0.426134,
+    "rule": "the hop trigger is the abstention working point of the same score "
+    "scale and the same golden set: a rewrite is spent exactly on the rounds the "
+    "calibration would abstain on",
 }
 
 #: spec.md rows 2-4, restated so the projection is checked rather than narrated.
@@ -388,12 +377,12 @@ def _render(entry: Dict[str, Any], base: Dict[str, Any]) -> str:
     if entry["family"] == "hops":
         header += [
             "#",
-            "#   trigger   : retrieval.trigger_threshold = %s, a cross-encoder score;"
+            "#   trigger   : retrieval.trigger_threshold = %s, the rerank abstention"
             % HOP_TRIGGER,
-            "#               derived against the v0 rerank calibration (working point",
-            "#               0.75925) and held fixed since, so it is now above the v1",
-            "#               working point (0.426134). Identical in hops-1, hops-2 and",
-            "#               hops-3 so only the cap differs.",
+            "#               working point of golden v1 (reports/abstention/",
+            "#               working-points.json), so a rewrite fires exactly where the",
+            "#               system would otherwise abstain. Identical in hops-1,",
+            "#               hops-2 and hops-3 so only the cap differs.",
         ]
     if cfg["chunk.overlap"] * INVARIANTS["overlap_ratio"] != cfg["chunk.size"]:
         header.append("#   WARNING: overlap is not size/8 -- the chunk sweep is confounded")

@@ -203,7 +203,13 @@ def test_chunk_cells_keep_overlap_and_parent_size_proportional():
         shutil.rmtree(out, ignore_errors=True)
 
 
-def test_hop_cells_share_one_trigger_chosen_below_the_abstention_working_point():
+def test_hop_cells_share_the_trigger_the_abstention_sweep_chose():
+    """The trigger is the rerank working point: a rewrite fires where the system abstains.
+
+    This is the property worth protecting, so it is read out of the published sweep
+    rather than compared with a second literal: same score scale, same golden set,
+    same number in all three hop cells so only the hop cap varies.
+    """
     out = _tmpdir()
     try:
         sweeps.emit(out)
@@ -216,30 +222,18 @@ def test_hop_cells_share_one_trigger_chosen_below_the_abstention_working_point()
             assert cfg["retrieval.trigger_threshold"] == sweeps.HOP_TRIGGER, count
         assert hops == {1: 1, 2: 2, 3: 3}
 
-        # The trigger is recomputed here from the fit it was declared against, so the
-        # number in the config is checkable arithmetic and not a preference.
-        source = sweeps.HOP_TRIGGER_SOURCE
-        expected = source["fitted_mean"] + source["fitted_stdev"] * statistics.NormalDist().inv_cdf(
-            source["grid_floor_t"]
-        )
-        assert abs(expected - sweeps.HOP_TRIGGER) < 5e-5, (expected, sweeps.HOP_TRIGGER)
-        # It was derived to fire before that curve's abstention point, not after it.
-        assert sweeps.HOP_TRIGGER < source["working_point_raw"], source
-
-        # The published calibration has since moved to v1, so the trigger is now
-        # ABOVE the rerank working point. That divergence is a known, documented
-        # consequence of holding the trigger fixed rather than re-running the hop
-        # cells; this assertion exists so it cannot drift silently in either
-        # direction.
         working = json.load(open("reports/abstention/working-points.json", "r", encoding="utf-8"))
         rerank = working["modes"]["rerank"]
+        # The same golden set the sweep cells measure on.
+        assert rerank["golden"] == "golden/v1.jsonl", rerank["golden"]
+        assert rerank["items"] == {"answerable": 40, "near_miss": 20, "total": 60}, rerank
         assert rerank["transform"]["kind"] == "zscore-normal-cdf", rerank
-        assert rerank["raw_threshold"] < sweeps.HOP_TRIGGER, (
-            "if the v1 working point has risen above the trigger, the hop derivation "
-            "should be re-derived from the v1 curve rather than kept",
-            rerank["raw_threshold"],
+        assert abs(sweeps.HOP_TRIGGER - rerank["raw_threshold"]) < 5e-6, (
+            "the hop trigger has drifted from the published rerank working point",
             sweeps.HOP_TRIGGER,
+            rerank["raw_threshold"],
         )
+        assert sweeps.HOP_TRIGGER_SOURCE["working_point_raw"] == sweeps.HOP_TRIGGER
     finally:
         shutil.rmtree(out, ignore_errors=True)
 

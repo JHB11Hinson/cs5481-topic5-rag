@@ -191,20 +191,34 @@ U013; on `hybrid` U002, U010 and U017; on `rerank` U011, U006 and U004. A
 cross-encoder scores *relevance*, and a near-miss is by construction relevant
 without being sufficient.
 
-## One consequence elsewhere: the hop trigger
+## One consequence elsewhere: the hop trigger is now this number
 
-`configs/sweeps/hops-*.yaml` set `retrieval.trigger_threshold: 0.5771`, which was
-the *v0* rerank curve's raw score at the grid floor and sat 0.18 below that curve's
-working point (0.75925). Against this v1 calibration it sits **above** the rerank
-working point (0.426134), so a hop now fires on rounds that are already above the
-abstention line. It is held fixed rather than re-derived: the hop cells are part of
-the running matrix, their config digests are how their runs resume, and re-emitting
-the parameter would orphan every hop run mid-flight. `ragqa/sweeps.py` records the
-derivation it was declared against (`HOP_TRIGGER_SOURCE`), its test asserts the
-divergence in both directions, and re-deriving the trigger from this curve is a
-one-line change plus a re-run of three cells.
+`configs/sweeps/hops-*.yaml` set `retrieval.trigger_threshold` to the rerank working
+point measured here, raw **0.426134**, in all three hop cells so only the hop cap
+varies. That is the coherent reading of "a round failed to surface evidence": a
+rewrite now fires exactly on the rounds the calibration would abstain on, on the
+same score scale as the decision it precedes.
 
-## Regenerate
+It replaces 0.5771, which was the grid *floor* of the v0 curve (0.182 below that
+curve's working point). Once the sweep moved to golden v1 the old number sat above
+the abstention point it was meant to precede, so it was re-derived rather than kept.
+No hop run directory existed when it changed, so nothing was orphaned.
+`ragqa/sweeps.py` records the provenance in `HOP_TRIGGER_SOURCE`, and its test
+asserts the trigger equals the published rerank working point of golden v1 -- the
+property worth protecting -- instead of a second literal.
+
+## The one-sentence version the report can quote
+
+> The over-abstention budget of 0.05 is satisfiable only on the dense scale; on
+> hybrid and rerank it is infeasible at all 18 grid points, so the pre-registered
+> fallback applied -- take the smallest achievable over-abstention rate and break
+> ties towards the larger threshold -- and the table reports 0.075 and 0.150 rather
+> than a budget that was not met.
+
+That is a finding about the score, not a defect in the rule: it is the same
+structural point the v0 sweep made about the RRF lattice, now measured on 60 items.
+
+## Regenerate## Regenerate
 
 ```bash
 python -m ragqa sweep abstention --runs "D:/DE Project/wt/exp/runs" --out reports
