@@ -290,6 +290,7 @@ def make(cfg):
             temperature=0.0,
             session_header=cfg["llm.session_header"],
             session_id=cfg["llm.session_id"],
+            reasoning_effort=cfg["judge.reasoning_effort"],
         )
         llm = LLMJudge(client, model=model, max_chars=int(cfg["judge.llm_max_chars"]))
     return SupportJudges(nli=nli, llm=llm)
