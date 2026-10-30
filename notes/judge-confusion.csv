@@ -1,0 +1,13 @@
+table,cell,count
+nli_x_judge,both_supported,18
+nli_x_judge,nli_only,5
+nli_x_judge,judge_only,0
+nli_x_judge,neither,7
+nli_vs_human,tp,19
+nli_vs_human,fp,4
+nli_vs_human,fn,1
+nli_vs_human,tn,6
+judge_vs_human,tp,18
+judge_vs_human,fp,0
+judge_vs_human,fn,2
+judge_vs_human,tn,10

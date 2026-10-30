@@ -1,0 +1,689 @@
+[
+  {
+    "id": "A001",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "easy",
+    "question": "What state does a Vault server start in when it is launched?",
+    "reference_answer": "It starts in a sealed state.",
+    "evidence": [{"doc_id": "docs/concepts/seal", "keyword": "it starts in a sealed state"}],
+    "tags": ["seal"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A002",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "easy",
+    "question": "A service token is revoked. What happens to the leases that were created with it?",
+    "reference_answer": "Every lease created using that token is revoked as well.",
+    "evidence": [{"doc_id": "docs/concepts/lease", "keyword": "Vault will revoke all leases that were created using that token"}],
+    "tags": ["lease", "token", "revocation"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A003",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "easy",
+    "question": "The root key is stored in the storage backend. What is needed to decrypt it?",
+    "reference_answer": "An unseal key.",
+    "evidence": [{"doc_id": "docs/commands/operator/init", "keyword": "requires an _unseal key_ to decrypt it"}],
+    "tags": ["init", "unseal"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A004",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "When you move a mount with the sys/remount endpoint, is the mount fully moved by the time the call returns?",
+    "reference_answer": "No. The endpoint is asynchronous, so the migration continues after the call returns.",
+    "evidence": [{"doc_id": "docs/concepts/mount-migration", "keyword": "is that it is an asynchronous endpoint"}],
+    "tags": ["remount", "mounts"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A005",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "How can you tell from the value of a token whether it is a batch token or a service token?",
+    "reference_answer": "From its prefix, which indicates the token type.",
+    "evidence": [{"doc_id": "docs/concepts/tokens", "keyword": "Tokens have a specific prefix that indicates their type"}],
+    "tags": ["tokens"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A006",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "easy",
+    "question": "While a node runs in recovery mode, how many recovery tokens can exist at a time?",
+    "reference_answer": "Exactly one.",
+    "evidence": [{"doc_id": "docs/concepts/recovery-mode", "keyword": "Only a single recovery token can be generated"}],
+    "tags": ["recovery-mode", "tokens"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A007",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "In a high availability cluster, which server processes requests and what does the standby do with them?",
+    "reference_answer": "Only the active server processes all requests; the standby redirects requests to an active Vault server.",
+    "evidence": [{"doc_id": "docs/internals/high-availability", "keyword": "standby server redirects all requests to an active Vault server"}],
+    "tags": ["ha"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A008",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "What does the vault.core.leadership_lost metric measure?",
+    "reference_answer": "How long a server held the leader position before losing it.",
+    "evidence": [{"doc_id": "docs/internals/telemetry/key-metrics", "keyword": "measures the duration a server held the leader position before losing it"}],
+    "tags": ["telemetry", "metrics"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A009",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "Is the data returned by a kv list operation filtered against ACL policies?",
+    "reference_answer": "No, it is not filtered.",
+    "evidence": [{"doc_id": "docs/secrets/kv/kv-v2/setup", "keyword": "Data returned for a `list` operation"}],
+    "tags": ["kv", "acl"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A010",
+    "answerable": true,
+    "type": "fact_lookup",
+    "difficulty": "medium",
+    "question": "After a replication secondary cluster is promoted, what must existing applications do?",
+    "reference_answer": "Reauthenticate and obtain new leases from the newly promoted primary.",
+    "evidence": [{"doc_id": "docs/enterprise/replication", "keyword": "When the secondary is promoted, applications must reauthenticate"}],
+    "tags": ["replication"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A011",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "easy",
+    "question": "What address and port does the Vault dev server listen on by default, and does it use TLS?",
+    "reference_answer": "127.0.0.1:8200, without TLS.",
+    "evidence": [{"doc_id": "docs/concepts/dev-server", "keyword": "default server address"}],
+    "tags": ["dev-mode"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A012",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "If Vault cannot read the host's memory size, what does the replication log shipper buffer default to?",
+    "reference_answer": "1GB, as the value of logshipper_buffer_size.",
+    "evidence": [{"doc_id": "docs/concepts/tune-server-performance", "keyword": "uses the default value of 1GB for `logshipper_buffer_size`"}],
+    "tags": ["replication", "performance"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A013",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "easy",
+    "question": "What is the default lease time in Vault?",
+    "reference_answer": "32 days, or 768 hours.",
+    "evidence": [{"doc_id": "docs/internals/recommended-patterns", "keyword": "default lease time in Vault is 32 days"}],
+    "tags": ["lease", "ttl"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A014",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "What is the default value of default_max_request_duration, the server-wide cap on how long a request may take?",
+    "reference_answer": "90 seconds.",
+    "evidence": [{"doc_id": "docs/concepts/tune-server-performance", "keyword": "with a default value of 90 seconds"}],
+    "tags": ["performance", "timeouts"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A015",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "How many entries does Vault's storage read cache hold by default?",
+    "reference_answer": "131072 entries.",
+    "evidence": [{"doc_id": "docs/concepts/tune-server-performance", "keyword": "default value is **131072**"}],
+    "tags": ["performance", "cache"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A016",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "What is the smallest value the remove_irrevocable_lease_after option accepts?",
+    "reference_answer": "2 days.",
+    "evidence": [{"doc_id": "docs/configuration", "keyword": "The minimum value for `remove_irrevocable_lease_after` is 2 days"}],
+    "tags": ["configuration", "lease"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A017",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "What is the largest blob the Azure storage backend can write?",
+    "reference_answer": "4 megabytes per blob.",
+    "evidence": [{"doc_id": "docs/configuration/storage/azure", "keyword": "limited to a maximum of 4 megabytes per blob"}],
+    "tags": ["storage", "azure"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A018",
+    "answerable": true,
+    "type": "param_value",
+    "difficulty": "medium",
+    "question": "How many consecutive failed TOTP passcode validations does Vault allow by default?",
+    "reference_answer": "5.",
+    "evidence": [{"doc_id": "docs/auth/login-mfa", "keyword": "5 consecutive failed TOTP passcode validation"}],
+    "tags": ["mfa", "totp"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A019",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "medium",
+    "question": "In the entropy augmentation table, what is the root key, and what does it protect?",
+    "reference_answer": "An AES key encrypted by the seal mechanism; it encrypts the key ring.",
+    "evidence": [{"doc_id": "docs/enterprise/entropy-augmentation", "keyword": "AES key that is encrypted by the seal mechanism", "mode": "line"}],
+    "tags": ["table", "entropy"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A020",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "hard",
+    "question": "In the telemetry table for non-entity clients in a reporting period, what metric type is used and what does the value count?",
+    "reference_answer": "A gauge, counting distinct non entities that created a token during the reporting period.",
+    "evidence": [{"doc_id": "partials/telemetry-metrics/vault/identity/nonentity/active/reporting_period", "keyword": "distinct non entities", "mode": "line"}],
+    "tags": ["table", "telemetry", "fragment"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A021",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "medium",
+    "question": "Which quota type caps the number of leases, and is it available in the Community edition?",
+    "reference_answer": "Lease count quotas; no, they are Enterprise only.",
+    "evidence": [{"doc_id": "docs/concepts/resource-quotas", "keyword": "Lease count quotas", "mode": "line"}],
+    "tags": ["table", "quotas"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A022",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "medium",
+    "question": "Which quota type limits requests per second, and does the Community edition support it?",
+    "reference_answer": "Rate limit quotas; yes, both editions support them.",
+    "evidence": [{"doc_id": "docs/concepts/resource-quotas", "keyword": "Limit maximum amount of requests per second", "mode": "line"}],
+    "tags": ["table", "quotas"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A023",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "medium",
+    "question": "Which Vault Enterprise releases include long-term support?",
+    "reference_answer": "Since 1.16, the first major release of each calendar year.",
+    "evidence": [{"doc_id": "docs/enterprise/lts", "keyword": "When are LTS versions released?", "mode": "line"}],
+    "tags": ["table", "lts", "enterprise"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A024",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "medium",
+    "question": "What does a soft-mandatory Sentinel policy require?",
+    "reference_answer": "The policy must pass unless an override is specified.",
+    "evidence": [{"doc_id": "docs/enterprise/sentinel", "keyword": "soft-mandatory", "mode": "line"}],
+    "tags": ["table", "sentinel"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A025",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "hard",
+    "question": "In the Sentinel properties table, which values can performance.mode take?",
+    "reference_answer": "disabled, bootstrapping, primary, and secondary.",
+    "evidence": [{"doc_id": "docs/enterprise/sentinel/properties", "keyword": "`performance.mode`", "mode": "line"}],
+    "tags": ["table", "sentinel", "replication"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A026",
+    "answerable": true,
+    "type": "table_content",
+    "difficulty": "hard",
+    "question": "Which Vault Enterprise versions does Oracle database plugin release 0.12.3+ent support?",
+    "reference_answer": "1.19.23+, 1.20.17+, 1.21.12+, or 2.2.0+.",
+    "evidence": [{"doc_id": "docs/secrets/databases/oracle", "keyword": "0.12.3+ent", "mode": "line"}],
+    "tags": ["table", "databases", "oracle"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A027",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "Vault splits the root key into shards at initialisation. How does supplying a threshold of those shards take a server from sealed to usable?",
+    "reference_answer": "The shards reconstruct the root key; unsealing is obtaining that plaintext root key, which is then used to decrypt the encryption key.",
+    "evidence": [
+      {"doc_id": "docs/commands/operator/init", "keyword": "threshold of shards is required"},
+      {"doc_id": "docs/concepts/seal", "keyword": "Unsealing is the process of obtaining the plaintext root key"}
+    ],
+    "tags": ["multi-hop", "init", "seal"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A028",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "With auto unseal, what comes back at initialisation instead of unseal keys, and what still needs that credential later?",
+    "reference_answer": "Recovery keys, and they are still required for highly privileged actions such as generating new root keys.",
+    "evidence": [
+      {"doc_id": "docs/concepts/seal", "keyword": "returns recovery keys to the operator rather than unseal keys"},
+      {"doc_id": "docs/configuration/seal/seal-best-practices", "keyword": "highly privileged actions, such as generating new root keys"}
+    ],
+    "tags": ["multi-hop", "auto-unseal", "recovery-keys"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A029",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "What makes a token a root token, and why can that power not be edited away from the policy it carries?",
+    "reference_answer": "A root token is a token with the root policy attached, and that built-in policy cannot be modified or removed.",
+    "evidence": [
+      {"doc_id": "docs/concepts/tokens", "keyword": "Root tokens are tokens that have the `root` policy attached"},
+      {"doc_id": "docs/concepts/policies", "keyword": "The `root` policy is a built-in Vault policy that cannot be modified or removed"}
+    ],
+    "tags": ["multi-hop", "tokens", "policies"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A030",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "If you remount a secrets engine that hands out dynamic credentials, what happens to credentials already issued, and why?",
+    "reference_answer": "Remounting revokes the existing leases on that mount, and every dynamic secret carries a lease, so the issued credentials go with them.",
+    "evidence": [
+      {"doc_id": "docs/concepts/mount-migration", "keyword": "remount operation will result in existing leases on a mount being revoked"},
+      {"doc_id": "docs/concepts/lease", "keyword": "All dynamic secrets in Vault are required to have a lease"}
+    ],
+    "tags": ["multi-hop", "remount", "lease"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A031",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "Vault on Consul caps one stored value at 512KB. What does that cap mean for a KV v2 key with a long archive of versions?",
+    "reference_answer": "All archived versions of a single key must fit in a single storage entry, so the whole history has to fit inside that one 512KB value.",
+    "evidence": [
+      {"doc_id": "docs/concepts/tune-server-performance", "keyword": "Raft suggested maximum size of"},
+      {"doc_id": "docs/internals/limits", "keyword": "All archived versions of a single key must fit in a single storage entry"}
+    ],
+    "tags": ["multi-hop", "kv", "limits"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A032",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "Why does linking one person's logins into a single identity entity keep the billed client count down?",
+    "reference_answer": "Each token adds to the client count and each unique authentication issues a token, so aliases connecting those logins to one identity avoid counting them separately.",
+    "evidence": [
+      {"doc_id": "docs/concepts/identity", "keyword": "each entity is made up of zero or more aliases"},
+      {"doc_id": "docs/internals/recommended-patterns", "keyword": "each token adds to the client count"}
+    ],
+    "tags": ["multi-hop", "identity", "client-count"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A033",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "Audit logs are kept for inspection yet do not leak secrets. What does Vault write instead of the value, and what happens to requests when no audit device can record them?",
+    "reference_answer": "Most string values are written as a keyed HMAC-SHA256 hash, and Vault does not respond to requests when audit devices are not enabled to record them.",
+    "evidence": [
+      {"doc_id": "docs/audit", "keyword": "HMAC-SHA256) of most string values"},
+      {"doc_id": "docs/internals/recommended-patterns", "keyword": "Vault will not respond to requests when audit devices are not enabled"}
+    ],
+    "tags": ["multi-hop", "audit"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A034",
+    "answerable": true,
+    "type": "multi_hop",
+    "difficulty": "hard",
+    "question": "In a high availability cluster that uses the Shamir seal, does unsealing one node bring the whole cluster up?",
+    "reference_answer": "No: HA runs several servers together, and each node must be unsealed with the required threshold of shares; partially unsealed nodes are not distributed across the cluster.",
+    "evidence": [
+      {"doc_id": "docs/concepts/seal", "keyword": "you must unseal each node with the required threshold of shares"},
+      {"doc_id": "docs/internals/high-availability", "keyword": "Vault can run in a high availability (HA) mode"}
+    ],
+    "tags": ["multi-hop", "ha", "seal"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A035",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "Why does Vault encrypt its data encryption key with a second key instead of keeping it in plaintext?",
+    "reference_answer": "So the encryption key stored with the data is itself protected by the root key.",
+    "evidence": [{"doc_id": "docs/concepts/seal", "keyword": "To protect this encryption key, Vault encrypts it using another encryption key"}],
+    "tags": ["seal", "keyring"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A036",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "During a suspected intrusion, what does sealing the Vault achieve?",
+    "reference_answer": "It cuts off access quickly to limit the damage: nobody can reach the data in a sealed Vault without the root key shares.",
+    "evidence": [
+      {"doc_id": "docs/concepts/seal", "keyword": "If there is a detected intrusion, you can seal the Vault data quickly"},
+      {"doc_id": "docs/concepts/seal", "keyword": "Users cannot access the data from a sealed Vault without access to the root key shares"}
+    ],
+    "tags": ["seal", "incident-response"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A037",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "Why does unbounded lease growth matter operationally and not only for storage cost?",
+    "reference_answer": "It can eventually cause serious issues with the underlying storage, and then with Vault itself.",
+    "evidence": [{"doc_id": "docs/concepts/tune-server-performance", "keyword": "Unbounded lease growth can eventually cause serious issues"}],
+    "tags": ["lease", "operations"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A038",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "Why does Vault keep separate keys for separate jobs instead of one key for everything?",
+    "reference_answer": "Because it stores different encryption keys for different purposes, and rotation then targets the key that needs changing.",
+    "evidence": [{"doc_id": "docs/internals/rotation", "keyword": "Vault stores different encryption keys for different purposes"}],
+    "tags": ["keys", "rotation"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A039",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "What limits Vault request latency, and which direction of storage access costs more?",
+    "reference_answer": "The configured storage type; storage writes are much more expensive than reads.",
+    "evidence": [{"doc_id": "docs/concepts/tune-server-performance", "keyword": "Vault request latency is primarily limited by the configured storage type"}],
+    "tags": ["performance", "storage"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "A040",
+    "answerable": true,
+    "type": "concept",
+    "difficulty": "medium",
+    "question": "What does the security model assume about trust between a Vault client and a Vault server?",
+    "reference_answer": "That there is no mutual trust between the client and the server.",
+    "evidence": [{"doc_id": "docs/internals/security", "keyword": "There is no mutual trust between the Vault client and server"}],
+    "tags": ["security", "tls"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U001",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "Which Vault release first introduced the replication_primary setting?",
+    "why_unanswerable": "Release archaeology: the setting is documented, but no page states the version that introduced it.",
+    "near_miss_doc": "docs/enterprise/replication",
+    "tags": ["version-drift"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U002",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "easy",
+    "question": "In Vault 1.22, what is the default value of the shed_rate option for adaptive overload protection?",
+    "why_unanswerable": "The snapshot is 1.21.x; shed_rate appears nowhere in it, and 1.22 material is not part of the corpus.",
+    "near_miss_doc": "docs/configuration/adaptive-overload-protection",
+    "tags": ["version-drift"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U003",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "In Vault 1.22, what is the default value of the listener option disable_gzip?",
+    "why_unanswerable": "The snapshot documents 1.21.x; disable_gzip is not documented in it at all.",
+    "near_miss_doc": "docs/configuration/listener/tcp",
+    "tags": ["version-drift"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U004",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "Which Vault release removed the -dev-kv-v1 flag from vault server -dev?",
+    "why_unanswerable": "The flag is documented as current, and the corpus never records its removal or the release that would have removed it.",
+    "near_miss_doc": "docs/concepts/dev-server",
+    "tags": ["version-drift"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U005",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "easy",
+    "question": "What is my cluster's current unseal key threshold?",
+    "why_unanswerable": "That is the state of one deployment; the documentation explains the mechanism, not any cluster's configured value.",
+    "near_miss_doc": "docs/concepts/seal",
+    "tags": ["deployment-specific"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U006",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "How many performance secondaries are currently connected to my primary cluster?",
+    "why_unanswerable": "Live topology of a running cluster; the replication pages describe what secondaries do, never how many a cluster has.",
+    "near_miss_doc": "docs/enterprise/replication",
+    "tags": ["deployment-specific"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U007",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "easy",
+    "question": "What is the Docker image digest of the Vault 1.20.4 release I deployed last week?",
+    "why_unanswerable": "Artifact metadata lives in a registry; the docs tree records image names and tags, never digests.",
+    "near_miss_doc": "docs/deploy/kubernetes/helm/configuration",
+    "tags": ["deployment-specific"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U008",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "What is the current size of the raft log on each of my Vault nodes?",
+    "why_unanswerable": "Runtime state of a specific cluster; the raft configuration pages describe snapshot thresholds, not the size of anyone's log.",
+    "near_miss_doc": "docs/configuration/storage/raft",
+    "tags": ["deployment-specific"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U009",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "How do I enable the Consul catalog sync feature?",
+    "why_unanswerable": "Catalog sync is a Consul feature; this corpus mentions Consul only as a storage backend and an HA backend.",
+    "near_miss_doc": "docs/configuration/storage/consul",
+    "tags": ["sibling-product"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U010",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "What is the Terraform resource name for a KV v2 secret?",
+    "why_unanswerable": "The Terraform provider has its own documentation; this corpus shows only a handful of other vault_ resources and never this one.",
+    "near_miss_doc": "docs/secrets/kv/kv-v2/setup",
+    "tags": ["sibling-product"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U011",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "Which Kubernetes admission controller must be disabled before the Vault Agent Injector can mutate pods?",
+    "why_unanswerable": "That is Kubernetes cluster policy; the Vault docs describe the injector's own admission controller and never name a controller to disable.",
+    "near_miss_doc": "docs/deploy/kubernetes/injector",
+    "tags": ["sibling-product"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U012",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "How do I write a Consul intention that lets the Vault servers reach the Consul agents?",
+    "why_unanswerable": "Service-mesh intentions are Consul configuration; the corpus covers Vault's Consul storage settings, not Consul intentions.",
+    "near_miss_doc": "docs/configuration/storage/consul",
+    "tags": ["sibling-product"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U013",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "If my AppRole secret ID has a 30-minute TTL, what will the agent auto-auth token TTL be?",
+    "why_unanswerable": "Each TTL rule is documented separately and the composed result is never stated; answering needs arithmetic the corpus does not perform.",
+    "near_miss_doc": "docs/agent-and-proxy/autoauth/methods/approle",
+    "tags": ["undocumented-combination"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U014",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "How do I move a live Integrated Storage cluster onto Consul storage without downtime?",
+    "why_unanswerable": "Only the reverse migration, Consul storage to Integrated Storage, has a procedure page; moving off Integrated Storage is never described.",
+    "near_miss_doc": "docs/concepts/integrated-storage/migrate-consul-storage",
+    "tags": ["undocumented-combination"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U015",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "What happens to a response-wrapping token that is in flight when the cluster's seal is migrated?",
+    "why_unanswerable": "Response-wrapping tokens and seal migration are documented on separate pages; no page says whether an outstanding wrapping token survives a seal migration.",
+    "near_miss_doc": "docs/concepts/response-wrapping",
+    "tags": ["undocumented-combination"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U016",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "hard",
+    "question": "If a namespace's API is locked, are Sentinel EGP policies still evaluated for requests that reach it before the unlock key is supplied?",
+    "why_unanswerable": "The namespace API lock and Sentinel policy evaluation are documented separately; no page says how a locked namespace interacts with EGP evaluation.",
+    "near_miss_doc": "docs/concepts/namespace-api-lock",
+    "tags": ["undocumented-combination"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U017",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "easy",
+    "question": "What is the per-seat list price of HCP Vault Dedicated?",
+    "why_unanswerable": "Pricing is commercial information; the only pricing statement in the corpus says client totals are the basis, with no figures.",
+    "near_miss_doc": "docs/concepts/client-count/client-usage",
+    "tags": ["commercial"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U018",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "What uptime SLA does Vault Enterprise commit to?",
+    "why_unanswerable": "Contractual availability figures are not documentation content; no percentage appears anywhere in the corpus.",
+    "near_miss_doc": "docs/enterprise/lts",
+    "tags": ["commercial"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U019",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "How many client seats does the HCP Vault Dedicated Essentials tier include?",
+    "why_unanswerable": "Commercial packaging: the corpus discusses client counting but names no HCP tier or seat allowance.",
+    "near_miss_doc": "docs/concepts/client-count",
+    "tags": ["commercial"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  },
+  {
+    "id": "U020",
+    "answerable": false,
+    "type": "near_miss",
+    "difficulty": "medium",
+    "question": "What does the Transform secrets engine add-on cost per year?",
+    "why_unanswerable": "Add-on pricing is commercial; the Transform pages describe capability and licensing requirements, never cost.",
+    "near_miss_doc": "docs/secrets/transform",
+    "tags": ["commercial"],
+    "provenance": {"verified_by": "automated:corpus-anchored", "edits": ""}
+  }
+]

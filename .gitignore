@@ -1,6 +1,8 @@
 # Large or regenerable artifacts — fetch or rebuild, do not commit (ADR-0003)
 data/
 runs/*/vectors/
+runs/*/chunks.jsonl
+runs/*/corpus_snapshot.json
 *.gguf
 *.safetensors
 *.bin

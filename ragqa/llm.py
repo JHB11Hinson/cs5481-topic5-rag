@@ -190,7 +190,10 @@ class LLMClient:
             try:
                 body = self._post(payload)
             except LLMError as error:
-                retryable = error.status in (429, 500, 502, 503, 504)
+                # A dropped TLS handshake is the same class of event as a 503: the
+                # request never landed, so retrying is safe and not retrying throws
+                # away a 40-minute warm-up over one bad minute of network.
+                retryable = error.status in (429, 500, 502, 503, 504) or error.kind == "transport"
                 if retryable and attempt <= self.max_retries:
                     time.sleep(min(2 ** attempt, 20))
                     continue
