@@ -20,8 +20,9 @@ per claim so the confusion between them is inspectable rather than assumed.
 
 from __future__ import annotations
 
+import inspect
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 JUDGE_SYSTEM = (
     "You are a strict citation checker for a documentation question-answering "
@@ -42,27 +43,53 @@ class NLIJudge:
     provider = "nli"
 
     def __init__(self, model_id: str = DEFAULT_NLI_MODEL, threshold: float = 0.5,
-                 device: str = "cpu"):
-        from sentence_transformers import CrossEncoder
+                 device: str = "cpu", model=None):
+        if model is None:
+            from sentence_transformers import CrossEncoder
+
+            model = CrossEncoder(model_id, max_length=512, device=device)
 
         self.model_id = model_id
         self.threshold = float(threshold)
-        self.model = CrossEncoder(model_id, max_length=512, device=device)
-        self.last_stats: Dict[str, Any] = {"calls": 0, "entailed": 0}
+        self.model = model
+        # Label order belongs to the checkpoint. This one is
+        # [entailment, neutral, contradiction] — the reverse of the original MNLI
+        # convention — so reading index 2 as "entailment" inverts every verdict.
+        self.labels = self._label_order()
+        self.entailment_index = (
+            self.labels.index("entailment") if "entailment" in self.labels else len(self.labels) - 1
+        )
+        self.last_stats: Dict[str, Any] = {"calls": 0, "entailed": 0, "labels": self.labels}
+
+    def _label_order(self) -> List[str]:
+        config = getattr(getattr(self.model, "model", None), "config", None)
+        mapping = getattr(config, "id2label", None) or {}
+        if not mapping:
+            return ["contradiction", "neutral", "entailment"]  # documented MNLI order
+        labels: List[str] = []
+        for index in sorted(mapping):
+            name = str(mapping[index]).lower()
+            if "contradict" in name:
+                labels.append("contradiction")
+            elif "entail" in name:
+                labels.append("entailment")
+            else:
+                labels.append("neutral")
+        return labels
 
     def judge(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         scores = self.model.predict([(premise[:4000], hypothesis[:1000])])[0]
-        # CrossEncoder on an NLI head returns logits in the model's label order; the
-        # MNLI convention used here is [contradiction, neutral, entailment].
+        # The cross-encoder returns raw logits; they are turned into probabilities
+        # here and read through the checkpoint's own label order.
         import numpy as np
 
         values = np.asarray(scores, dtype=float).reshape(-1)
-        if values.size == 3:
+        if values.size > 1 and values.size == len(self.labels):
             logits = values
             probabilities = np.exp(logits - logits.max())
             probabilities = probabilities / probabilities.sum()
-            entailment = float(probabilities[2])
-            label = ["contradiction", "neutral", "entailment"][int(probabilities.argmax())]
+            entailment = float(probabilities[self.entailment_index])
+            label = self.labels[int(probabilities.argmax())]
         else:  # a scalar "similarity" head: treat the score itself as confidence
             entailment = float(values[0])
             label = "entailment" if entailment >= self.threshold else "neutral"
@@ -80,12 +107,22 @@ class NLIJudge:
 class LLMJudge:
     provider = "llm"
 
-    def __init__(self, client, model: str, max_chars: int = 2000):
+    def __init__(self, client, model: str, max_chars: int = 2000, max_tokens: int = 700,
+                 reasoning_effort: str = ""):
         if not model:
             raise ValueError("LLMJudge needs a model id")
         self.client = client
         self.model_id = model
         self.max_chars = int(max_chars)
+        # `deepseek-v4-pro` answers through a thinking channel, so a 200-token
+        # budget can be spent entirely on reasoning and return empty content —
+        # which the parser would score as "unsupported" and quietly bias the
+        # judge toward false. 700 leaves room for both channels (measured: ~50-80
+        # reasoning tokens plus a 25-token answer on the calibration set).
+        self.max_tokens = int(max_tokens)
+        # `reasoning_effort="none"` skips that channel entirely and is ~10x
+        # cheaper; it is opt-in because the judge is meant to deliberate.
+        self.reasoning_effort = reasoning_effort
         self.last_stats: Dict[str, Any] = {
             "calls": 0,
             "supported": 0,
@@ -105,18 +142,23 @@ class LLMJudge:
                 ),
             },
         ]
-        result = self.client.complete(self.model_id, messages, max_tokens=200)
+        result = self.client.complete(self.model_id, messages, max_tokens=self.max_tokens,
+                                      **_effort_kwargs(self.client, self.reasoning_effort))
         self.last_stats["calls"] += 1
         self.last_stats["tokens_in"] += int(result.get("tokens_in", 0) or 0)
         self.last_stats["tokens_out"] += int(result.get("tokens_out", 0) or 0)
+        usage = {
+            "tokens_in": int(result.get("tokens_in", 0) or 0),
+            "tokens_out": int(result.get("tokens_out", 0) or 0),
+        }
         payload = _parse(result.get("text", ""))
         if payload is None or "supported" not in payload:
             self.last_stats["parse_failures"] += 1
-            return {"supported": False, "reason": "judge reply was not parseable"}
+            return {"supported": False, "reason": "judge reply was not parseable", **usage}
         supported = bool(payload.get("supported"))
         if supported:
             self.last_stats["supported"] += 1
-        return {"supported": supported, "reason": str(payload.get("reason", ""))[:300]}
+        return {"supported": supported, "reason": str(payload.get("reason", ""))[:300], **usage}
 
 
 def _parse(raw: str) -> Optional[Dict[str, Any]]:
@@ -133,6 +175,22 @@ def _parse(raw: str) -> Optional[Dict[str, Any]]:
     except json.JSONDecodeError:
         return None
     return value if isinstance(value, dict) else None
+
+
+def _effort_kwargs(client, effort: str) -> Dict[str, Any]:
+    """Pass `reasoning_effort` only to a client that declares it.
+
+    `LLMClient` gained the knob after the judge was written, and a client that
+    does not accept it (a test double, an older checkout) must keep working, so
+    the capability is detected rather than assumed.
+    """
+    if not effort:
+        return {}
+    try:
+        parameters = inspect.signature(client.complete).parameters
+    except (TypeError, ValueError):
+        return {}
+    return {"reasoning_effort": effort} if "reasoning_effort" in parameters else {}
 
 
 class SupportJudges:
@@ -168,6 +226,10 @@ class SupportJudges:
             outcome = self.llm.judge(claim_text, text)
             verdict["judge_supported"] = outcome["supported"]
             verdict["judge_reason"] = outcome["reason"]
+            # Per-claim usage, so a calibration or a run can price exactly the
+            # claims it judged instead of only the aggregate (ticket 10).
+            verdict["judge_tokens_in"] = int(outcome.get("tokens_in", 0) or 0)
+            verdict["judge_tokens_out"] = int(outcome.get("tokens_out", 0) or 0)
         layers = [
             verdict.get("nli_supported"),
             verdict.get("judge_supported"),
@@ -228,6 +290,7 @@ def make(cfg):
             temperature=0.0,
             session_header=cfg["llm.session_header"],
             session_id=cfg["llm.session_id"],
+            reasoning_effort=cfg["judge.reasoning_effort"],
         )
         llm = LLMJudge(client, model=model, max_chars=int(cfg["judge.llm_max_chars"]))
     return SupportJudges(nli=nli, llm=llm)
@@ -250,6 +313,75 @@ def confusion(verdicts: List[Dict[str, Any]]) -> Dict[str, int]:
         else:
             grid["judge_only"] += 1
     return grid
+
+
+def kappa(human: Sequence[bool], predicted: Sequence[bool]) -> float:
+    """Cohen's kappa for two binary labellings (ticket 10).
+
+    Agreement is corrected for what the two raters would agree on by chance,
+    because the interesting claims in a RAG citation set are mostly supported:
+    a judge that answers "supported" to everything scores high raw agreement and
+    says nothing. Where chance agreement is total — both raters constant — kappa
+    is undefined and 0.0 is returned rather than a flattering 1.0.
+    """
+    left = [bool(value) for value in human]
+    right = [bool(value) for value in predicted]
+    if len(left) != len(right):
+        raise ValueError(
+            f"kappa needs one predicted label per human label, got {len(left)} and {len(right)}"
+        )
+    if not left:
+        raise ValueError("kappa needs at least one labelled pair")
+    total = float(len(left))
+    observed = sum(1 for a, b in zip(left, right) if a == b) / total
+    positive_left = sum(left) / total
+    positive_right = sum(right) / total
+    chance = positive_left * positive_right + (1.0 - positive_left) * (1.0 - positive_right)
+    if chance >= 1.0 - 1e-12:
+        return 0.0
+    return (observed - chance) / (1.0 - chance)
+
+
+def score_against_human(
+    human: Sequence[bool], predicted: Sequence[Optional[bool]]
+) -> Dict[str, Any]:
+    """One judge layer against the hand labels: agreement, precision, recall, kappa.
+
+    `predicted` may hold None for a claim the layer never judged (containment
+    failed, so no model was asked). Those rows are counted as skipped and left
+    out of every figure. The positive class is "supported": precision answers
+    "of the citations this judge passed, how many were really supported", recall
+    answers "of the citations that were really supported, how many did it pass".
+    """
+    if len(human) != len(predicted):
+        raise ValueError(
+            f"need one predicted label per human label, got {len(predicted)} and {len(human)}"
+        )
+    judged = [(bool(h), None if p is None else bool(p)) for h, p in zip(human, predicted)]
+    resolved = [(h, p) for h, p in judged if p is not None]
+    tp = sum(1 for h, p in resolved if h and p)
+    fp = sum(1 for h, p in resolved if not h and p)
+    fn = sum(1 for h, p in resolved if h and not p)
+    tn = sum(1 for h, p in resolved if not h and not p)
+    total = len(resolved)
+
+    def ratio(part: int, whole: int) -> float:
+        return round(part / whole, 4) if whole else 0.0
+
+    return {
+        "n": total,
+        "skipped": len(judged) - total,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
+        "agreement": ratio(tp + tn, total),
+        "precision": ratio(tp, tp + fp),
+        "recall": ratio(tp, tp + fn),
+        "kappa": round(kappa([h for h, _ in resolved], [p for _, p in resolved]), 4)
+        if total
+        else 0.0,
+    }
 
 
 def rerun_verification(run_dir: str, write: bool = True) -> int:

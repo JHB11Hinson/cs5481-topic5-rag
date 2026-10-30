@@ -77,7 +77,7 @@ Rules:
 
 ## Validation
 
-`python -m ragqa.golden validate golden/v1.jsonl` must check, and fail loudly on:
+`python -m ragqa golden validate golden/v1.jsonl --strict-quotas` must check, and fail loudly on:
 
 1. schema conformance and unique `id`s
 2. quota counts match the table above
@@ -89,4 +89,4 @@ Rules:
 ## Build passes
 
 - **v0, 20 items (10 answerable + 10 unanswerable)** — exists before the first end-to-end run. Cheap, thrown away later; its only job is to let the harness run.
-- **v1, 60 items** — the set every reported number uses. Drafted with an LLM, then every item opened against the document by a human. Items where the human changed the question materially get `edits` filled in; the count of those is reported.
+- **v1, 60 items — shipped** — the set every reported number uses. Drafted by `llm:deepseek-v4.1-flash@2026-10-30`, with every quote extracted from the corpus by `scripts/golden_emit.py` and every item's evidence proven verbatim and unique by the validator. `verified_by` is `automated:corpus-anchored`: no human has opened these items against the documents, so no human edit is claimed and `edits` is empty throughout. Six items were revised between first draft and ship — two anchors re-pointed because they resolved to a heading or a line fragment, two near-misses replaced because the corpus turned out to answer them, one metadata fix, one item replaced before the first emit — and the revision log lives in `notes/golden-v1-authoring.md`. A human pass would produce `v2`; v1 is immutable.

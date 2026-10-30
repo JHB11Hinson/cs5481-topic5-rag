@@ -1,0 +1,572 @@
+{
+  "B-A002-c1": {
+    "claim_id": "B-A002-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source text explicitly states that dev-mode servers enable the v2 kv secrets engine by default at path demo/.",
+      "supported": true,
+      "tokens_in": 860,
+      "tokens_out": 126
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9658,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "B-A003-c3": {
+    "claim_id": "B-A003-c3",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk explicitly states this exact process.",
+      "supported": true,
+      "tokens_in": 826,
+      "tokens_out": 96
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.7779,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "B-A004-c1": {
+    "claim_id": "B-A004-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The chunk explicitly states the dev server listens on 127.0.0.1:8200 without TLS by default.",
+      "supported": true,
+      "tokens_in": 854,
+      "tokens_out": 131
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.926,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "B-A010-c2": {
+    "claim_id": "B-A010-c2",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The chunk explicitly states the storage backend is untrusted because it resides outside the barrier, Vault encrypts data before sending it, and this prevents compromise if attackers access the backend.",
+      "supported": true,
+      "tokens_in": 794,
+      "tokens_out": 201
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9952,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A001-c1": {
+    "claim_id": "C-A001-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source explicitly states that when you start a Vault server, it starts in a sealed state.",
+      "supported": true,
+      "tokens_in": 813,
+      "tokens_out": 84
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9946,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A001-c2": {
+    "claim_id": "C-A001-c2",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk explicitly states that in the sealed state Vault can access physical storage but cannot decrypt any data on it.",
+      "supported": true,
+      "tokens_in": 824,
+      "tokens_out": 131
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.898,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A001-c3": {
+    "claim_id": "C-A001-c3",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states each Vault server must be unsealed before it can respond to requests.",
+      "supported": true,
+      "tokens_in": 852,
+      "tokens_out": 111
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9364,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A002-c1": {
+    "claim_id": "C-A002-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk explicitly states that dev-mode enables v2 kv at demo/ while non-dev defaults to v1.",
+      "supported": true,
+      "tokens_in": 875,
+      "tokens_out": 176
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9902,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A002-c2": {
+    "claim_id": "C-A002-c2",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk states a v2 KV secret engine is mounted at secret/ on a dev server.",
+      "supported": true,
+      "tokens_in": 858,
+      "tokens_out": 208
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9483,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A003-c1": {
+    "claim_id": "C-A003-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states that during initialization Vault generates a root key stored in the storage backend and that the root key itself is encrypted.",
+      "supported": true,
+      "tokens_in": 857,
+      "tokens_out": 131
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.8444,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A003-c2": {
+    "claim_id": "C-A003-c2",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk explicitly states the root key is encrypted and requires an unseal key to decrypt it.",
+      "supported": true,
+      "tokens_in": 855,
+      "tokens_out": 103
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9819,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A005-c1": {
+    "claim_id": "C-A005-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk explicitly states reload has default false.",
+      "supported": true,
+      "tokens_in": 808,
+      "tokens_out": 81
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9487,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A006-c1": {
+    "claim_id": "C-A006-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The chunk explicitly states a local mount created on a performance primary isn't visible to its performance secondaries.",
+      "supported": true,
+      "tokens_in": 750,
+      "tokens_out": 133
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9827,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A006-c3": {
+    "claim_id": "C-A006-c3",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source chunk does not mention local mounts or that they replicate only to disaster recovery secondaries.",
+      "supported": false,
+      "tokens_in": 737,
+      "tokens_out": 127
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.0383,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A007-c1": {
+    "claim_id": "C-A007-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source table states the Root Key is an AES key encrypted by the seal mechanism and encrypts the key ring.",
+      "supported": true,
+      "tokens_in": 730,
+      "tokens_out": 106
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.8655,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A008-c1": {
+    "claim_id": "C-A008-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source table row exactly states the gauge metric value counts distinct non-entities across all namespaces that created a token during the reporting period.",
+      "supported": true,
+      "tokens_in": 446,
+      "tokens_out": 163
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.7369,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A009-c3": {
+    "claim_id": "C-A009-c3",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The chunk does not state that the shares come from init, only that operators add shares until enough exist to reconstruct the unseal key.",
+      "supported": false,
+      "tokens_in": 841,
+      "tokens_out": 959
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.7906,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A010-c1": {
+    "claim_id": "C-A010-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source explicitly states Vault encrypts the encryption key using the root key to protect it.",
+      "supported": true,
+      "tokens_in": 829,
+      "tokens_out": 106
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9561,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-A010-c2": {
+    "claim_id": "C-A010-c2",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source explicitly states the root key is needed to decrypt the encryption key and that the root key is encrypted using the unseal key.",
+      "supported": true,
+      "tokens_in": 833,
+      "tokens_out": 251
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.8698,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "C-U005-c1": {
+    "claim_id": "C-U005-c1",
+    "containment_error": "",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The chunk shows a Terraform resource block named vault_aws_auth_backend_role.",
+      "supported": true,
+      "tokens_in": 862,
+      "tokens_out": 106
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.9726,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P01": {
+    "claim_id": "P01",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states the default for reload is false, not true.",
+      "supported": false,
+      "tokens_in": 812,
+      "tokens_out": 72
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.0046,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P02": {
+    "claim_id": "P02",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The `reload` option defaults to false; `1m` is the default for `reload_period`.",
+      "supported": false,
+      "tokens_in": 810,
+      "tokens_out": 96
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.7325,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P03": {
+    "claim_id": "P03",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source says the dev server listens on 127.0.0.1:8200, not 0.0.0.0:8200.",
+      "supported": false,
+      "tokens_in": 855,
+      "tokens_out": 157
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.1582,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P04": {
+    "claim_id": "P04",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states the default path is `demo/`, not `secret/`.",
+      "supported": false,
+      "tokens_in": 862,
+      "tokens_out": 140
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.082,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P05": {
+    "claim_id": "P05",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states the opposite: in sealed state Vault can access physical storage but cannot decrypt data.",
+      "supported": false,
+      "tokens_in": 825,
+      "tokens_out": 128
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.433,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P06": {
+    "claim_id": "P06",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The text states Vault encrypts the root key using the unseal key, not the unseal key using the root key.",
+      "supported": false,
+      "tokens_in": 826,
+      "tokens_out": 141
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.7012,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P07": {
+    "claim_id": "P07",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source explicitly states a local mount created on a performance primary isn't visible at all to its performance secondaries.",
+      "supported": false,
+      "tokens_in": 744,
+      "tokens_out": 96
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.0013,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P08": {
+    "claim_id": "P08",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source states the root key is encrypted by the seal mechanism and encrypts the key ring, not that it encrypts the seal mechanism.",
+      "supported": false,
+      "tokens_in": 733,
+      "tokens_out": 162
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.5623,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P09": {
+    "claim_id": "P09",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The source identifies the metric type as gauge, not summary.",
+      "supported": false,
+      "tokens_in": 443,
+      "tokens_out": 229
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "contradiction",
+      "score": 0.1235,
+      "supported": false
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  },
+  "P10": {
+    "claim_id": "P10",
+    "containment_error": "unsupported_by_judge",
+    "containment_ok": true,
+    "llm": {
+      "reason": "The shares reconstruct the unseal key, which then decrypts the root key, not the reverse as claimed.",
+      "supported": false,
+      "tokens_in": 827,
+      "tokens_out": 173
+    },
+    "llm_model": "deepseek-v4-pro",
+    "nli": {
+      "label": "entailment",
+      "score": 0.5021,
+      "supported": true
+    },
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "nli_threshold": 0.5
+  }
+}

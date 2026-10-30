@@ -42,6 +42,19 @@ def _percentile(values: List[float], fraction: float) -> float:
     return float(ordered[int(round(fraction * (len(ordered) - 1)))])
 
 
+def _file_digest(path: str) -> Dict[str, Any]:
+    """sha256 and size of one artifact, or a marker when it was never written."""
+    import os
+
+    if not os.path.exists(path):
+        return {"sha256": "", "bytes": 0}
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return {"sha256": digest.hexdigest(), "bytes": os.path.getsize(path)}
+
+
 def run_id_for(cfg: config_mod.Config) -> str:
     stamp = time.strftime("%Y%m%dT%H%M%S", time.gmtime())
     digest = hashlib.sha256(
@@ -491,6 +504,22 @@ def _execute(cfg: config_mod.Config, contract: RunContract, run_id: str) -> Dict
         },
     )
     contract.write_json("metrics.json", metrics)
+
+    # Large, re-derivable artifacts stay out of git (ADR-0003, spec item 5). The
+    # checksums are committed so `scripts/fetch_artifacts.py` can rebuild a file and
+    # prove it is the same one the numbers came from, instead of asking a reader to
+    # trust a rebuild.
+    contract.write_json(
+        "artifacts.json",
+        {
+            "excluded_from_git": ["chunks.jsonl", "corpus_snapshot.json"],
+            "checksums": {
+                name: _file_digest(str(contract.path / name))
+                for name in ("chunks.jsonl", "corpus_snapshot.json")
+            },
+            "rebuild": "python scripts/fetch_artifacts.py --run <this directory>",
+        },
+    )
 
     if prefixer is not None:
         prefixer.close()

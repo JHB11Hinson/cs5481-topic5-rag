@@ -1,6 +1,8 @@
 # Large or regenerable artifacts — fetch or rebuild, do not commit (ADR-0003)
 data/
 runs/*/vectors/
+runs/*/chunks.jsonl
+runs/*/corpus_snapshot.json
 *.gguf
 *.safetensors
 *.bin
@@ -21,3 +23,14 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Chainlit runtime artifacts (regenerated on every import)
+.files/
+.chainlit/translations/
+chainlit.md
+
+# Demo capture output (regenerate with .scratch/capture_demo.py)
+.scratch/demo-capture.json
+.scratch/capture.log
+.scratch/serve-*.out
+.scratch/serve-*.err

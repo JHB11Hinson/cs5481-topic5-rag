@@ -346,3 +346,34 @@ def _tmp():
     _TMP_STATE.setdefault("root", tempfile.mkdtemp(prefix="abstain-test-"))
     _TMP_STATE["counter"] = _TMP_STATE.get("counter", itertools.count())
     return Path(_TMP_STATE["root"]) / f"case-{next(_TMP_STATE['counter'])}"
+
+def test_mode_is_recovered_from_the_run_config_when_the_name_says_nothing():
+    """A grid cell called `cell-fixed-rerank-plain` still has a readable scale."""
+    import tempfile
+
+    root = Path(tempfile.mkdtemp(prefix="ragqa-mode-"))
+    run = root / "cell-fixed-rerank-plain-20261101T000000-abcd1234"
+    run.mkdir(parents=True)
+    (run / "config.json").write_text(
+        json.dumps(
+            {
+                "retrieval": {"mode": "rerank", "k": 10},
+                "generate": {"provider": "llm"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    assert abstain.mode_for_run(run.name) is None
+    assert abstain.mode_from_config(run) == "llm"
+
+    (run / "config.json").write_text(
+        json.dumps({"retrieval": {"mode": "hybrid"}, "generate": {"provider": "llm"}}),
+        encoding="utf-8",
+    )
+    assert abstain.mode_from_config(run) == "hybrid"
+
+    (run / "config.json").write_text(
+        json.dumps({"retrieval": {"mode": "dense"}, "generate": {"provider": "llm"}}),
+        encoding="utf-8",
+    )
+    assert abstain.mode_from_config(run) == "dense"

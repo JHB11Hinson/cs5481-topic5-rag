@@ -90,6 +90,9 @@ DEFAULTS: Dict[str, Any] = {
     "judge.nli_threshold": 0.5,
     "judge.llm_model": "",
     "judge.llm_max_chars": 2000,
+    # Calibration found the cheap setting gives the same verdicts for a tenth of
+    # the tokens; the choice is recorded per configuration rather than baked in.
+    "judge.reasoning_effort": "",
     # Baselines (ticket 14).
     "baseline.closed_book": False,
     "baseline.long_context": False,
