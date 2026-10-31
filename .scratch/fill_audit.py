@@ -95,6 +95,14 @@ def main() -> int:
     path = pathlib.Path("notes/golden-audit.md")
     text = path.read_text(encoding="utf-8")
 
+    text = text.replace(
+        f"Ten items of `golden/v1.jsonl` ({len(VERDICTS)} rows), read one by one against the corpus.",
+        f"Fourteen items of `golden/v1.jsonl`, read one by one against the corpus: ten stratified "
+        f"across the strata (six answerable, four near-miss), plus the four that a question/quote "
+        f"overlap screen over all forty answerable items flagged hardest.",
+    )
+    text = text.replace("## The ten", "## The fourteen")
+
     for item_id, (verdict, note) in VERDICTS.items():
         old = f"| {item_id} |"
         # fill the verdict column of the summary table row for this id
