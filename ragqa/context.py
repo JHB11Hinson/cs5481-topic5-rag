@@ -25,6 +25,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Dict, List, Optional
@@ -91,16 +92,21 @@ class PrefixCache:
         directory = os.path.dirname(os.path.abspath(path))
         if directory:
             os.makedirs(directory, exist_ok=True)
-        self._conn = sqlite3.connect(path, timeout=30)
-        self._conn.execute("PRAGMA journal_mode=WAL")
-        self._conn.execute(
-            "CREATE TABLE IF NOT EXISTS prefixes ("
-            " key TEXT PRIMARY KEY, model TEXT NOT NULL, prompt_version TEXT NOT NULL,"
-            " prefix TEXT NOT NULL, tokens_in INTEGER, tokens_out INTEGER,"
-            " prefix_chars INTEGER)"
-        )
-        self._migrate()
-        self._conn.commit()
+        # Built in the main thread, read from Chainlit's worker threads, so the thread
+        # check comes off and every statement is serialised behind a lock: a sqlite3
+        # connection may be *used* from another thread, never *concurrently*.
+        self._conn = sqlite3.connect(path, timeout=30, check_same_thread=False)
+        self._lock = threading.RLock()
+        with self._lock:
+            self._conn.execute("PRAGMA journal_mode=WAL")
+            self._conn.execute(
+                "CREATE TABLE IF NOT EXISTS prefixes ("
+                " key TEXT PRIMARY KEY, model TEXT NOT NULL, prompt_version TEXT NOT NULL,"
+                " prefix TEXT NOT NULL, tokens_in INTEGER, tokens_out INTEGER,"
+                " prefix_chars INTEGER)"
+            )
+            self._migrate()
+            self._conn.commit()
 
     def _migrate(self) -> None:
         """Add `prefix_chars` to a database created before it existed."""
@@ -117,46 +123,51 @@ class PrefixCache:
         ).hexdigest()
 
     def get(self, key: str) -> Optional[str]:
-        row = self._conn.execute(
-            "SELECT prefix FROM prefixes WHERE key = ?", (key,)
-        ).fetchone()
-        return row[0] if row else None
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT prefix FROM prefixes WHERE key = ?", (key,)
+            ).fetchone()
+            return row[0] if row else None
 
     def get_chars(self, key: str) -> Optional[int]:
         """The stored prefix length, or the length of the stored prefix itself."""
-        row = self._conn.execute(
-            "SELECT prefix_chars, prefix FROM prefixes WHERE key = ?", (key,)
-        ).fetchone()
-        if row is None:
-            return None
-        stored, prefix = row
-        if stored is not None:
-            return int(stored)
-        # A row written before the column existed: its length is still knowable.
-        return len(prefix or "")
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT prefix_chars, prefix FROM prefixes WHERE key = ?", (key,)
+            ).fetchone()
+            if row is None:
+                return None
+            stored, prefix = row
+            if stored is not None:
+                return int(stored)
+            # A row written before the column existed: its length is still knowable.
+            return len(prefix or "")
 
     def put(self, key: str, model: str, prompt_version: str, prefix: str,
             tokens_in: int, tokens_out: int) -> None:
-        self._conn.execute(
-            "INSERT OR REPLACE INTO prefixes"
-            " (key, model, prompt_version, prefix, tokens_in, tokens_out, prefix_chars)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (
-                key,
-                model,
-                prompt_version,
-                prefix,
-                int(tokens_in),
-                int(tokens_out),
-                len(prefix or ""),
-            ),
-        )
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO prefixes"
+                " (key, model, prompt_version, prefix, tokens_in, tokens_out, prefix_chars)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (
+                    key,
+                    model,
+                    prompt_version,
+                    prefix,
+                    int(tokens_in),
+                    int(tokens_out),
+                    len(prefix or ""),
+                ),
+            )
 
     def flush(self) -> None:
-        self._conn.commit()
+        with self._lock:
+            self._conn.commit()
 
     def count(self) -> int:
-        return int(self._conn.execute("SELECT COUNT(*) FROM prefixes").fetchone()[0])
+        with self._lock:
+            return int(self._conn.execute("SELECT COUNT(*) FROM prefixes").fetchone()[0])
 
     def close(self) -> None:
         self.flush()

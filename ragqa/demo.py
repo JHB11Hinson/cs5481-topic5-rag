@@ -398,6 +398,9 @@ class ChatEngine:
 
 
 _ENGINE: Optional[ChatEngine] = None
+_HISTORY: Optional[object] = None
+_HISTORY_ENV = "RAGQA_DEMO_HISTORY"
+DEFAULT_HISTORY = "data/demo/history.sqlite"
 
 
 def install_engine(engine: ChatEngine) -> ChatEngine:
@@ -413,6 +416,22 @@ def get_engine() -> ChatEngine:
     if _ENGINE is None:
         _ENGINE = ChatEngine.from_config(os.environ.get(CONFIG_ENV, DEFAULT_CONFIG))
     return _ENGINE
+
+
+def get_history(path: Optional[str] = None):
+    """The process conversation store, so every tab shares one history file.
+
+    Built in the main thread and used from Chainlit's worker threads, which is why
+    `ConversationStore` opens its connection with `check_same_thread=False` and guards
+    every statement behind a lock — the same class of bug that made the stateless demo
+    hang on its first real question.
+    """
+    global _HISTORY
+    if _HISTORY is None:
+        from .history import ConversationStore
+
+        _HISTORY = ConversationStore(path or os.environ.get(_HISTORY_ENV, DEFAULT_HISTORY))
+    return _HISTORY
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -14,6 +14,7 @@ import json
 import os
 import random
 import sqlite3
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -46,7 +47,8 @@ class ResponseCache:
         directory = os.path.dirname(os.path.abspath(path))
         if directory:
             os.makedirs(directory, exist_ok=True)
-        self._conn = sqlite3.connect(path)
+        self._conn = sqlite3.connect(path, check_same_thread=False)
+        self._lock = threading.RLock()
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS responses ("
             " key TEXT PRIMARY KEY, model TEXT NOT NULL, text TEXT NOT NULL,"
@@ -55,44 +57,49 @@ class ResponseCache:
         self._conn.commit()
 
     def get(self, key: str) -> Optional[Dict[str, Any]]:
-        row = self._conn.execute(
-            "SELECT text, tokens_in, tokens_out, latency_ms FROM responses WHERE key = ?",
-            (key,),
-        ).fetchone()
-        if row is None:
-            return None
-        text, tokens_in, tokens_out, latency_ms = row
-        return {
-            "text": text,
-            "tokens_in": int(tokens_in or 0),
-            "tokens_out": int(tokens_out or 0),
-            "latency_ms": float(latency_ms or 0.0),
-            "cached": True,
-        }
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT text, tokens_in, tokens_out, latency_ms FROM responses WHERE key = ?",
+                (key,),
+            ).fetchone()
+            if row is None:
+                return None
+            text, tokens_in, tokens_out, latency_ms = row
+            return {
+                "text": text,
+                "tokens_in": int(tokens_in or 0),
+                "tokens_out": int(tokens_out or 0),
+                "latency_ms": float(latency_ms or 0.0),
+                "cached": True,
+            }
 
     def put(self, key: str, model: str, result: Dict[str, Any]) -> None:
-        self._conn.execute(
-            "INSERT OR REPLACE INTO responses (key, model, text, tokens_in, tokens_out, latency_ms)"
-            " VALUES (?, ?, ?, ?, ?, ?)",
-            (
-                key,
-                model,
-                result["text"],
-                result["tokens_in"],
-                result["tokens_out"],
-                result["latency_ms"],
-            ),
-        )
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO responses (key, model, text, tokens_in, tokens_out, latency_ms)"
+                " VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    key,
+                    model,
+                    result["text"],
+                    result["tokens_in"],
+                    result["tokens_out"],
+                    result["latency_ms"],
+                ),
+            )
 
     def flush(self) -> None:
-        self._conn.commit()
+        with self._lock:
+            self._conn.commit()
 
     def count(self) -> int:
-        return int(self._conn.execute("SELECT COUNT(*) FROM responses").fetchone()[0])
+        with self._lock:
+            return int(self._conn.execute("SELECT COUNT(*) FROM responses").fetchone()[0])
 
     def close(self) -> None:
-        self.flush()
-        self._conn.close()
+        with self._lock:
+            self.flush()
+            self._conn.close()
 
 
 class LLMClient:

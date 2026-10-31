@@ -16,6 +16,7 @@ import hashlib
 import os
 import re
 import sqlite3
+import threading
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -58,7 +59,10 @@ class EmbeddingCache:
         directory = os.path.dirname(os.path.abspath(path))
         if directory:
             os.makedirs(directory, exist_ok=True)
-        self._conn = sqlite3.connect(path)
+        # Built in the main thread, read from Chainlit's worker threads: the check has
+        # to come off, and every statement has to be serialised behind a lock.
+        self._conn = sqlite3.connect(path, check_same_thread=False)
+        self._lock = threading.RLock()
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS embeddings ("
             " key TEXT PRIMARY KEY, dim INTEGER NOT NULL, vector BLOB NOT NULL)"
@@ -72,29 +76,34 @@ class EmbeddingCache:
         ).hexdigest()
 
     def get(self, key: str) -> Optional[np.ndarray]:
-        row = self._conn.execute(
-            "SELECT dim, vector FROM embeddings WHERE key = ?", (key,)
-        ).fetchone()
-        if row is None:
-            return None
-        dim, blob = row
-        return np.frombuffer(blob, dtype=np.float32).astype(np.float64).reshape(dim)
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT dim, vector FROM embeddings WHERE key = ?", (key,)
+            ).fetchone()
+            if row is None:
+                return None
+            dim, blob = row
+            return np.frombuffer(blob, dtype=np.float32).astype(np.float64).reshape(dim)
 
     def put(self, key: str, vector: np.ndarray) -> None:
-        self._conn.execute(
-            "INSERT OR REPLACE INTO embeddings (key, dim, vector) VALUES (?, ?, ?)",
-            (key, int(vector.shape[0]), vector.astype(np.float32).tobytes()),
-        )
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO embeddings (key, dim, vector) VALUES (?, ?, ?)",
+                (key, int(vector.shape[0]), vector.astype(np.float32).tobytes()),
+            )
 
     def flush(self) -> None:
-        self._conn.commit()
+        with self._lock:
+            self._conn.commit()
 
     def count(self) -> int:
-        return int(self._conn.execute("SELECT COUNT(*) FROM embeddings").fetchone()[0])
+        with self._lock:
+            return int(self._conn.execute("SELECT COUNT(*) FROM embeddings").fetchone()[0])
 
     def close(self) -> None:
-        self.flush()
-        self._conn.close()
+        with self._lock:
+            self.flush()
+            self._conn.close()
 
 
 class BgeM3Embedder:
