@@ -130,6 +130,16 @@ SUGGESTIONS = [
 ]
 
 
+def html(content: str) -> ui.html:
+    """A `ui.html` that does not need a `sanitize` argument at every call site.
+
+    Everything this module interpolates is escaped by `_escape` or by
+    `ChatEngine.citation_props` (which escapes the chunk and wraps the cited span in
+    `<mark>`), so re-sanitising would only strip the highlight. One rule, one place.
+    """
+    return ui.html(content, sanitize=False)
+
+
 def _store() -> history_mod.ConversationStore:
     """The process history, built once and shared by every browser tab."""
     return demo.get_history(os.environ.get(HISTORY_ENV, DEFAULT_HISTORY))
@@ -151,8 +161,8 @@ class Screen:
 
         with ui.left_drawer(value=True, bordered=False).props("width=280").classes("q-pa-sm"):
             with ui.row().classes("ds-brand w-full items-center"):
-                ui.html(WHALE)
-                ui.html('<div class="ds-wordmark">Doc<span>QA</span></div>')
+                html(WHALE)
+                html('<div class="ds-wordmark">Doc<span>QA</span></div>')
 
             ui.button("＋  New chat", on_click=self._new_conversation).props("flat no-caps").classes("ds-new")
 
@@ -195,9 +205,9 @@ class Screen:
                     ).classes("ds-send")
 
         with ui.right_drawer(value=False, bordered=False).props("width=420").classes("q-pa-md") as self.drawer:
-            self.drawer_title = ui.html("").classes("ds-doc")
+            self.drawer_title = html("").classes("ds-doc")
             self.drawer_meta = ui.label("").classes("ds-doc-meta q-mt-xs")
-            self.drawer_body = ui.html("", sanitize=False).classes("ds-doc-text q-mt-md")
+            self.drawer_body = html("").classes("ds-doc-text q-mt-md")
 
         self.question.on("keydown.enter", self._ask)
         self._render_welcome()
@@ -207,12 +217,12 @@ class Screen:
     def _render_welcome(self) -> None:
         self.welcome.clear()
         with self.welcome:
-            ui.html(WHALE.replace('width="26" height="26"', 'width="44" height="44"'))
-            ui.html("<h1>Ask the Vault documentation</h1>")
-            ui.html("<p>Every claim comes back with a citation you can open.</p>")
+            html(WHALE.replace('width="26" height="26"', 'width="44" height="44"'))
+            html("<h1>Ask the Vault documentation</h1>")
+            html("<p>Every claim comes back with a citation you can open.</p>")
             with ui.row().classes("ds-suggest q-mt-md"):
                 for suggestion in SUGGESTIONS:
-                    ui.html(
+                    html(
                         f'<div class="ds-chip-suggest" data-q="{suggestion}">{suggestion}</div>'
                     ).on("click", lambda _event, text=suggestion: self._use_suggestion(text))
 
@@ -234,7 +244,7 @@ class Screen:
         groups = _group_by_day(rows)
         with self.list_container:
             for label, items in groups:
-                ui.html(f'<div class="ds-group">{label}</div>')
+                html(f'<div class="ds-group">{label}</div>')
                 for row in items:
                     self._row(row)
         self.delete_button.text = f"Delete ({len(self.selected)})" if self.selected else "Delete"
@@ -264,9 +274,26 @@ class Screen:
         self.delete_button.text = f"Delete ({len(self.selected)})" if self.selected else "Delete"
 
     def _row_menu(self, conversation_id: str) -> None:
-        with ui.menu():
-            ui.menu_item("Rename", lambda: self._rename(conversation_id))
-            ui.menu_item("Delete", lambda: self._delete([conversation_id]))
+        """Rename or delete one conversation.
+
+        A `ui.menu()` built inside a click handler has no anchor and never opens unless
+        it is told to, which is exactly the sort of control that looks present and does
+        nothing. A dialog has no such trap and reads better on a projector anyway.
+        """
+        record = self.store.get(conversation_id) or {}
+        with ui.dialog() as dialog, ui.card().classes("q-pa-md"):
+            ui.label(record.get("title") or "New chat").classes("text-sm font-semibold")
+            with ui.column().classes("w-full gap-1 q-mt-sm"):
+                ui.button(
+                    "Rename",
+                    on_click=lambda: (dialog.close(), self._rename(conversation_id)),
+                ).props("flat no-caps align=left").classes("w-full")
+                ui.button(
+                    "Delete",
+                    on_click=lambda: (dialog.close(), self._delete([conversation_id])),
+                ).props("flat no-caps align=left color=negative").classes("w-full")
+                ui.button("Cancel", on_click=dialog.close).props("flat no-caps color=grey-7").classes("w-full")
+        dialog.open()
 
     def _delete_selected(self) -> None:
         if not self.selected:
@@ -350,7 +377,7 @@ class Screen:
     def _bubble_user(self, text: str) -> None:
         with self.transcript:
             with ui.row().classes("ds-msg user w-full"):
-                ui.html(f'<div class="ds-user-bubble">{_escape(text)}</div>')
+                html(f'<div class="ds-user-bubble">{_escape(text)}</div>')
 
     def _bubble_assistant(self, markdown: str, payload: Optional[Dict[str, Any]]) -> None:
         claims = (payload or {}).get("claims") or []
@@ -361,12 +388,12 @@ class Screen:
                 if claims or abstained:
                     with ui.row().classes("ds-cites"):
                         for claim in claims:
-                            ui.html(
+                            html(
                                 f'<div class="ds-cite" data-marker="{claim["marker"]}">'
                                 f'{claim["marker"]}</div>'
                             ).on("click", lambda _event, citation=claim["citation"]: self._open_citation(citation))
                         if abstained:
-                            ui.html('<div class="ds-badge">not in the documentation</div>')
+                            html('<div class="ds-badge">not in the documentation</div>')
         self.body.run_method("scrollTo", {"top": 10 ** 6, "behavior": "smooth"})
 
     # ---- asking ----------------------------------------------------------
