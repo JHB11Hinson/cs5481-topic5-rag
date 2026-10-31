@@ -7788,9 +7788,7 @@
       }
     }
   },
-  "orphan_runs": [
-    "sweep-k-40-20261031T050455-33bfad7a.partial"
-  ],
+  "orphan_runs": [],
   "protocol": {
     "bootstrap_confidence": 0.95,
     "bootstrap_resamples": 10000,

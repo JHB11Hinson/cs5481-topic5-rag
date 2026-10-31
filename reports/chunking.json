@@ -942,83 +942,138 @@
       }
     },
     {
-      "abstentions_delta": null,
-      "abstentions_fixed": null,
-      "abstentions_recursive": null,
-      "citation_discordant_fixed_only": null,
-      "citation_discordant_recursive_only": null,
-      "citation_p_value": null,
-      "citation_precision_delta": null,
-      "citation_precision_fixed": null,
-      "citation_precision_recursive": null,
-      "citation_recall_delta": null,
-      "citation_recall_fixed": null,
-      "citation_recall_recursive": null,
-      "cny_per_1k_questions_delta": null,
-      "cny_per_1k_questions_fixed": null,
-      "cny_per_1k_questions_recursive": null,
+      "cache": {
+        "fixed": 63,
+        "recursive": 64
+      },
       "context_mode": "late_chunking",
-      "fixed_chunks": null,
-      "fixed_llm_cache_misses": null,
-      "fixed_mean_tokens": null,
-      "fixed_mechanism_source": null,
-      "fixed_over_budget": null,
-      "fixed_over_budget_structural_share": null,
-      "fixed_over_budget_with_fence": null,
-      "fixed_over_budget_with_table": null,
-      "fixed_p95_tokens": null,
-      "fixed_parents": null,
-      "fixed_run_id": null,
-      "fixed_share_containing_code_fence": null,
-      "fixed_share_containing_table_row": null,
-      "fixed_share_ending_mid_sentence": null,
-      "fixed_share_over_budget": null,
-      "hit_at_10_delta": null,
-      "hit_at_10_fixed": null,
-      "hit_at_10_recursive": null,
-      "hit_discordant_fixed_only": null,
-      "hit_discordant_recursive_only": null,
-      "hit_p_value": null,
-      "latency_p95_ms_delta": null,
-      "latency_p95_ms_fixed": null,
-      "latency_p95_ms_recursive": null,
-      "missing": [
-        "recursive_parent_child"
-      ],
-      "mrr_delta": null,
-      "mrr_fixed": null,
-      "mrr_recursive": null,
-      "ndcg_at_10_delta": null,
-      "ndcg_at_10_fixed": null,
-      "ndcg_at_10_recursive": null,
-      "over_abstain_rate_delta": null,
-      "over_abstain_rate_fixed": null,
-      "over_abstain_rate_recursive": null,
-      "paired_items": null,
-      "recursive_chunks": null,
-      "recursive_llm_cache_misses": null,
-      "recursive_mean_tokens": null,
-      "recursive_mechanism_source": null,
-      "recursive_over_budget": null,
-      "recursive_over_budget_structural_share": null,
-      "recursive_over_budget_with_fence": null,
-      "recursive_over_budget_with_table": null,
-      "recursive_p95_tokens": null,
-      "recursive_parents": null,
-      "recursive_run_id": null,
-      "recursive_share_containing_code_fence": null,
-      "recursive_share_containing_table_row": null,
-      "recursive_share_ending_mid_sentence": null,
-      "recursive_share_over_budget": null,
+      "fixed_run_id": "grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0",
+      "mcnemar": {
+        "citation_support": {
+          "baseline_only": 4,
+          "discordant": 5,
+          "method": "exact_binomial",
+          "p_value": 0.375,
+          "pairs": 40,
+          "statistic": 0.8,
+          "treatment_only": 1
+        },
+        "retrieval_hit": {
+          "baseline_only": 0,
+          "discordant": 2,
+          "method": "exact_binomial",
+          "p_value": 0.5,
+          "pairs": 40,
+          "statistic": 0.5,
+          "treatment_only": 2
+        }
+      },
+      "mechanism": {
+        "fixed": {
+          "chunks": 2318,
+          "mean_tokens": 327.68,
+          "note": "",
+          "over_budget": 0,
+          "over_budget_structural_share": null,
+          "over_budget_with_fence": 0,
+          "over_budget_with_table": 0,
+          "p95_tokens": 512,
+          "parents": 0,
+          "path": "vault-1.21.x-1817bdfe-fixed-512-o64",
+          "share_containing_code_fence": 0.5544,
+          "share_containing_table_row": 0.5298,
+          "share_ending_mid_sentence": 0.5745,
+          "share_over_budget": 0.0,
+          "source": "chunk_set"
+        },
+        "recursive_parent_child": {
+          "chunks": 2203,
+          "mean_tokens": 311.86,
+          "note": "",
+          "over_budget": 477,
+          "over_budget_structural_share": 0.8679,
+          "over_budget_with_fence": 374,
+          "over_budget_with_table": 299,
+          "p95_tokens": 543,
+          "parents": 1536,
+          "path": "vault-1.21.x-1817bdfe-recursive_parent_child-512-p1024",
+          "share_containing_code_fence": 0.5275,
+          "share_containing_table_row": 0.5143,
+          "share_ending_mid_sentence": 0.1865,
+          "share_over_budget": 0.2165,
+          "source": "chunk_set"
+        }
+      },
+      "metrics": {
+        "abstentions": {
+          "delta": 1.0,
+          "fixed": 2,
+          "recursive": 3
+        },
+        "citation_precision": {
+          "delta": -0.0352,
+          "fixed": 0.9844,
+          "recursive": 0.9492
+        },
+        "citation_recall": {
+          "delta": -0.075,
+          "fixed": 0.925,
+          "recursive": 0.85
+        },
+        "cny_per_1k_questions": {
+          "delta": -0.4467,
+          "fixed": 7.7369,
+          "recursive": 7.2902
+        },
+        "hit_at_10": {
+          "delta": 0.05,
+          "fixed": 0.825,
+          "recursive": 0.875
+        },
+        "latency_p95_ms": {
+          "delta": 6666.217,
+          "fixed": 28671.24,
+          "recursive": 35337.457
+        },
+        "mrr": {
+          "delta": -0.0024,
+          "fixed": 0.6204,
+          "recursive": 0.618
+        },
+        "ndcg_at_10": {
+          "delta": 0.008,
+          "fixed": 0.6712,
+          "recursive": 0.6792
+        },
+        "over_abstain_rate": {
+          "delta": 0.025,
+          "fixed": 0.05,
+          "recursive": 0.075
+        },
+        "span_hit_rate": {
+          "delta": -0.0352,
+          "fixed": 0.9844,
+          "recursive": 0.9492
+        }
+      },
+      "paired_items": 40,
+      "recursive_run_id": "grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b",
       "retrieval_mode": "rerank",
-      "span_hit_rate_delta": null,
-      "span_hit_rate_fixed": null,
-      "span_hit_rate_recursive": null,
-      "status": "pending",
-      "table_fixed_hits": null,
-      "table_items": null,
-      "table_p_value": null,
-      "table_recursive_hits": null
+      "status": "finished",
+      "table_content": {
+        "fixed_hits": 8,
+        "items": 8,
+        "mcnemar": {
+          "baseline_only": 0,
+          "discordant": 0,
+          "method": "exact_binomial",
+          "p_value": 1.0,
+          "pairs": 8,
+          "statistic": 0.0,
+          "treatment_only": 0
+        },
+        "recursive_hits": 8
+      }
     },
     {
       "cache": {
@@ -1161,5 +1216,5 @@
     "test": "exact conditional McNemar on per-item outcomes (ragqa.baselines)"
   },
   "runs_root": "runs",
-  "verdict": "The largest movement in hit@10 across the 8 finished pair(s) is +0.0500 in `dense` / `contextual_prefix` (paired McNemar p = 0.5000). Atomicity itself did happen: 87% of the recursive chunks that exceed the budget carry a table row or a code fence, so the splitter kept them whole at the cost of the token budget, and the share of chunks ending mid-sentence falls from 0.5745 to 0.1865. The one thing chunk strategy does move is how often an answer carries a supported citation: 1 of 8 pairs shift significantly, the largest being +7 items in `dense/contextual_prefix` (p = 0.0156), and the sign is not the same in every pair \u2014 so the mechanism buys citation coverage rather than retrieval quality. The `table_content` items \u2014 the golden questions whose answer sits in a table \u2014 do not move significantly in any pair, so keeping tables atomic did not measurably help the questions it was meant to help. On this corpus the atomic-table hypothesis does not survive: chunk strategy changes how chunks are built and how often an answer is cited, not how well retrieval works."
+  "verdict": "The largest movement in hit@10 across the 9 finished pair(s) is +0.0500 in `dense` / `contextual_prefix` (paired McNemar p = 0.5000). Atomicity itself did happen: 87% of the recursive chunks that exceed the budget carry a table row or a code fence, so the splitter kept them whole at the cost of the token budget, and the share of chunks ending mid-sentence falls from 0.5745 to 0.1865. The one thing chunk strategy does move is how often an answer carries a supported citation: 1 of 9 pairs shift significantly, the largest being +7 items in `dense/contextual_prefix` (p = 0.0156), and the sign is not the same in every pair \u2014 so the mechanism buys citation coverage rather than retrieval quality. The `table_content` items \u2014 the golden questions whose answer sits in a table \u2014 do not move significantly in any pair, so keeping tables atomic did not measurably help the questions it was meant to help. On this corpus the atomic-table hypothesis does not survive: chunk strategy changes how chunks are built and how often an answer is cited, not how well retrieval works."
 }

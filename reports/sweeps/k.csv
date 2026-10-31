@@ -1,5 +1,5 @@
 label,family,x,status,run_id,recall_at_k,mrr,ndcg_at_10,citation_precision,citation_recall,span_hit_rate,over_abstain_rate,p50_ms,p95_ms,tokens,cny_per_1k,answers,negatives,hops,mean_hops,stop_hit_first_round,stop_hit_after_rewrite,stop_cap_reached,stop_abstained,delta_recall,delta_citation_precision,delta_p50_ms,delta_cny_per_1k,incremental_cny_per_recall_point
-k-05,k,5,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
-k-10,k,10,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
-k-20,k,20,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
-k-40,k,40,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
+k-05,k,5,finished,sweep-k-05-20261031T054546-01f96417,0.8750,0.6458,0.7020,0.9655,0.9000,0.9655,0.0750,5864.0030,13710.4320,194392,6.8111,40,0,1,,,,,,,,,,
+k-10,k,10,finished,sweep-k-10-20261031T045408-034c1a0a,0.9000,0.5985,0.6707,1.0000,0.9500,1.0000,0.0250,645.3540,15486.9030,293960,9.4650,40,0,1,,,,,,,,,,
+k-20,k,20,finished,sweep-k-20-20261031T045716-4c238521,1.0000,0.6235,0.7078,0.9206,0.9000,0.9206,0.0250,8382.5400,27034.5740,323728,10.7092,40,0,1,,,,,,,,,,
+k-40,k,40,finished,sweep-k-40-20261031T055049-33bfad7a,1.0000,0.6148,0.6979,0.9697,0.9000,0.9697,0.0500,19972.8770,34967.4660,308614,10.0959,40,0,1,,,,,,,,,,

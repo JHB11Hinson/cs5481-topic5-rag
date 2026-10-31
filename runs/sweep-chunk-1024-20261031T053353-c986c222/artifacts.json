@@ -1,0 +1,17 @@
+{
+  "checksums": {
+    "chunks.jsonl": {
+      "bytes": 12310361,
+      "sha256": "2177033d4f05404d02325604ef12f0cbb7058589191efb632f31c5f7babffd30"
+    },
+    "corpus_snapshot.json": {
+      "bytes": 334106,
+      "sha256": "d304f21e56f47867c1a2f5099a4626aaacb891adba2cfb647515e7611225ad74"
+    }
+  },
+  "excluded_from_git": [
+    "chunks.jsonl",
+    "corpus_snapshot.json"
+  ],
+  "rebuild": "python scripts/fetch_artifacts.py --run <this directory>"
+}

@@ -1,4 +1,4 @@
 label,family,x,status,run_id,recall_at_k,mrr,ndcg_at_10,citation_precision,citation_recall,span_hit_rate,over_abstain_rate,p50_ms,p95_ms,tokens,cny_per_1k,answers,negatives,hops,mean_hops,stop_hit_first_round,stop_hit_after_rewrite,stop_cap_reached,stop_abstained,delta_recall,delta_citation_precision,delta_p50_ms,delta_cny_per_1k,incremental_cny_per_recall_point
-chunk-256,chunk,256,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
-chunk-512,chunk,512,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
-chunk-1024,chunk,1024,pending,,,,,,,,,,,,,,,1,,,,,,,,,,
+chunk-256,chunk,256,finished,sweep-chunk-256-20261031T052654-8084b8fd,0.9500,0.7556,0.8030,0.9538,0.9750,0.9538,0.0250,6561.1940,9903.7440,169505,5.9004,40,0,1,,,,,,,,,,
+chunk-512,chunk,512,finished,sweep-chunk-512-20261031T053228-eb901ca7,0.9000,0.5985,0.6707,1.0000,0.9750,1.0000,0.0250,807.2880,929.3290,293354,9.3990,40,0,1,,,,,,,,,,
+chunk-1024,chunk,1024,finished,sweep-chunk-1024-20261031T053353-c986c222,0.9750,0.5664,0.6628,0.9714,0.9750,0.9714,0.0250,8174.5140,24067.8780,462583,13.7861,40,0,1,,,,,,,,,,

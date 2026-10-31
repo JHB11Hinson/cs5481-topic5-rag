@@ -6,19 +6,19 @@ Every figure here is redrawn from a CSV under `reports`, so the picture and the 
 
 ![](figures/sweep-k.png)
 
-Drawn from `sweeps/k.csv`: 0 of 4 point(s) finished.
+Drawn from `sweeps/k.csv`: 4 of 4 point(s) finished.
 
 ## `figures/sweep-chunk.png`
 
 ![](figures/sweep-chunk.png)
 
-Drawn from `sweeps/chunk.csv`: 0 of 3 point(s) finished.
+Drawn from `sweeps/chunk.csv`: 3 of 3 point(s) finished.
 
 ## `figures/sweep-hops.png`
 
 ![](figures/sweep-hops.png)
 
-Drawn from `sweeps/hops.csv`: 0 of 3 point(s) finished.
+Drawn from `sweeps/hops.csv`: 3 of 3 point(s) finished.
 
 ## `figures/abstention-dense.png`
 

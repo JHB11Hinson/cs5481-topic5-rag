@@ -1,0 +1,7 @@
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A003"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A021"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A023"}
+{"class": "parse_failure", "detail": "{\"answerable\":true,\"claims\":[{\"text\":\"Initialization generates a root key, stores it in the storage backend, and encrypts it so that an unseal key is required to decrypt it.\",\"chunk_id\":\"c-3becd3bb1a1", "item_id": "A027"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A028"}
+{"class": "parse_failure", "detail": "", "item_id": "A031"}
+{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A040"}
