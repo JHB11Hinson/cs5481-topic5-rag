@@ -687,12 +687,14 @@ def load_run_items(run_dir: str, golden: Dict[str, Dict[str, Any]]) -> Optional[
         item_id = prediction.get("item_id", "")
         retrieved = []
         for hit in prediction.get("retrieved") or []:
-            retrieved.append(
-                {
-                    **hit,
-                    "text": texts.get(hit.get("chunk_id", ""), ""),
-                }
-            )
+            row = dict(hit)
+            # Attach the text only when the chunk set is actually here. Writing "" for
+            # a missing chunk made an absent artifact look like an empty one, and a
+            # quote search over empty strings silently reports every item as a miss.
+            chunk_text = texts.get(hit.get("chunk_id", ""))
+            if chunk_text is not None:
+                row["text"] = chunk_text
+            retrieved.append(row)
         quotes = golden.get(item_id, {}).get("quotes", [])
         claims = verdicts.get(item_id, [])
         supported = sum(1 for claim in claims if claim.get("supported"))
@@ -743,12 +745,28 @@ def item_outcomes(items: Dict[str, Dict[str, Any]], misses: Optional[Iterable[st
             rank = 0
         ranks[item_id] = rank
 
-    recomputed = any(record["retrieved"] for record in items.values())
-    hits = {
-        item_id: (rank > 0) for item_id, rank in ranks.items()
-    }
+    # A committed run directory excludes `chunks.jsonl` (it is regenerable and large,
+    # `ADR-0003` + the fetch script), so `predictions.jsonl`'s retrieved rows carry a
+    # chunk id, doc id, rank and score but **no text**. Locating the evidence quote
+    # therefore cannot be done from the run directory at all: assuming it can made
+    # every per-item hit false, every retrieval bootstrap interval [0, 0], and every
+    # `retrieval_hit` contrast b = c = 0 — a confident zero for a cell whose own
+    # metrics.json says 0.85. The recorded `retrieval.misses` list is the exact
+    # complement of the hit set inside the answerable items, computed at run time
+    # when the text was still in memory, so it is the honest source here.
+    text_available = any(
+        hit.get("text")
+        for record in items.values()
+        for hit in record["retrieved"]
+    )
+    recomputed = text_available
+    hits = {item_id: (rank > 0) for item_id, rank in ranks.items()}
     if not recomputed and misses_set:
-        hits = {item_id: (item_id not in misses_set) for item_id in items}
+        hits = {
+            item_id: (item_id not in misses_set)
+            for item_id, record in items.items()
+            if record["answerable"]
+        }
 
     return {
         "items": items,
