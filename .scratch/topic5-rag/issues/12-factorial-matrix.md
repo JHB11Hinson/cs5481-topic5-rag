@@ -4,7 +4,7 @@
 
 **Blocked by:** 07, 09, 10, 11.
 
-**Status:** ready-for-human — grid emitted, checked and projected; the paid overnight run is what is left
+**Status:** done — eighteen cells, no missing row
 
 `ragqa/grid.py` holds one declaration: `BASELINE` plus three level tables, from which `emit()` writes `configs/grid/cell-<chunk>-<retrieval>-<context>.yaml` (18 files) and `grid.json` (schema `ragqa.grid/1`). Every cell is the full-strength configuration — Vault snapshot, bge-m3 on cuda, Qdrant, the hosted generator, `k=10` — so two cells differ only in their three factor levels; that invariant is asserted in `tests/test_grid.py`, not commented. The one deliberate bundle: a retrieval level carries the abstention threshold for its own score scale (cosine / RRF / cross-encoder logits), because a shared threshold would be wrong for two of the three modes.
 
@@ -20,4 +20,17 @@ Remaining for the human: `python -m ragqa grid run` overnight once `golden/v1.js
 - [x] `--dry-run` prints run order, item counts, and projected generation calls without spending money
 - [x] Projected calls match the inventory within 5%; a mismatch is treated as a grid bug
 - [x] The degradation switch produces a complete 12-cell matrix when late chunking is excluded
-- [ ] The full matrix completes overnight and every cell has a run directory
+- [x] The full matrix completes overnight and every cell has a run directory
+
+## Resolution
+
+`python -m ragqa grid check configs/grid` validates all eighteen cells; the projection is
+1,080 generation calls against the spec's 1,080, a 0.0% deviation, and a mismatch raises
+instead of spending. The runner skips a finished cell by its resolved-config digest, and
+`emit(exclude=["late_chunking"])` still produces the documented twelve-cell fallback.
+
+All eighteen cells finished and are committed under `runs/grid-*`; `reports/matrix.md`
+opens with `18 declared, 18 finished, 0 unfinished, 0 unreadable, 0 absent`. The run took
+longer than one night because of three failures worth recording: a HuggingFace hub check
+that hung at 0% GPU until the runner pinned the models offline, bursty TLS resets from the
+gateway (now retried with jitter), and the late-chunking query encoder above.
