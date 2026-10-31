@@ -338,9 +338,9 @@ def build():
         ("Two factors move nothing. ", "Chunk strategy averages 0.7944 against 0.8167 hit@10 and "
          "no one of nine paired comparisons clears p = 0.05; the contextual prefix is null against "
          "plain (citation p = 0.82, abstention p = 0.58)."),
-        ("Two contrasts clear the bar. ", "Reranked retrieval loses to hybrid on grounded citation "
-         "(p = 0.0357); late chunking loses to plain on citation (p = 0.000007) and abstention "
-         "(p < 0.000001)."),
+        ("Three contrasts clear the bar. ", "Late chunking loses to plain on retrieval (54 of 240 "
+         "paired items, p < 0.000001), citation (p = 0.000007) and abstention (p < 0.000001); "
+         "reranked retrieval loses to hybrid on citation (p = 0.0357)."),
         ("Pending. ", "all 10 sweep points. Five baseline configurations ran (§cost)."),
     ], size=16)
     para(frame, "A null result with a mechanism behind it is a finding; an absent cell is not.",
@@ -351,8 +351,9 @@ def build():
                  "and the citation layer is where the differences are.")
 
     # 7 — matrix results
-    slide = slide_frame(prs, "The matrix: retrieval level matters, chunking does not", "Results · matrix")
-    frame = textbox(slide, Inches(0.62), Inches(1.42), Inches(6.1), Inches(5.5))
+    slide = slide_frame(prs, "Late chunking is the only factor that moves retrieval",
+                        "Results · matrix")
+    frame = textbox(slide, Inches(0.62), Inches(1.42), Inches(6.1), Inches(2.9))
     para(frame, "hit@10, mean over the cells of each level", size=13.5, bold=True, color=ACCENT,
          first=True, space_after=8)
     for label, values in (
@@ -363,44 +364,48 @@ def build():
         para(frame, label, size=12.5, color=MUTED, space_after=1, line=1.0)
         para(frame, values, size=13.5, color=INK, space_after=9, line=1.05)
     para(frame, "Each mean over 6 cells (chunk strategy: 9). Source `reports/matrix.md`; all 18 "
-                "runs are listed in the report's Table 1 and Appendix A.1.",
+                "runs are in the report's Table 1 and Appendix A.1.",
          size=11.5, color=MUTED, space_after=0, line=1.05)
     frame = textbox(slide, Inches(7.0), Inches(1.42), Inches(5.7), Inches(5.4))
     para(frame, "What separates, and by how much", size=13.5, bold=True, color=ACCENT,
          first=True, space_after=8)
     for value, label in (
-        ("p = 0.0357", "rerank vs hybrid, grounded citation — 8 items to 20, hybrid wins"),
+        ("b = 0 / c = 54", "late chunking vs plain, retrieval hit@10 of 240 paired items, "
+                           "p < 0.000001"),
         ("p = 0.000007", "late chunking vs plain, grounded citation — 5 to 32"),
         ("p < 0.000001", "late chunking vs plain, abstention decision — 1 to 32"),
-        ("p ≥ 0.5000", "every chunking pair on hit@10, and every prefix pair on everything"),
+        ("p = 0.0357", "rerank vs hybrid, grounded citation — 8 items to 20, hybrid wins"),
+        ("p ≥ 0.5000", "every chunking pair on hit@10; every prefix pair on everything"),
     ):
         paragraph = frame.add_paragraph()
-        paragraph.space_after = Pt(6)
+        paragraph.space_after = Pt(5)
         run = paragraph.add_run()
         run.text = value + "   "
-        run.font.size = Pt(15)
+        run.font.size = Pt(14)
         run.font.bold = True
         run.font.color.rgb = AMBER
         run.font.name = BODY_FONT
         run = paragraph.add_run()
         run.text = label
-        run.font.size = Pt(12.5)
+        run.font.size = Pt(12)
         run.font.color.rgb = INK
         run.font.name = BODY_FONT
-    para(frame, "The one interaction that is not near zero is retrieval × context at the dense / "
-                "late-chunking corner: 0.2750 against 0.5110 predicted (i = −0.2361). Late chunking "
-                "damages the dense branch specifically.", size=12, color=MUTED,
-         space_before=8, space_after=0, line=1.05)
-    stat_row(slide, Inches(4.3), [
-        ("0.6583", "dense — the level that costs retrieval"),
+    para(frame, "hit@10 carries a 10,000-resample item bootstrap (0.8500 [0.7250, 0.9500] for the "
+                "reference cell; MRR and nDCG@10 have none, because a rank cannot be recovered from "
+                "a committed run directory).", size=11.5, color=MUTED,
+         space_before=6, space_after=0, line=1.05)
+    stat_row(slide, Inches(4.75), [
+        ("0.025", "mean-pooled query hit@10, against 0.275 with CLS"),
+        ("0 / 10", "items the pooling swap recovered / lost"),
         ("0.8792", "hybrid and rerank, tied on hit@10"),
-        ("0.8167", "recursive — 2.2 points over fixed, n.s."),
-    ], width=Inches(1.95), gap=Inches(0.12), h=Inches(1.5))
-    notes(slide, "5:30–6:50. Numbers: reports/matrix.md main effects and reports/significance.md "
-                 "contrasts. Do not claim the retrieval interval table — reports/significance.csv "
-                 "prints hit_at_10, mrr and ndcg_at_10 as 0.0000 [0, 0] for all 18 cells, an "
-                 "aggregate defect we report instead of reprinting. The two p-values that matter: "
-                 "0.035698 (rerank vs hybrid) and 0.000007 (late chunking vs plain).")
+    ], width=Inches(1.95), gap=Inches(0.12), h=Inches(1.6))
+    notes(slide, "5:30–6:50. Numbers: reports/matrix.md main effects, reports/significance.md "
+                 "contrasts, notes/late-pooling-probe.md. The retrieval interval is real again "
+                 "(0.8500 [0.7250, 0.9500], seed 11706917); mrr and ndcg deliberately print "
+                 "missing. The single finding to land: late chunking costs the dense branch 54 of "
+                 "240 paired retrieval items, and mean-pooling the query as well makes it worse "
+                 "(0.275 → 0.025 hit@10, 10 items lost, none gained), so the failure is the "
+                 "encoder's geometry, not the technique.")
 
     # 8 — abstention
     slide = slide_frame(prs, "Abstention: a rank-fusion score is not a confidence", "Results · abstention")
@@ -552,8 +557,9 @@ def build():
          "“the span occurs”, not “the citation supports the claim”."),
         ("The taxonomy covers two cells.", "14 hand-assigned failures, not 40; the class counts "
          "describe the two plain cells, not eighteen."),
-        ("The retrieval intervals are broken in this bundle.", "`hit_at_10`, MRR and nDCG@10 print "
-         "0.0000 [0, 0] for all 18 cells; we withhold them rather than reprint a zero."),
+        ("Rank metrics have no interval.", "hit@10 is bootstrapped over items; MRR and nDCG@10 "
+         "print `missing` — a committed run directory records which items were missed, not where "
+         "the evidence ranked."),
         ("Latency is cache-dominated.", "61 of 64 LLM calls in the dense cell were cache hits: "
          "17.3 ms is a SQLite read, not a round trip."),
         ("No human read the golden set.", "`verified_by: automated:corpus-anchored` — quotes proven "
@@ -563,38 +569,43 @@ def build():
     ], size=14.5, gap=6)
     notes(slide, "13:05–13:50. Read these as commitments, not apologies: each is one line in the "
                  "report's threats-to-validity section, and each names what would fix it. The "
-                 "interval defect is the one we found in this pass and could not fix from where we "
-                 "sit: reports/significance.csv.")
+                 "intervals were repaired in this pass — hit@10 is real, and only the rank metrics "
+                 "stay absent, on purpose (reports/significance.csv).")
 
     # 14 — what next
     slide = slide_frame(prs, "With more time, in the order the taxonomy justifies", "Next")
     frame = textbox(slide, Inches(0.62), Inches(1.55), Inches(11.4), Inches(5.0))
     steps = [
-        ("1  Run the ten sweep points.",
+        ("1  Late chunking on a mean-pooling encoder.",
+         "`jina-embeddings-v2`, or an e5/gte model: the only test of the mechanism rather than of "
+         "bge-m3's CLS geometry."),
+        ("2  Run the ten sweep points.",
          "The chunk-size curve tests chunk resolution, the one mechanism the nine pairs could not."),
-        ("2  Judge-enabled headline cells.",
+        ("3  Judge-enabled headline cells.",
          "So citation precision stops meaning containment."),
-        ("3  Parent-chunk generation.",
+        ("4  Parent-chunk generation.",
          "`parent_id` already travels through retrieval; citing the child while reading the parent "
          "needs one span field, not a re-index (ADR-0017)."),
-        ("4  Fix the aggregate's interval path.", "And re-issue the interval table."),
         ("5  Scale the hand taxonomy to 18 cells.", "So the class counts stop resting on 120 items."),
         ("6  A human reads the 60 items.", "The one threat no compute removes."),
     ]
     for lead, rest in steps:
         paragraph = frame.paragraphs[0] if lead.startswith("1") else frame.add_paragraph()
-        paragraph.space_after = Pt(9)
-        run = paragraph.add_run()
-        run.text = lead
-        run.font.size = Pt(15)
-        run.font.bold = True
-        run.font.color.rgb = ACCENT
-        run.font.name = BODY_FONT
-        run = paragraph.add_run()
-        run.text = "  " + rest
-        run.font.size = Pt(14)
-        run.font.color.rgb = INK
-        run.font.name = BODY_FONT
+        paragraph.space_after = Pt(11)
+        paragraph.line_spacing = 1.04
+        for chunk, is_mono in split_mono(lead):
+            run = paragraph.add_run()
+            run.text = chunk
+            run.font.size = Pt(15.5 - 1.5 if is_mono else 15.5)
+            run.font.bold = True
+            run.font.color.rgb = ACCENT
+            run.font.name = MONO_FONT if is_mono else BODY_FONT
+        for chunk, is_mono in split_mono("  " + rest):
+            run = paragraph.add_run()
+            run.text = chunk
+            run.font.size = Pt(14.5 - 1.5 if is_mono else 14.5)
+            run.font.color.rgb = INK
+            run.font.name = MONO_FONT if is_mono else BODY_FONT
     notes(slide, "13:50–14:35. One line per item, no elaboration beyond the first. The order is the "
                  "taxonomy's, not ours: the class that the next factor can move comes first, and "
                  "the sweep points are cheaper than any new cell because the configurations are "

@@ -14,7 +14,7 @@ about the experiment. Sources of truth, in order: `reports/report.md` (prose) �
 | `submission.pdf` | 25 | 10 report pages, then the 15 slides |
 
 **Main-content page count: 6.** Section `5 References` begins at the top of page 7
-(y = 54/842), so §1–§4 close on page 6 with about 85 pt (~6 lines) of slack above the
+(y = 54/842), so §1–§4 close on page 6 with about 27 pt (~2 lines) of slack above the
 footer, and Appendix A (A.1–A.5) fills pages 7–9. The contribution page (§6) is page 10 —
 the last page of the report and the page immediately before the first slide — so it does
 not count toward the six. Verified by converting the DOCX to PDF and locating the section
@@ -35,11 +35,12 @@ python .scratch/topic5-rag/merge_pdf.py       # -> reports/submission.pdf
 
 ## Page budget, if text is added
 
-Page 6 is full and has ~85 pt spare. Anything that adds more than about six lines to §1–§4
+Page 6 is full and has ~27 pt spare. Anything that adds more than about two lines to §1–§4
 pushes `5 References` onto page 7 and makes the main body seven pages. Levers, in order:
-`FIGURE_CM` in `md_to_docx.py` (11.6 cm now; it was 12.4 cm, reduced in this pass to pay
-for the eighteen-row matrix table), dropping a table column that Appendix A.1 already
-carries (MRR, citation precision), and the §3.3 sweep prose.
+`FIGURE_CM` in `md_to_docx.py` (11.4 cm now; 12.4 cm in the first build), dropping a table
+column that Appendix A.1 already carries (MRR, citation precision), and the §3.3 sweep
+prose — that last one is the natural place to reclaim room when the sweep CSVs land and the
+section gains three curves.
 
 ## What this pass changed
 
@@ -52,6 +53,19 @@ discussion rebuilt on the taxonomy, two null results and the smaller-embedder co
 (§4); three appendix tables each carrying its run id (§A.1). The nine numeric mismatches in
 `notes/report-factcheck.md` are all closed, and the slides were rebuilt from the new prose
 with one added slide for correctness.
+
+A second pass, after the integration tip moved, added three things and paid for them by
+converting §2.5 from a table to a paragraph: the **hit@10 bootstrap intervals** are back
+(the aggregate now recovers a per-item hit from the run's `retrieval.misses`, so
+`cell-fixed-dense-plain` reads 0.8500 [0.7250, 0.9500]; MRR and nDCG@10 deliberately print
+`missing`, because a rank cannot be recovered from a committed run directory);
+**late chunking versus plain on retrieval is no longer a tie** — b = 0, c = 54 of 240
+paired items, p < 0.000001; and the **query-pooling probe** (`notes/late-pooling-probe.md`)
+now carries the §3.1 interaction paragraph, a new §4 paragraph and slide 7, because
+mean-pooling the query makes the collapse worse (0.2750 → 0.0250 hit@10, 10 items lost,
+none gained), which locates the failure in bge-m3's CLS geometry rather than in late
+chunking. `notes/chunking-comparison.md` now covers nine pairs and `notes/prefix-ab.md` six,
+so the "eight pairs" and "four pairs" sentences are gone.
 
 ## Figure provenance
 
@@ -75,17 +89,14 @@ yet"; they are deliberately not used in the report.
 
 ## Known defects in the generated bundle (reported, not edited)
 
-1. `reports/significance.{md,csv}` — the retrieval intervals above; also every
-   `retrieval_hit` contrast prints `b = c = 0`, which cannot be right when the hit@10 means
-   differ by 0.22. Regenerate with `python -m ragqa aggregate`.
-2. `reports/chunking.json` — the `rerank` / `late_chunking` pair still prints
-   `pending: ["recursive_parent_child"]` although that cell finished
-   (`grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b`, matrix row
-   18). The report gives that pair's deltas from `matrix.md` rows 9 and 18 and marks its
-   p-values pending. Re-run `scripts/chunk_comparison.py` from the runs root to close it.
-3. `notes/error-taxonomy.md` and `notes/prefix-ab.md` describe the world before the matrix
-   finished (two cells; four usable prefix pairs). The report cites them only for what they
-   actually measured, and says so in place.
+1. `reports/significance.{md,csv}` — the retrieval intervals and the `retrieval_hit`
+   contrasts were repaired (`c22c0d54`): hit@10 is real, MRR and nDCG@10 print `missing` on
+   purpose. Nothing to report here any more.
+2. `reports/chunking.json` — the `rerank` / `late_chunking` pair is no longer pending;
+   all nine pairs carry deltas and both p-values.
+3. `notes/error-taxonomy.md` still describes the two-cell world, since the taxonomy is a
+   hand audit and has not been extended. The report cites it for exactly what it measured
+   and says so in §3.5 and §3.9. `notes/prefix-ab.md` was refreshed to six usable pairs.
 
 ## Still pending (not fixable from this worktree)
 
