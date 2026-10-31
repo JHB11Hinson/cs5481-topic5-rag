@@ -341,7 +341,7 @@ def build():
         ("Three contrasts clear the bar. ", "Late chunking loses to plain on retrieval (54 of 240 "
          "paired items, p < 0.000001), citation (p = 0.000007) and abstention (p < 0.000001); "
          "reranked retrieval loses to hybrid on citation (p = 0.0357)."),
-        ("Pending. ", "all 10 sweep points. Five baseline configurations ran (§cost)."),
+        ("Finished too. ", "ten sweep points across three curves, and five baseline configurations (§3.3, §3.7)."),
     ], size=16)
     para(frame, "A null result with a mechanism behind it is a finding; an absent cell is not.",
          size=15, italic=True, color=AMBER, space_before=10, space_after=0)
@@ -433,29 +433,41 @@ def build():
                  "columns measure the generator, not the tuned operating point.")
 
     # 9 — error taxonomy
-    slide = slide_frame(prs, "Fourteen failures, and ten of them are retrieval", "Diagnosis")
-    picture(slide, "fig2-error-classes.png", Inches(0.55), Inches(2.85), Inches(7.6))
-    frame = textbox(slide, Inches(8.4), Inches(1.55), Inches(4.35), Inches(4.4))
+    slide = slide_frame(prs, "275 failures, and 71 % of them are evidence that never arrived",
+                        "Diagnosis")
+    stat_row(slide, Inches(1.5), [
+        ("157", "document misses, on 25 items"),
+        ("39", "chunk misses, from 12 items"),
+        ("29", "window drops — k = 10, window = 8"),
+    ], width=Inches(3.85), gap=Inches(0.2), h=Inches(1.3))
+    frame = textbox(slide, Inches(0.62), Inches(3.05), Inches(6.0), Inches(3.2))
     bullets(frame, [
-        ("6 document misses.", "`docs/concepts/seal` never retrieved in either cell; an overview "
-         "page's paraphrase satisfies the surface match."),
-        ("4 chunk misses.", "Right document, wrong chunk — the failover paragraph sits in a "
-         "sibling chunk."),
-        ("4 non-retrieval.", "One fabricated span of 138 containment-checked claims, one parse "
-         "failure, two over-abstentions."),
+        ("196 of 275 are lost evidence.", "71 % never reached the prompt: retrieval, boundaries and "
+         "the context window, not the reader."),
+        ("Zero over-abstention is derived.", "All 64 refusals on answerable items are exactly the "
+         "64 items whose evidence was lost first — 43 doc misses, 13 chunk misses, 8 window drops."),
+        ("Quotes and parses are the small end.", "26 mangled quotes (8 are flattened markdown "
+         "links) and 17 unparsable replies, on 1,080 item-cells."),
     ], size=13, gap=7)
-    para(frame, "A hand audit of two cells, not eighteen — 14 of the ticket's 40, and the "
-                "shortfall is reported, not padded.", size=12, italic=True, color=AMBER,
-         space_before=6, space_after=0, line=1.05)
-    frame = textbox(slide, Inches(0.62), Inches(6.05), Inches(7.6), Inches(0.9))
-    para(frame, "Chunk misses are the class chunking was meant to move — and §3.6 says it does "
-                "not. Document misses are the class a wider net or a better embedder does move.",
-         size=13, italic=True, color=ACCENT, first=True, space_after=0, line=1.08)
-    notes(slide, "8:00–9:00. Short: the taxonomy routes the next experiment. 14 failures from 18 "
-                 "candidates across the two plain cells, assigned by the earliest layer that lost "
-                 "the answer (notes/error-taxonomy.md). Ten of 14 are retrieval; the other four are "
-                 "a parse failure, two over-abstentions and one fabricated span out of 138 "
-                 "containment-checked claims (73 dense + 65 hybrid).")
+    frame = textbox(slide, Inches(6.95), Inches(3.05), Inches(5.8), Inches(3.2))
+    para(frame, "What it cannot see", size=14, bold=True, color=ACCENT, first=True, space_after=8)
+    para(frame, "Every cell ran with `judge_enabled = false`, so an answer that is wrong while its "
+                "citations check out is invisible: these are lost-evidence and malformed-output "
+                "events — an upper bound on answer errors, not a wrong-answer count.",
+         size=13, color=INK, space_after=8, line=1.05)
+    para(frame, "hit@10 is any-of: it returns on the first gold quote it finds, so 56 of the 196 "
+                "evidence-loss events sit on items the matrix scored as hits. Recall over every "
+                "gold quote is 0.73, not 0.81.", size=12.5, color=MUTED, space_after=0, line=1.05)
+    frame = textbox(slide, Inches(0.62), Inches(6.35), Inches(12.1), Inches(0.8))
+    para(frame, "A028 misses its page in all 18 cells; A034 and A035 theirs in all 18; A030 in 17. "
+                "The pages are absent, not mis-ranked.", size=13.5, italic=True, color=ACCENT,
+         first=True, space_after=0, line=1.08)
+    notes(slide, "8:00–9:00. Short: the taxonomy routes every later experiment. 275 events across "
+                 "all eighteen cells, 40 hand-inspected (notes/error-taxonomy.{md,json}). The three "
+                 "numbers to say aloud: 196/275 lost before generation; 64 abstentions = 64 "
+                 "evidence losses; 29 chunks dropped between k = 10 and the eight-chunk window. "
+                 "Then the caveat: judge off, so this bounds answer errors without counting them, "
+                 "and hit@10 is any-of, which is why recall over all gold quotes is 0.73.")
 
     # 10 — DEMO
     slide = slide_frame(prs, "Demo: a citation you can click, an abstention you can inspect",
@@ -480,13 +492,39 @@ def build():
          space_after=7, line=1.05)
     para(frame, "Startup: 38.9 s, 2,203 chunks, loaded once. Chainlit on :8000.",
          size=12.5, color=MUTED, space_after=0, line=1.05)
-    notes(slide, "9:00–11:30. DEMO. Type the question, do not just talk over the screen. Order: "
+    notes(slide, "9:00–11:15. DEMO. Type the question, do not just talk over the screen. Order: "
                  "A001, A007, A009, U008. If the model is slow, fall back to the cache replay and "
                  "say you are doing it. Keep the U008 explanation for last: 0.669 is above the "
                  "threshold, so the refusal is the generator's, which is the honest story. "
                  "Script and captured outputs: notes/demo-script.md.")
 
-    # 11 — answer correctness
+    # 11 — the three sensitivity curves
+    slide = slide_frame(prs, "Depth buys recall and dilutes the ranking", "Results · sensitivity")
+    picture(slide, "fig2-sweeps.png", Inches(0.45), Inches(1.5), Inches(8.5))
+    frame = textbox(slide, Inches(9.15), Inches(1.55), Inches(3.6), Inches(3.3))
+    bullets(frame, [
+        ("Depth saturates at k = 20.", "recall 0.8750 → 0.9000 → 1.0000 → 1.0000, while MRR peaks "
+         "at k = 5 (0.6458) and citation precision at k = 10."),
+        ("512 words is dominated.", "256 retrieves more (0.9500 against 0.9000) for ¥3.50 less per "
+         "1,000 questions."),
+        ("The loop pays once.", "2.5 recall points for ¥0.62 at hop 2; the third hop buys nothing — "
+         "break-even is hop 2."),
+    ], size=12, gap=6)
+    para(frame, "Deep lists recover the tail and dilute the head: the generator sees eight chunks "
+                "however deep the retrieval went.", size=11.5, italic=True, color=AMBER,
+         space_before=6, space_after=0, line=1.05)
+    stat_row(slide, Inches(4.85), [
+        ("1.0000", "recall at k = 20, and no gain at k = 40"),
+        ("0.6458", "MRR at k = 5 — the shallowest depth wins ranking"),
+        ("hop 2", "break-even; the third round buys nothing"),
+    ], width=Inches(4.0), gap=Inches(0.15), h=Inches(1.25))
+    notes(slide, "11:15–11:55. Ten finished points, reports/sweeps/{k,chunk,hops}.{csv,md}. Say the "
+                 "two things a reader does not expect: more depth does not raise MRR (0.6458 at "
+                 "k = 5 against 0.5985 at k = 10), and the matrix's own 512-word chunk is beaten on "
+                 "both recall and price by 256. Hop break-even is hop 2 with a marginal ¥24.7 per "
+                 "recall point, and all three hop points share one trigger, 0.426134.")
+
+    # 12 — answer correctness
     slide = slide_frame(prs, "Correctness: right answer, not just the right passage",
                         "Results · answer correctness")
     stat_row(slide, Inches(1.55), [
@@ -521,58 +559,69 @@ def build():
                 "the two dense late-chunking cells at 0.4250 and 0.4750, where 16 and 14 of 40 "
                 "answerable items were refused: correctness and hit@10 fall together.",
          size=12.5, color=INK, first=True, space_after=0, line=1.08)
-    notes(slide, "11:30–12:15. This slide closes brief item 5, which asked for hit rate AND answer "
+    notes(slide, "11:55–12:35. This slide closes brief item 5, which asked for hit rate AND answer "
                  "correctness. Source reports/correctness.json and notes/correctness.md: 18 cells, "
                  "656 judge calls, 227,829/20,608 tokens, ¥0.3104, 243 cache hits, no parse "
                  "failure. The interpretation worth saying out loud: the two dense late-chunking "
                  "cells fall to 0.4250 and 0.4750 because they abstained on 16 and 14 of 40 — "
                  "correctness and hit@10 fall together.")
 
-    # 12 — cost
+    # 13 — cost
     slide = slide_frame(prs, "Long context is cheaper, and that costs us the citation",
                         "Cost · baselines")
-    picture(slide, "fig3-prompt-shape-cost.png", Inches(0.5), Inches(2.6), Inches(7.5))
-    frame = textbox(slide, Inches(8.2), Inches(1.55), Inches(4.6), Inches(4.6))
-    bullets(frame, [
-        ("¥4.24 vs ¥9.10 measured.", "Long context is 0.47× the reference cell per 1,000 "
-         "questions; the projection agrees (¥4.77 vs ¥9.54, 2.0×)."),
-        ("What it costs is the handle.", "No chunk ids in the prompt, so claims land as "
-         "`chunk_not_retrieved`: 36 items to 0, p = 3e-11."),
-        ("The embedder is the floor.", "all-MiniLM-L6-v2: hit@10 0.90 → 0.65, 13 items lost to 3, "
-         "p = 0.021."),
-    ], size=12.5, gap=7)
-    para(frame, "So we do not argue that long context is too expensive. On this corpus it is not.",
-         size=12, italic=True, color=AMBER, space_before=6, space_after=0, line=1.05)
-    notes(slide, "12:15–13:05. Kills an argument we could have made and would have been wrong "
+    stat_row(slide, Inches(1.5), [
+        ("¥4.24", "long context per 1,000 questions"),
+        ("¥9.10", "the reference cell, same 60 items"),
+        ("2.0×", "the real gap — not 3×"),
+    ], width=Inches(3.85), gap=Inches(0.2), h=Inches(1.3))
+    frame = textbox(slide, Inches(0.62), Inches(3.05), Inches(6.0), Inches(3.7))
+    para(frame, "Five configurations, one factor each", size=14, bold=True, color=ACCENT,
+         first=True, space_after=8)
+    para(frame, "Long context is 0.47× the reference cell per 1,000 questions; the prompt-shape "
+                "projection agrees (¥4.77 against ¥9.54). What it loses is the citation: a claim "
+                "cites a document, not a chunk, so it lands as `chunk_not_retrieved` — 36 items "
+                "to 0, p = 3e-11.", size=12.5, color=INK, space_after=7, line=1.05)
+    para(frame, "Closed book declines by construction (36 to 0): it bounds the context block, not "
+                "the model's knowledge.", size=12.5, color=INK, space_after=0, line=1.05)
+    frame = textbox(slide, Inches(6.95), Inches(3.05), Inches(5.8), Inches(3.7))
+    para(frame, "The other three rows", size=14, bold=True, color=ACCENT, first=True, space_after=8)
+    para(frame, "The embedder is the floor: all-MiniLM-L6-v2 takes hit@10 from 0.90 to 0.65, 13 "
+                "items lost to 3 (p = 0.021).", size=12.5, color=INK, space_after=7, line=1.05)
+    para(frame, "The cheap generator keeps retrieval, loses 4 citation items to 3 at half the "
+                "money — a business claim, not a headline.", size=12.5, color=INK, space_after=7,
+         line=1.05)
+    para(frame, "Judge: ¥1.4519 per 1,000 claims. Answer correctness for all 18 cells: ¥0.3104.",
+         size=12.5, color=AMBER, space_after=0, line=1.05)
+    notes(slide, "12:35–13:20. Kills an argument we could have made and would have been wrong "
                  "about: the gap is 2.0×, not 3× (9.5366 / 4.7682 projected; 9.0993 / 4.2440 "
                  "measured — reports/baselines/table.md). Generator probe: 19 requests across 13 "
                  "models, $0.0017; gpt-6-luna ¥6.80 vs ¥9.54, a 29% saving. Judge cost if asked: "
                  "¥1.45 per 1,000 claims.")
 
-    # 13 — threats
+    # 14 — threats
     slide = slide_frame(prs, "What is not established", "Limits")
     frame = textbox(slide, Inches(0.62), Inches(1.55), Inches(11.3), Inches(5.2))
     bullets(frame, [
         ("Citation numbers are containment.", "No matrix cell ran the judge, so precision means "
          "“the span occurs”, not “the citation supports the claim”."),
-        ("The taxonomy covers two cells.", "14 hand-assigned failures, not 40; the class counts "
-         "describe the two plain cells, not eighteen."),
         ("Rank metrics have no interval.", "hit@10 is bootstrapped over items; MRR and nDCG@10 "
          "print `missing` — a committed run directory records which items were missed, not where "
          "the evidence ranked."),
         ("Latency is cache-dominated.", "61 of 64 LLM calls in the dense cell were cache hits: "
          "17.3 ms is a SQLite read, not a round trip."),
-        ("No human read the golden set.", "`verified_by: automated:corpus-anchored` — quotes proven "
-         "verbatim and unique, grading behaviour unverified."),
-        ("Ten sweep points are declared and unrun.", "The curves are pending, and the report says "
-         "so instead of drawing a line through zero points."),
+        ("hit@10 is any-of, not recall.", "It returns on the first gold quote it finds: 56 of the "
+         "196 evidence-loss events sit on items scored as hits, and recall over every gold "
+         "quote is 0.73."),
+        ("No human read the golden set.", "Fourteen items were read by the agent at the "
+         "group's authorisation: one defect (A038), three quotes containable but not "
+         "self-locating. Containment proves a quote is real, not that it is sufficient."),
     ], size=14.5, gap=6)
-    notes(slide, "13:05–13:50. Read these as commitments, not apologies: each is one line in the "
+    notes(slide, "13:20–14:05. Read these as commitments, not apologies: each is one line in the "
                  "report's threats-to-validity section, and each names what would fix it. The "
                  "intervals were repaired in this pass — hit@10 is real, and only the rank metrics "
                  "stay absent, on purpose (reports/significance.csv).")
 
-    # 14 — what next
+    # 15 — what next
     slide = slide_frame(prs, "With more time, in the order the taxonomy justifies", "Next")
     frame = textbox(slide, Inches(0.62), Inches(1.55), Inches(11.4), Inches(5.0))
     steps = [
@@ -606,12 +655,12 @@ def build():
             run.font.size = Pt(14.5 - 1.5 if is_mono else 14.5)
             run.font.color.rgb = INK
             run.font.name = MONO_FONT if is_mono else BODY_FONT
-    notes(slide, "13:50–14:35. One line per item, no elaboration beyond the first. The order is the "
+    notes(slide, "14:05–14:35. One line per item, no elaboration beyond the first. The order is the "
                  "taxonomy's, not ours: the class that the next factor can move comes first, and "
                  "the sweep points are cheaper than any new cell because the configurations are "
                  "already emitted and gated.")
 
-    # 15 — close
+    # 16 — close
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     band = slide.shapes.add_shape(1, Emu(0), Inches(2.0), W, Inches(3.1))
     band.fill.solid()
