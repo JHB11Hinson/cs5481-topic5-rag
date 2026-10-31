@@ -418,9 +418,9 @@ def build():
         ("Hybrid is a plateau.", "Three grid points return the identical operating point "
          "(0.6607 / 0.9250): an RRF sum takes a few lattice values."),
     ], size=12.5, gap=6)
-    para(frame, "In the matrix the thresholds are 0.2 / 0.01 / 0.0 and every refusal is the "
-                "generator's own: 20 of 20 near-misses refused in all 18 cells.",
-         size=12, color=AMBER, space_before=6, space_after=0, line=1.05)
+    para(frame, "The shipped cells carry 0.2 / 0.01 / 0.0 but `LLMGenerator` never reads the key "
+                "(ADR-0019): every refusal is the model's, and 20 of 20 near-misses were refused "
+                "in all 18 cells.", size=12, color=AMBER, space_before=6, space_after=0, line=1.05)
     stat_row(slide, Inches(4.85), [
         ("0.5706", "dense · 38/40 answered, 17/20 near-misses"),
         ("0.028606", "hybrid · budget infeasible, 37/40 answered"),
