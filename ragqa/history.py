@@ -141,9 +141,14 @@ class ConversationStore:
     def list(self, limit: int = 10) -> List[Dict[str, Any]]:
         with self._lock:
             rows = self._conn.execute(
+                # `rowid` is the tiebreaker, not decoration: timestamps have one-second
+                # resolution, so two conversations made in the same second used to come
+                # back in whatever order the query planner felt like, and "newest first"
+                # silently stopped meaning anything under a fast test or a busy click.
                 "SELECT c.*, COUNT(m.id) AS turns FROM conversations c "
                 "LEFT JOIN messages m ON m.conversation_id = c.id "
-                "GROUP BY c.id ORDER BY c.updated_at DESC, c.created_at DESC LIMIT ?",
+                "GROUP BY c.id ORDER BY c.updated_at DESC, c.created_at DESC, c.rowid DESC "
+                "LIMIT ?",
                 (max(1, int(limit)),),
             ).fetchall()
         return [

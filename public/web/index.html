@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grounded documentation QA</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<aside id="sidebar">
+  <header class="sidebar-head">
+    <button id="new-chat" class="primary">＋ New chat</button>
+    <div class="bulk">
+      <label class="check">
+        <input type="checkbox" id="select-all">
+        <span>Select all</span>
+      </label>
+      <button id="delete-selected" class="danger" disabled>Delete selected</button>
+    </div>
+  </header>
+  <ul id="conversation-list"></ul>
+  <footer class="sidebar-foot">
+    <div id="config-line">loading…</div>
+  </footer>
+</aside>
+
+<main id="pane">
+  <header class="pane-head">
+    <div>
+      <h1 id="conversation-title">New conversation</h1>
+      <div id="conversation-meta" class="meta"></div>
+    </div>
+    <button id="rename" class="ghost" title="Rename this conversation">Rename</button>
+  </header>
+
+  <section id="transcript"></section>
+
+  <form id="composer" autocomplete="off">
+    <textarea id="question" rows="2" placeholder="Ask a question about the documentation…"></textarea>
+    <button type="submit" id="ask" class="primary">Ask</button>
+  </form>
+  <div id="status" class="status"></div>
+</main>
+
+<aside id="drawer" class="hidden" aria-live="polite">
+  <header>
+    <span id="drawer-title">Source</span>
+    <button id="drawer-close" class="ghost">✕</button>
+  </header>
+  <div id="drawer-meta" class="meta"></div>
+  <pre id="drawer-text"></pre>
+</aside>
+
+<script src="/app.js"></script>
+</body>
+</html>

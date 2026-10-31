@@ -65,6 +65,25 @@ def _store():
     return demo.get_history(os.environ.get(HISTORY_ENV, DEFAULT_HISTORY))
 
 
+def _ensure_steps() -> None:
+    """Give the message machinery a `local_steps` value in action callbacks.
+
+    Chainlit 2.3.0 sets that ContextVar while it processes a message, but not while it
+    runs an `action_callback`, so the first `cl.Message(...)` a button handler builds
+    raises `LookupError: <ContextVar name='local_steps'>` and the button does nothing.
+    Setting an empty list is what the library does for itself in the message path;
+    doing it here keeps the two button handlers as usable as the slash commands.
+    """
+    try:
+        from chainlit.context import local_steps
+
+        local_steps.get()
+    except LookupError:
+        local_steps.set([])
+    except Exception:  # noqa: BLE001 - an older Chainlit without the var is fine
+        return
+
+
 def _conversation_id() -> str:
     conversation_id = cl.user_session.get("conversation_id")
     if conversation_id and _store().exists(conversation_id):
@@ -276,6 +295,7 @@ async def on_message(message: cl.Message) -> None:
 
 @cl.action_callback(ACTION_NEW_CONVERSATION)
 async def new_conversation(action: cl.Action) -> None:
+    _ensure_steps()
     store = _store()
     conversation_id = store.create()
     cl.user_session.set("conversation_id", conversation_id)
@@ -284,11 +304,13 @@ async def new_conversation(action: cl.Action) -> None:
 
 @cl.action_callback(ACTION_HISTORY)
 async def show_history(action: cl.Action) -> None:
+    _ensure_steps()
     await _handle_command("/history")
 
 
 @cl.action_callback(ACTION_OPEN_CITATION)
 async def open_citation(action: cl.Action) -> None:
+    _ensure_steps()
     """Marker clicked: build the source panel from the index and send it."""
     engine = demo.get_engine()
     try:

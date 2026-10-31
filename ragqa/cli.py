@@ -117,6 +117,10 @@ def _aggregate(args: argparse.Namespace) -> int:
 
 
 def _serve(args: argparse.Namespace) -> int:
+    if getattr(args, "backend", "chainlit") == "web":
+        from . import webapp
+
+        return webapp.serve(args.config, host=args.host, port=args.port)
     from . import demo
 
     return demo.main(["--config", args.config])
@@ -182,6 +186,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     serve = sub.add_parser("serve", help="single-screen demo over one configuration")
     serve.add_argument("--config", required=True)
+    serve.add_argument(
+        "--backend",
+        choices=["chainlit", "web"],
+        default="chainlit",
+        help="chainlit: the chat stream with clickable citation cards; "
+        "web: the conversation sidebar with multi-select delete (ragqa/webapp.py)",
+    )
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8100)
     serve.set_defaults(func=_serve)
 
     return parser
