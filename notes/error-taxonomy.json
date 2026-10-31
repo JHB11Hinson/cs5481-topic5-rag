@@ -1,0 +1,679 @@
+{
+  "classes": [
+    {
+      "name": "retrieval-document-miss",
+      "definition": "No chunk of any evidence document reached the returned depth: the passage was never a candidate.",
+      "decided_by": "the item's gold quote is in no returned chunk and at least one gold evidence doc_id is absent from retrieved[]"
+    },
+    {
+      "name": "retrieval-chunk-miss",
+      "definition": "The evidence document was retrieved, but no returned chunk contains the evidence quote -- the passage was split into a sibling chunk or into a parent that was not expanded.",
+      "decided_by": "the gold quote is in no returned chunk while every gold evidence doc_id is in retrieved[]"
+    },
+    {
+      "name": "context-budget-drop",
+      "definition": "Every retrieved chunk carrying the quote sits beyond llm.context_chunks, so the passage never entered the prompt.",
+      "decided_by": "the quote-bearing chunk's rank exceeds the run's config.json llm.context_chunks"
+    },
+    {
+      "name": "generator-over-abstention",
+      "definition": "The generator refused an answerable question with the whole evidence set inside its context window.",
+      "decided_by": "abstained on an answerable item whose every gold quote sits at a rank within llm.context_chunks"
+    },
+    {
+      "name": "generator-under-abstention",
+      "definition": "The generator answered a question the knowledge base does not answer, from neighbouring documentation.",
+      "decided_by": "not abstained on an item whose golden answerable flag is false"
+    },
+    {
+      "name": "citation-quote-not-in-chunk",
+      "definition": "The claim's quoted span does not occur in the chunk it is cited against: a fabricated, spliced or mangled span.",
+      "decided_by": "citations.jsonl error_class = quote_not_in_chunk, re-checked by locating the quote in the rebuilt chunk text"
+    },
+    {
+      "name": "citation-span-out-of-bounds",
+      "definition": "The quoted text does occur, but the reported offsets do not delimit it.",
+      "decided_by": "error_class in {span_out_of_bounds, span_text_mismatch}"
+    },
+    {
+      "name": "citation-chunk-not-retrieved",
+      "definition": "The claim cites a chunk id that was never in the retrieved set.",
+      "decided_by": "error_class = chunk_not_retrieved"
+    },
+    {
+      "name": "generation-parse-failure",
+      "definition": "The response could not be parsed into claims, so the item produced no verdict at all.",
+      "decided_by": "errors.jsonl class = parse_failure, with tokens_out and the raw response inspected"
+    }
+  ],
+  "cells": [
+    "cell-fixed-dense-contextual_prefix",
+    "cell-fixed-dense-late_chunking",
+    "cell-fixed-dense-plain",
+    "cell-fixed-hybrid-contextual_prefix",
+    "cell-fixed-hybrid-late_chunking",
+    "cell-fixed-hybrid-plain",
+    "cell-fixed-rerank-contextual_prefix",
+    "cell-fixed-rerank-late_chunking",
+    "cell-fixed-rerank-plain",
+    "cell-recursive_parent_child-dense-contextual_prefix",
+    "cell-recursive_parent_child-dense-late_chunking",
+    "cell-recursive_parent_child-dense-plain",
+    "cell-recursive_parent_child-hybrid-contextual_prefix",
+    "cell-recursive_parent_child-hybrid-late_chunking",
+    "cell-recursive_parent_child-hybrid-plain",
+    "cell-recursive_parent_child-rerank-contextual_prefix",
+    "cell-recursive_parent_child-rerank-late_chunking",
+    "cell-recursive_parent_child-rerank-plain"
+  ],
+  "counts": {
+    "cell-fixed-dense-contextual_prefix": {
+      "retrieval-document-miss": 8,
+      "retrieval-chunk-miss": 5,
+      "context-budget-drop": 2,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 1
+    },
+    "cell-fixed-dense-late_chunking": {
+      "retrieval-document-miss": 24,
+      "retrieval-chunk-miss": 5,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 0,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-fixed-dense-plain": {
+      "retrieval-document-miss": 9,
+      "retrieval-chunk-miss": 2,
+      "context-budget-drop": 4,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 0,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 1
+    },
+    "cell-fixed-hybrid-contextual_prefix": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 2,
+      "context-budget-drop": 0,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 2
+    },
+    "cell-fixed-hybrid-late_chunking": {
+      "retrieval-document-miss": 9,
+      "retrieval-chunk-miss": 2,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 1
+    },
+    "cell-fixed-hybrid-plain": {
+      "retrieval-document-miss": 6,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 0,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-fixed-rerank-contextual_prefix": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 2,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 3,
+      "generation-parse-failure": 0
+    },
+    "cell-fixed-rerank-late_chunking": {
+      "retrieval-document-miss": 9,
+      "retrieval-chunk-miss": 2,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 1,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 1
+    },
+    "cell-fixed-rerank-plain": {
+      "retrieval-document-miss": 6,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 2,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 3,
+      "generation-parse-failure": 2
+    },
+    "cell-recursive_parent_child-dense-contextual_prefix": {
+      "retrieval-document-miss": 7,
+      "retrieval-chunk-miss": 3,
+      "context-budget-drop": 3,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 0,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-recursive_parent_child-dense-late_chunking": {
+      "retrieval-document-miss": 25,
+      "retrieval-chunk-miss": 4,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 0,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 1,
+      "generation-parse-failure": 0
+    },
+    "cell-recursive_parent_child-dense-plain": {
+      "retrieval-document-miss": 8,
+      "retrieval-chunk-miss": 4,
+      "context-budget-drop": 2,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 3,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 1
+    },
+    "cell-recursive_parent_child-hybrid-contextual_prefix": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 1,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 2,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-recursive_parent_child-hybrid-late_chunking": {
+      "retrieval-document-miss": 8,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 0,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 4,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-recursive_parent_child-hybrid-plain": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 0,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 3,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 0
+    },
+    "cell-recursive_parent_child-rerank-contextual_prefix": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 5,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 3,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 3
+    },
+    "cell-recursive_parent_child-rerank-late_chunking": {
+      "retrieval-document-miss": 8,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 2,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 3,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 2
+    },
+    "cell-recursive_parent_child-rerank-plain": {
+      "retrieval-document-miss": 5,
+      "retrieval-chunk-miss": 1,
+      "context-budget-drop": 4,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 0,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 0,
+      "generation-parse-failure": 3
+    }
+  },
+  "totals": {
+    "retrieval-document-miss": 157,
+    "retrieval-chunk-miss": 39,
+    "context-budget-drop": 29,
+    "generator-over-abstention": 0,
+    "generator-under-abstention": 0,
+    "citation-quote-not-in-chunk": 26,
+    "citation-span-out-of-bounds": 0,
+    "citation-chunk-not-retrieved": 7,
+    "generation-parse-failure": 17
+  },
+  "total_events": 275,
+  "layer_counts": {
+    "item": 225,
+    "parse": 17,
+    "claim": 33
+  },
+  "sampling": {
+    "target": 40,
+    "rule": "stratified by class with a fixed quota per class, then round-robin over cells in run-id order, one event per cell per pass, preferring an item the sample has not used yet; quotas are set for coverage, not for rate estimation",
+    "quotas": {
+      "retrieval-document-miss": 18,
+      "retrieval-chunk-miss": 6,
+      "context-budget-drop": 5,
+      "generator-over-abstention": 0,
+      "generator-under-abstention": 0,
+      "citation-quote-not-in-chunk": 6,
+      "citation-span-out-of-bounds": 0,
+      "citation-chunk-not-retrieved": 2,
+      "generation-parse-failure": 3
+    },
+    "cells_covered": 18,
+    "classes_covered": [
+      "citation-chunk-not-retrieved",
+      "citation-quote-not-in-chunk",
+      "context-budget-drop",
+      "generation-parse-failure",
+      "retrieval-chunk-miss",
+      "retrieval-document-miss"
+    ],
+    "distinct_items": 19
+  },
+  "citation_mechanisms": {
+    "markdown_link_flattened": 8,
+    "diverge_into_absent_text": 6,
+    "quote_in_no_chunk": 9,
+    "wrong_citation_target": 3
+  },
+  "sample": [
+    {
+      "index": 1,
+      "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "item_id": "A003",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/commands/operator/init`, the page that says 'requires an _unseal key_ to decrypt it', is in none of the ten chunks; the returned set is `system/rotate`, `pki/quick-start-root-ca` and `generate-root`, and `docs/concepts/seal` appears only at rank 9, outside the eight-chunk window."
+    },
+    {
+      "index": 2,
+      "run_id": "grid-fixed-dense-late_chunking-20261030T161040-76813f02",
+      "cell": "cell-fixed-dense-late_chunking",
+      "item_id": "A001",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` is absent; the ranker read 'what state does a server start in' as a dev-server question (`dev-server`, `run-as-service`, `ui`) and the generator answered from that page -- 'starts automatically initialized and unsealed' -- the opposite of the reference's sealed state."
+    },
+    {
+      "index": 3,
+      "run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+      "cell": "cell-fixed-dense-plain",
+      "item_id": "A003",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "same item and same missing page as row 1; here the generator abstained instead of answering from memory, which is the abstention the miss causes -- the cause is the absent `docs/commands/operator/init`, not the abstention policy."
+    },
+    {
+      "index": 4,
+      "run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+      "cell": "cell-fixed-hybrid-contextual_prefix",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` is returned four times and carries the recovery-key half, but the second evidence page `docs/configuration/seal/seal-best-practices` is absent, and the answer says 'generating a root token' where the reference says 'generating new root keys' -- the distinction only the missing page draws."
+    },
+    {
+      "index": 5,
+      "run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "cell": "cell-fixed-hybrid-late_chunking",
+      "item_id": "A013",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/internals/recommended-patterns` is absent and the top ten are lease telemetry partials plus `lease/renew` and `lease/lookup`, none of which states a default TTL; the 32 days in the answer has no supporting chunk."
+    },
+    {
+      "index": 6,
+      "run_id": "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+      "cell": "cell-fixed-hybrid-plain",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at ranks 1 and 8, `seal-best-practices` absent; the answer again substitutes 'generating a root token' for 'generating new root keys', so one page gap reappears as the same answer error under a different ranker."
+    },
+    {
+      "index": 7,
+      "run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+      "cell": "cell-fixed-rerank-contextual_prefix",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "reranking lifts `docs/concepts/seal` to ranks 1 and 2 and still never returns `seal-best-practices`: the missing page survives a change of ranker, which points at coverage of the question rather than at ordering."
+    },
+    {
+      "index": 8,
+      "run_id": "grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0",
+      "cell": "cell-fixed-rerank-late_chunking",
+      "item_id": "A013",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/internals/recommended-patterns` absent again; the answer keeps 32 days and drops the '768 hours' form the reference pairs with it, and no returned chunk states either value."
+    },
+    {
+      "index": 9,
+      "run_id": "grid-fixed-rerank-plain-20261030T125648-57be667d",
+      "cell": "cell-fixed-rerank-plain",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at ranks 1 and 4, `seal-best-practices` absent, answer again 'generating a root token': third cell family, same page, same substitution."
+    },
+    {
+      "index": 10,
+      "run_id": "grid-recursive_parent_child-dense-contextual_prefix-20261030T150403-7ace3fb3",
+      "cell": "cell-recursive_parent_child-dense-contextual_prefix",
+      "item_id": "A016",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/configuration` is absent and all ten chunks are lease API or concept pages, so an option named `remove_irrevocable_lease_after` never appears; the abstention is correct behaviour for this context and the wrong answer for the corpus."
+    },
+    {
+      "index": 11,
+      "run_id": "grid-recursive_parent_child-dense-late_chunking-20261030T164237-9b6dc31d",
+      "cell": "cell-recursive_parent_child-dense-late_chunking",
+      "item_id": "A001",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "same returned set as row 2 (`dev-server`, `run-as-service`, `ui`) with `docs/concepts/seal` absent: parent-child chunking changed the chunk shape and not the candidate set, so the answer describes dev mode again."
+    },
+    {
+      "index": 12,
+      "run_id": "grid-recursive_parent_child-dense-plain-20261030T132126-5b0e5d3e",
+      "cell": "cell-recursive_parent_child-dense-plain",
+      "item_id": "A003",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/commands/operator/init` absent; this cell answered 'the HSM is needed to decrypt it' from `docs/enterprise/hsm` at rank 7 -- a different mechanism, and the citation trail holds no chunk with the gold sentence."
+    },
+    {
+      "index": 13,
+      "run_id": "grid-recursive_parent_child-hybrid-contextual_prefix-20261030T151148-effcbe64",
+      "cell": "cell-recursive_parent_child-hybrid-contextual_prefix",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at rank 1 only, `seal-best-practices` absent; the answer's second half is built from the seal page alone and again names a root token rather than new root keys."
+    },
+    {
+      "index": 14,
+      "run_id": "grid-recursive_parent_child-hybrid-late_chunking-20261030T165835-0cecad68",
+      "cell": "cell-recursive_parent_child-hybrid-late_chunking",
+      "item_id": "A015",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/tune-server-performance` is absent -- the ten chunks are agent and proxy caching pages -- yet the answer gives 131,072: the number is right and the evidence trail is empty, which is the failure this class exists to catch."
+    },
+    {
+      "index": 15,
+      "run_id": "grid-recursive_parent_child-hybrid-plain-20261030T133329-e4e09d4e",
+      "cell": "cell-recursive_parent_child-hybrid-plain",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at rank 1, `seal-best-practices` absent; A028 fails this way in nearly every cell it appears in, so this is one page-coverage gap reproduced across the matrix, not independent generator errors."
+    },
+    {
+      "index": 16,
+      "run_id": "grid-recursive_parent_child-rerank-contextual_prefix-20261030T152204-d112558a",
+      "cell": "cell-recursive_parent_child-rerank-contextual_prefix",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at rank 1 and no `seal-best-practices`; 'operations besides unsealing that require a quorum' is assembled from the seal page, without the page that names the privileged actions."
+    },
+    {
+      "index": 17,
+      "run_id": "grid-recursive_parent_child-rerank-late_chunking-20261030T170813-ddf8886b",
+      "cell": "cell-recursive_parent_child-rerank-late_chunking",
+      "item_id": "A015",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`tune-server-performance` absent, ten agent and proxy caching chunks returned, and the answer states 131072 with nothing retrieved to support it."
+    },
+    {
+      "index": 18,
+      "run_id": "grid-recursive_parent_child-rerank-plain-20261030T133556-dc28d910",
+      "cell": "cell-recursive_parent_child-rerank-plain",
+      "item_id": "A028",
+      "layer": "item",
+      "class": "retrieval-document-miss",
+      "justification": "`docs/concepts/seal` at rank 1, `seal-best-practices` absent; eighth instance of this page gap in the sample, with the same 'root token' substitution in the answer."
+    },
+    {
+      "index": 19,
+      "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "item_id": "A010",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "`docs/enterprise/replication` is returned at ranks 5 and 6 and neither chunk contains 'applications must reauthenticate and obtain new leases from the newly-promoted primary'; the generator abstained saying the context only covers switching clusters, so the page arrived and the paragraph did not."
+    },
+    {
+      "index": 20,
+      "run_id": "grid-fixed-dense-late_chunking-20261030T161040-76813f02",
+      "cell": "cell-fixed-dense-late_chunking",
+      "item_id": "A005",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "`docs/concepts/tokens` is returned only at rank 10 and that chunk does not carry 'Tokens have a specific prefix that indicates their type'; ranks 1-9 are token telemetry partials, so the abstention tracks a chunk boundary, not a judgement call."
+    },
+    {
+      "index": 21,
+      "run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+      "cell": "cell-fixed-dense-plain",
+      "item_id": "A010",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "replication at ranks 1 and 6, neither with the promoted-secondary sentence; the generator answered from the neighbouring 're-authenticate if they switch clusters' text -- right conclusion, no returned chunk supports it."
+    },
+    {
+      "index": 22,
+      "run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+      "cell": "cell-fixed-hybrid-contextual_prefix",
+      "item_id": "A031",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "both evidence pages are returned (`tune-server-performance`, `internals/limits`) and neither chunk carries its quote, so the answer could not have been grounded; the body is also empty because the call spent its whole budget (tokens_out 3200 against max_tokens 1600), the parse failure recorded beside this item."
+    },
+    {
+      "index": 23,
+      "run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "cell": "cell-fixed-hybrid-late_chunking",
+      "item_id": "A029",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "`docs/concepts/policies` at rank 2 supplies the 'root policy cannot be modified' half, but `docs/concepts/tokens` at rank 4 does not carry 'Root tokens are tokens that have the `root` policy attached'; the answer is nonetheless correct, a chunk-placement miss with no visible answer error."
+    },
+    {
+      "index": 24,
+      "run_id": "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+      "cell": "cell-fixed-hybrid-plain",
+      "item_id": "A015",
+      "layer": "item",
+      "class": "retrieval-chunk-miss",
+      "justification": "`tune-server-performance` at rank 7 without the 131072 row, and this time the generator answered the opposite -- 'unlimited in size... no fixed default entry count' -- the wrong-answer form of the same chunk boundary."
+    },
+    {
+      "index": 25,
+      "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "item_id": "A018",
+      "layer": "item",
+      "class": "context-budget-drop",
+      "justification": "the quote-bearing `docs/auth/login-mfa` chunk is at rank 10 and the window holds 8, so 'Vault allows for 5 consecutive failed TOTP passcode validations' never entered the prompt; the abstention is the window's doing, not the generator's."
+    },
+    {
+      "index": 26,
+      "run_id": "grid-fixed-dense-late_chunking-20261030T161040-76813f02",
+      "cell": "cell-fixed-dense-late_chunking",
+      "item_id": "A004",
+      "layer": "item",
+      "class": "context-budget-drop",
+      "justification": "`docs/concepts/mount-migration` is at rank 9, outside the eight-chunk window; the answer is right anyway ('the status can be in-progress'), so a real window drop is hidden behind a lucky answer."
+    },
+    {
+      "index": 27,
+      "run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+      "cell": "cell-fixed-dense-plain",
+      "item_id": "A021",
+      "layer": "item",
+      "class": "context-budget-drop",
+      "justification": "the lease-count row of `docs/concepts/resource-quotas` sits at rank 9; the answer is correct ('lease count quota... enterprise-only'), again hiding the drop."
+    },
+    {
+      "index": 28,
+      "run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "cell": "cell-fixed-hybrid-late_chunking",
+      "item_id": "A005",
+      "layer": "item",
+      "class": "context-budget-drop",
+      "justification": "the prefix sentence is at rank 9, so the prompt held the service-versus-batch differences but not 'tokens have a specific prefix'; the generator abstained and listed the differences it could see, which is what a window drop looks like from outside."
+    },
+    {
+      "index": 29,
+      "run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+      "cell": "cell-fixed-rerank-contextual_prefix",
+      "item_id": "A033",
+      "layer": "item",
+      "class": "context-budget-drop",
+      "justification": "the audit-page quote is at rank 1 and 'Vault will not respond to requests when audit devices are not enabled' is at rank 10, outside the window; the answer still contains both halves, so the second half did not come from the retrieved context."
+    },
+    {
+      "index": 30,
+      "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "item_id": "A040",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "the 300-character quote is verbatim for 74 characters and then diverges where the chunk writes a markdown link (`[TLS](...)`) that the model flattened to plain 'TLS': the prose is faithful and the exact-string containment check is not."
+    },
+    {
+      "index": 31,
+      "run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+      "cell": "cell-fixed-hybrid-contextual_prefix",
+      "item_id": "A023",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "verbatim for 54 characters, then the model inserts '(e.g., 1.16, 1.19)' which the page does not contain, and resumes verbatim afterwards: an inserted example inside an otherwise real span."
+    },
+    {
+      "index": 32,
+      "run_id": "grid-fixed-hybrid-late_chunking-20261030T161751-66c05c39",
+      "cell": "cell-fixed-hybrid-late_chunking",
+      "item_id": "A027",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "the opening 40 characters of the Shamir quote occur nowhere in the cited `docs/commands/operator/init` chunk, and the full quote occurs in no rebuilt chunk: a summary of the page returned as a quotation."
+    },
+    {
+      "index": 33,
+      "run_id": "grid-fixed-hybrid-plain-20261030T125429-6170ae66",
+      "cell": "cell-fixed-hybrid-plain",
+      "item_id": "A032",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "the cited `docs/concepts/client-count` chunk defines what a client is; the 'entity aliases...' sentence is in `docs/concepts/identity`, retrieved at rank 1, so the passage was in the prompt and the citation names the wrong page."
+    },
+    {
+      "index": 34,
+      "run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+      "cell": "cell-fixed-rerank-contextual_prefix",
+      "item_id": "A004",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "the quoted sentence exists verbatim in `docs/concepts/mount-migration` chunk `c-3e3cd28f822244e7`, retrieved at rank 1, and is cited against `api-docs/system/remount`, where it does not occur: real evidence, wrong citation target."
+    },
+    {
+      "index": 35,
+      "run_id": "grid-fixed-rerank-late_chunking-20261030T163138-8f5d6ac0",
+      "cell": "cell-fixed-rerank-late_chunking",
+      "item_id": "A038",
+      "layer": "claim",
+      "class": "citation-quote-not-in-chunk",
+      "justification": "verbatim for 155 of 183 characters and then diverges at the chunk's markdown link `[generate-root](...)`, which the model wrote as plain `generate-root`; the sentence is faithful and the containment check is formatting-sensitive."
+    },
+    {
+      "index": 36,
+      "run_id": "grid-fixed-rerank-contextual_prefix-20261030T145745-14c0b222",
+      "cell": "cell-fixed-rerank-contextual_prefix",
+      "item_id": "A040",
+      "layer": "claim",
+      "class": "citation-chunk-not-retrieved",
+      "justification": "the model cited `c-87c83bb5d923ceb`; the real chunk is `c-87c83bb5d923cece`, one hex character longer, and it was retrieved at rank 2 -- the id was mistyped, so an otherwise correct citation was rejected as pointing outside the context."
+    },
+    {
+      "index": 37,
+      "run_id": "grid-fixed-rerank-plain-20261030T125648-57be667d",
+      "cell": "cell-fixed-rerank-plain",
+      "item_id": "A040",
+      "layer": "claim",
+      "class": "citation-chunk-not-retrieved",
+      "justification": "same mistyped id in the plain cell (`c-87c83bb5d923ceb` against `c-87c83bb5d923cece` at rank 2): the defect is chunk-id fidelity in the generator's output, not retrieval."
+    },
+    {
+      "index": 38,
+      "run_id": "grid-fixed-dense-contextual_prefix-20261030T142519-d947855e",
+      "cell": "cell-fixed-dense-contextual_prefix",
+      "item_id": "A027",
+      "layer": "parse",
+      "class": "generation-parse-failure",
+      "justification": "`tokens_out` is 3200 against `max_tokens` 1600 and the response body is empty: the call consumed its whole output budget and emitted no envelope, with both evidence quotes in the window at ranks 2 and 1."
+    },
+    {
+      "index": 39,
+      "run_id": "grid-fixed-dense-plain-20261030T124637-8ae4eb06",
+      "cell": "cell-fixed-dense-plain",
+      "item_id": "A031",
+      "layer": "parse",
+      "class": "generation-parse-failure",
+      "justification": "the envelope is cut mid-quote after 382 characters with `tokens_out` 3200 = 2 x `max_tokens`; the item also lost its second evidence passage to the window (rank 10 of 8), so two defects stack and the empty body is counted here."
+    },
+    {
+      "index": 40,
+      "run_id": "grid-fixed-hybrid-contextual_prefix-20261030T144111-0d58c950",
+      "cell": "cell-fixed-hybrid-contextual_prefix",
+      "item_id": "A027",
+      "layer": "parse",
+      "class": "generation-parse-failure",
+      "justification": "the provider returned an empty string with `tokens_out` at the 3200 cap and no error detail: budget exhaustion with nothing written, a different mechanism from a truncated envelope and the same class."
+    }
+  ]
+}
