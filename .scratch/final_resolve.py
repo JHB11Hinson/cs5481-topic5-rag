@@ -131,27 +131,22 @@ second run is byte-identical, PNGs included.
 """,
     },
     "17-report-and-slides.md": {
-        "status": "done — six pages, slides appended, contribution page last",
+        "status": "done — six pages, sixteen slides appended, contribution page last",
         "pending": [],
         "evidence": """\
 `reports/report.docx` runs to six pages of main content (`References` opens page 7), then
 references, appendix, and the contribution page as page 10 — the last page before the
-appended slides. `reports/submission.pdf` is 25 pages: 10 of report plus 15 of slides.
-The deck is a fifteen-minute structure with the demo at minute nine.
+appended slides. `reports/submission.pdf` is 26 pages: 10 of report plus 16 of slides
+(page counts re-checked independently of the build script). The deck is a fifteen-minute
+structure with the demo at minute nine, and everything added late sits after it.
 
 Methodology states the 18-cell design, the paired tests, the 60-item set with its strata,
-and the deliberate omissions with their ADRs. Experiments carry the matrix, the three
-curves, the abstention curve, judge agreement, the error distribution, the baselines and
-the cost table, each with its run id. Discussion argues from the taxonomy and from the two
-null results and the smaller-embedder collapse, and says what we would do with more time.
-
-`notes/report-factcheck.md` audited 75 numbers against their artifacts before submission:
-nine mismatches and three no-source rows were found and fixed, including a judge cost that
-was wrong by a factor of ten and a "three times more expensive" claim that is 2.0× in the
-other direction.
-
-The contribution page is a template: the group must fill names, ratios summing to 100%, and
-a signature per member. A submission missing it, or any signature, is desk rejected.
+and the deliberate omissions with their ADRs. Experiments carry the matrix with hit@10
+bootstrap intervals, the three sensitivity curves, the abstention curve and its working
+points, judge agreement, the 275-event error distribution, the four baselines and the cost
+table, each naming its run id. Discussion argues from the taxonomy — 71% of classified
+failures are evidence that never reached the prompt — and from the two null results and the
+smaller-embedder collapse, and leads "with more time" with a mean-pooling encoder.
 """,
     },
 }
