@@ -38,7 +38,7 @@ BODY_PT = 9.2
 TABLE_PT = 7.2
 CODE_PT = 8.2
 CONTENT_CM = 17.1
-FIGURE_CM = 12.4
+FIGURE_CM = 11.6
 INK = RGBColor(0x1F, 0x29, 0x33)
 ACCENT = RGBColor(0x1B, 0x3A, 0x5B)
 
@@ -180,6 +180,12 @@ def add_table(document, rows, widths=None):
         shade = OxmlElement("w:shd")
         shade.set(qn("w:fill"), "EDF1F5")
         cell._tc.get_or_add_tcPr().append(shade)
+
+    # repeat the header row when a long table is split across pages
+    tr_pr = table.rows[0]._tr.get_or_add_trPr()
+    header_flag = OxmlElement("w:tblHeader")
+    header_flag.set(qn("w:val"), "true")
+    tr_pr.append(header_flag)
 
     signature_table = any("signature" in cell.lower() for cell in header)
     for row in body:

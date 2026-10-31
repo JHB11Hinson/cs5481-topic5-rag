@@ -1,4 +1,4 @@
-"""Draw the four report figures from artifacts that already exist.
+"""Draw the three report figures from artifacts that already exist.
 
 Nothing here measures anything: every series is read out of a generated CSV, a
 generated JSON, or a count table in `notes/error-taxonomy.md`. The drawings live
@@ -9,10 +9,17 @@ and hand-writing files into it would break that rule.
 
 Sources, one per figure:
 
-    fig2-abstention.png       reports/abstention/{rerank,hybrid}-pr.csv
-    fig1-intervals.png        reports/significance.csv
-    fig4-prompt-shape-cost.png reports/baselines/window-cost.json
-    fig3-error-classes.png    notes/error-taxonomy.md (counts per class per cell)
+    fig1-abstention.png          reports/abstention/{dense,hybrid,rerank}-pr.csv
+                                 + the working points in working-points.json
+    fig2-error-classes.png       notes/error-taxonomy.md (counts per class per cell)
+    fig3-prompt-shape-cost.png   reports/baselines/window-cost.json
+
+Font sizes are chosen for the printed width (`FRAME_CM` in `md_to_docx.py` is
+11.6 cm against a 7.4 in canvas, so a canvas font renders at ~0.62 of its size).
+
+The interval figure (`fig1-intervals.png`, drawn from `reports/significance.csv`)
+is retired: the bundle's `hit_at_10`, `mrr` and `ndcg_at_10` rows print a
+degenerate [0, 0] for all 18 cells, so that figure would have drawn zeros.
 """
 
 from __future__ import annotations
@@ -34,6 +41,7 @@ INK = "#1f2933"
 BAR = "#3b6ea5"
 BAR2 = "#c47f3d"
 GRID = "#d8dee4"
+TICK = 11
 
 
 def style(ax):
@@ -43,16 +51,21 @@ def style(ax):
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(INK)
-    ax.tick_params(colors=INK, labelsize=8)
+    ax.tick_params(colors=INK, labelsize=TICK)
 
 
-def fig2_abstention():
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9), sharey=True)
+def fig1_abstention():
+    """One panel per score scale, with the calibrated working point marked."""
+    points = json.loads(
+        (ROOT / "reports" / "abstention" / "working-points.json").read_text(encoding="utf-8")
+    )["modes"]
     panels = [
-        ("rerank", "rerank (cross-encoder score)", 0.4471),
-        ("hybrid", "hybrid (RRF fused sum)", 0.4059),
+        ("dense", "dense (cosine)"),
+        ("hybrid", "hybrid (RRF sum)"),
+        ("rerank", "rerank (cross-encoder)"),
     ]
-    for ax, (mode, title, t_star) in zip(axes, panels):
+    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.55), sharey=True)
+    for ax, (mode, title) in zip(axes, panels):
         rows = list(
             csv.DictReader(
                 (ROOT / "reports" / "abstention" / f"{mode}-pr.csv").open(encoding="utf-8")
@@ -61,7 +74,8 @@ def fig2_abstention():
         t = [float(r["t"]) for r in rows]
         prec = [float(r["precision"]) for r in rows]
         rec = [float(r["recall"]) for r in rows]
-        ax.plot(rec, prec, color=BAR, linewidth=1.4, marker="o", markersize=3.2)
+        ax.plot(rec, prec, color=BAR, linewidth=1.4, marker="o", markersize=3.4)
+        t_star = points[mode]["t"]
         best = min(range(len(t)), key=lambda i: abs(t[i] - t_star))
         ax.scatter(
             [rec[best]],
@@ -69,92 +83,45 @@ def fig2_abstention():
             s=70,
             facecolor="white",
             edgecolor=BAR2,
-            linewidth=1.6,
+            linewidth=1.5,
             zorder=5,
         )
         ax.annotate(
-            f"working point t={t_star:.4f} (raw {rows[best]['raw_threshold']})",
+            f"t={t_star:.4f}\nraw {points[mode]['raw_threshold']:.6f}",
             xy=(rec[best], prec[best]),
-            xytext=(0.30, 0.06),
+            xytext=(0.44, 0.07),
             textcoords="axes fraction",
-            fontsize=7,
+            fontsize=9.5,
             color=BAR2,
         )
-        ax.set_title(title, fontsize=9, color=INK)
-        ax.set_xlabel("recall on answerable items", fontsize=8, color=INK)
-        ax.set_xlim(-0.02, 1.05)
-        ax.set_ylim(-0.02, 1.08)
+        ax.set_title(title, fontsize=13, color=INK)
+        ax.set_xlabel("recall on answerable items", fontsize=11.5, color=INK)
+        ax.set_xlim(-0.03, 1.06)
+        ax.set_ylim(-0.03, 1.08)
         style(ax)
-    axes[0].set_ylabel("precision of answered items", fontsize=8, color=INK)
-    fig.tight_layout(pad=0.6)
-    fig.savefig(OUT / "fig2-abstention.png", dpi=220)
+    axes[0].set_ylabel("precision of answered items", fontsize=11.5, color=INK)
+    fig.tight_layout(pad=0.5)
+    fig.savefig(OUT / "fig1-abstention.png", dpi=220)
     plt.close(fig)
 
 
-def fig1_intervals():
-    rows = list(
-        csv.DictReader((ROOT / "reports" / "significance.csv").open(encoding="utf-8"))
-    )
-    metrics = [
-        ("mrr", "MRR"),
-        ("citation_recall", "citation recall"),
-        ("hit_at_10", "hit@10"),
-    ]
-    cells = [
-        ("cell-fixed-dense-plain", "dense / plain", BAR),
-        ("cell-fixed-hybrid-plain", "hybrid / plain", BAR2),
-    ]
-    fig, ax = plt.subplots(figsize=(7.4, 2.5))
-    height = 0.34
-    for ci, (cell, label, colour) in enumerate(cells):
-        values, los, his = [], [], []
-        for key, _ in metrics:
-            row = next(
-                r for r in rows if r["cell"] == cell and r["metric"] == key
-            )
-            values.append(float(row["point"]))
-            los.append(float(row["point"]) - float(row["lo"]))
-            his.append(float(row["hi"]) - float(row["point"]))
-        xs = [i + (ci - 0.5) * height for i in range(len(metrics))]
-        ax.barh(
-            xs,
-            values,
-            height=height * 0.92,
-            color=colour,
-            label=label,
-            xerr=[los, his],
-            error_kw={"ecolor": INK, "elinewidth": 0.9, "capsize": 2.4},
-        )
-        for x, v, hi in zip(xs, values, his):
-            ax.text(v + hi + 0.02, x, f"{v:.3f}", va="center", fontsize=7, color=INK)
-    ax.set_yticks(range(len(metrics)))
-    ax.set_yticklabels([label for _, label in metrics], fontsize=8, color=INK)
-    ax.set_xlim(0, 1.22)
-    ax.set_xlabel("point estimate with 95% bootstrap interval (10,000 resamples, unit = item)", fontsize=7.6, color=INK)
-    ax.legend(fontsize=7.4, frameon=False, loc="upper right", bbox_to_anchor=(1.0, 1.18), ncol=2)
-    style(ax)
-    fig.tight_layout(pad=0.6)
-    fig.savefig(OUT / "fig1-intervals.png", dpi=220)
-    plt.close(fig)
-
-
-def fig4_prompt_cost():
+def fig3_prompt_cost():
     data = json.loads(
         (ROOT / "reports" / "baselines" / "window-cost.json").read_text(encoding="utf-8")
     )
     shapes = data["shapes"]
     order = [
         ("closed_book", "closed book (empty context)"),
-        ("long_context_12000", "long context, 12,000-char cap"),
-        ("long_context_20000", "long context, 20,000-char cap"),
-        ("long_context_70000", "long context, 70,000-char cap"),
+        ("long_context_12000", "long context, 12k-char cap"),
+        ("long_context_20000", "long context, 20k-char cap"),
+        ("long_context_70000", "long context, 70k-char cap"),
         ("retrieval_k10_8chunks", "RAG, k=10, 8 chunks pasted"),
     ]
     labels = [label for _, label in order]
     money = [shapes[key]["cny_per_1k_questions"] for key, _ in order]
     tokens = [shapes[key]["prompt_tokens_mean"] for key, _ in order]
     colours = [BAR2 if key == "retrieval_k10_8chunks" else BAR for key, _ in order]
-    fig, ax = plt.subplots(figsize=(7.4, 2.7))
+    fig, ax = plt.subplots(figsize=(7.4, 2.45))
     ys = list(range(len(order)))[::-1]
     ax.barh(ys, money, color=colours, height=0.62)
     for y, m, tok in zip(ys, money, tokens):
@@ -163,20 +130,20 @@ def fig4_prompt_cost():
             y,
             f"¥{m:.2f}  ·  {tok:,.0f} prompt tokens",
             va="center",
-            fontsize=7,
+            fontsize=10,
             color=INK,
         )
     ax.set_yticks(ys)
-    ax.set_yticklabels(labels, fontsize=7.6, color=INK)
-    ax.set_xlabel("CNY per 1,000 questions", fontsize=8, color=INK)
-    ax.set_xlim(0, max(money) * 1.45)
+    ax.set_yticklabels(labels, fontsize=11, color=INK)
+    ax.set_xlabel("CNY per 1,000 questions", fontsize=11.5, color=INK)
+    ax.set_xlim(0, max(money) * 1.75)
     style(ax)
-    fig.tight_layout(pad=0.6)
-    fig.savefig(OUT / "fig4-prompt-shape-cost.png", dpi=220)
+    fig.tight_layout(pad=0.5)
+    fig.savefig(OUT / "fig3-prompt-shape-cost.png", dpi=220)
     plt.close(fig)
 
 
-def fig3_error_classes():
+def fig2_error_classes():
     classes = [
         "retrieval-document-miss",
         "retrieval-chunk-miss",
@@ -190,28 +157,31 @@ def fig3_error_classes():
     ]
     dense = [4, 2, 0, 1, 0, 0, 0, 0, 1]
     hybrid = [2, 2, 0, 1, 0, 1, 0, 0, 0]
-    fig, ax = plt.subplots(figsize=(7.4, 2.6))
+    fig, ax = plt.subplots(figsize=(7.4, 2.45))
     ys = list(range(len(classes)))[::-1]
-    ax.barh([y + 0.19 for y in ys], dense, height=0.36, color=BAR, label="dense / plain (8 failures)")
-    ax.barh([y - 0.19 for y in ys], hybrid, height=0.36, color=BAR2, label="hybrid / plain (6 failures)")
+    ax.barh([y + 0.19 for y in ys], dense, height=0.36, color=BAR,
+            label="dense / plain (8 failures)")
+    ax.barh([y - 0.19 for y in ys], hybrid, height=0.36, color=BAR2,
+            label="hybrid / plain (6 failures)")
     for y, d, h in zip(ys, dense, hybrid):
-        ax.text(d + 0.08, y + 0.19, str(d), va="center", fontsize=7, color=INK)
-        ax.text(h + 0.08, y - 0.19, str(h), va="center", fontsize=7, color=INK)
+        if d:
+            ax.text(d + 0.08, y + 0.19, str(d), va="center", fontsize=10, color=INK)
+        if h:
+            ax.text(h + 0.08, y - 0.19, str(h), va="center", fontsize=10, color=INK)
     ax.set_yticks(ys)
-    ax.set_yticklabels(classes, fontsize=7.4, color=INK)
-    ax.set_xlabel("hand-assigned failures", fontsize=8, color=INK)
-    ax.set_xlim(0, 5.2)
-    ax.legend(fontsize=7.2, frameon=False, loc="lower right")
+    ax.set_yticklabels(classes, fontsize=10.5, color=INK)
+    ax.set_xlabel("hand-assigned failures", fontsize=11.5, color=INK)
+    ax.set_xlim(0, 5.4)
+    ax.legend(fontsize=10, frameon=False, loc="lower right")
     style(ax)
-    fig.tight_layout(pad=0.6)
-    fig.savefig(OUT / "fig3-error-classes.png", dpi=220)
+    fig.tight_layout(pad=0.5)
+    fig.savefig(OUT / "fig2-error-classes.png", dpi=220)
     plt.close(fig)
 
 
 if __name__ == "__main__":
-    fig1_intervals()
-    fig2_abstention()
-    fig3_error_classes()
-    fig4_prompt_cost()
+    fig1_abstention()
+    fig2_error_classes()
+    fig3_prompt_cost()
     for path in sorted(OUT.glob("*.png")):
         print(path.relative_to(ROOT), path.stat().st_size, "bytes")
