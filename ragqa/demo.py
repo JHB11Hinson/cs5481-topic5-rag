@@ -101,7 +101,12 @@ def render_answer(response: Dict[str, Any]) -> str:
     withheld = [claim for claim in claims if not claim["verified"]]
     if not claims:
         return f"**{ABSTAIN_MESSAGE}**\n\nThe generator returned no claim at all."
-    lines = [f"- {claim['text']} {claim['marker']}" for claim in verified]
+    if len(verified) == 1:
+        # One claim is an answer, not a list: a bullet in front of a single sentence is
+        # the visual grammar of a report, not of a chat reply.
+        lines = [f"{verified[0]['text']} {verified[0]['marker']}"]
+    else:
+        lines = [f"- {claim['text']} {claim['marker']}" for claim in verified]
     if withheld:
         lines += [
             "",

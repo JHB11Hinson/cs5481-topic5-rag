@@ -72,19 +72,25 @@ body, .nicegui-content {{ background: var(--ds-canvas); color: var(--ds-text);
 /* NiceGUI/Quasar give every column and row a flex gap; inside a 280 px sidebar that
    gap is what pushed "Today" a visible distance below "Manage". Zero it here and pay
    for spacing deliberately, with the paddings below. */
-.q-drawer .nicegui-column, .q-drawer .nicegui-row {{ gap: 0 !important; }}
-.ds-brand {{ display: flex; align-items: center; gap: 8px; padding: 12px 2px 8px; }}
+.q-drawer__content, .q-drawer__content .nicegui-column, .q-drawer__content .nicegui-row,
+.q-drawer__content .column, .q-drawer__content .row,
+.q-drawer .nicegui-column, .q-drawer .nicegui-row,
+.q-drawer .column, .q-drawer .row {{ gap: 0 !important; }}
+.q-drawer__content > *, .q-drawer__content .nicegui-column > *,
+.q-drawer__content .nicegui-row > * {{ margin-top: 0 !important; margin-bottom: 0 !important; }}
+.ds-brand {{ display: flex; align-items: center; gap: 8px; padding: 4px 2px 2px !important; }}
 .ds-wordmark {{ font-size: 17px; font-weight: 700; letter-spacing: -.2px; }}
 .ds-wordmark span {{ color: var(--ds-blue); }}
 .ds-new {{ width: 100%; border: 1px solid var(--ds-divider) !important; border-radius: 999px !important;
   background: var(--ds-canvas) !important; color: var(--ds-text) !important; font-weight: 500;
-  padding: 8px 12px !important; box-shadow: none !important; }}
+  padding: 6px 12px !important; box-shadow: none !important; margin: 8px 0 0 !important;
+  min-height: 32px !important; }}
 .ds-new:hover {{ background: var(--ds-surface) !important; }}
-.ds-manage {{ padding: 0 2px; margin: 2px 0 -2px; height: 22px; }}
-.ds-group {{ font-size: 11px; color: var(--ds-text-3); padding: 8px 8px 2px;
-  font-weight: 500; line-height: 16px; }}
+.ds-manage {{ padding: 0 2px; margin: 6px 0 0 !important; height: 18px !important; }}
+.ds-group {{ font-size: 11px; color: var(--ds-text-3); padding: 6px 8px 1px;
+  font-weight: 500; line-height: 14px; margin: 0 !important; }}
 .ds-row {{ display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden;
-  border-radius: 10px; padding: 6px 8px; cursor: pointer; }}
+  border-radius: 10px; padding: 4px 8px; cursor: pointer; margin: 1px 0 !important; }}
 .ds-row:hover {{ background: var(--ds-surface); }}
 .ds-row.active {{ background: var(--ds-blue-soft); }}
 .ds-row.active .ds-title {{ color: var(--ds-blue-pressed); font-weight: 600; }}
@@ -103,6 +109,11 @@ body, .nicegui-content {{ background: var(--ds-canvas); color: var(--ds-text);
 .ds-meta {{ display: block; max-width: 100%; font-size: 11px; color: var(--ds-text-3);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
 .ds-col {{ max-width: 720px; width: 100%; margin: 0 auto; padding: 0 20px; }}
+/* The transcript is a column whose inherited gap was the remaining 16 px between
+   messages. The composer row also carries `.ds-col`, so the rule must not force a
+   direction on it. */
+.ds-transcript {{ gap: 0 !important; }}
+.q-drawer__content {{ padding: 6px 8px !important; }}
 .ds-welcome {{ height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }}
 .ds-welcome h1 {{ font-size: 24px; font-weight: 700; margin: 0; }}
 .ds-welcome p {{ color: var(--ds-text-2); margin: 0; font-size: 14px; }}
@@ -110,11 +121,16 @@ body, .nicegui-content {{ background: var(--ds-canvas); color: var(--ds-text);
 .ds-chip-suggest {{ border: 1px solid var(--ds-divider); border-radius: 999px; padding: 7px 14px;
   font-size: 13px; color: var(--ds-text-2); background: var(--ds-canvas); cursor: pointer; }}
 .ds-chip-suggest:hover {{ background: var(--ds-surface); color: var(--ds-text); }}
-.ds-msg {{ display: flex; margin: 18px 0; }}
+.ds-msg {{ display: flex; margin: 8px 0; }}
 .ds-msg.user {{ justify-content: flex-end; }}
 .ds-user-bubble {{ background: var(--ds-blue-soft); color: var(--ds-text); border-radius: 18px 18px 4px 18px;
   padding: 10px 14px; max-width: 78%; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }}
 .ds-assistant {{ width: 100%; font-size: 15px; line-height: 1.65; color: var(--ds-text); }}
+.ds-assistant p, .ds-assistant ul, .ds-assistant ol {{ margin: 0 !important; }}
+.ds-assistant ul, .ds-assistant ol {{ padding-left: 20px; }}
+.ds-assistant li {{ margin: 0; }}
+.ds-assistant > :first-child {{ margin-top: 0 !important; }}
+.ds-assistant > :last-child {{ margin-bottom: 0 !important; }}
 .ds-assistant ul, .ds-assistant ol {{ padding-left: 22px; margin: 0 0 6px; }}
 .ds-assistant li {{ margin: 2px 0; }}
 .ds-assistant code {{ background: var(--ds-surface); border-radius: 4px; padding: 1px 5px;
@@ -180,20 +196,26 @@ class Screen:
         ui.add_css(CSS)
 
         with ui.left_drawer(value=True, bordered=False).props("width=280").classes("q-pa-sm"):
-            with ui.row().classes("ds-brand w-full items-center"):
-                html(WHALE)
-                html('<div class="ds-wordmark">Doc<span>QA</span></div>')
+            with ui.row().classes("ds-brand w-full items-center justify-between no-wrap"):
+                with ui.row().classes("items-center no-wrap").style("gap: 8px"):
+                    html(WHALE)
+                    html('<div class="ds-wordmark">Doc<span>QA</span></div>')
+                self.manage_button = (
+                    ui.button(icon="checklist", on_click=self._toggle_manage)
+                    .props("flat round dense size=sm color=grey-7")
+                    .tooltip("Select conversations to delete")
+                )
 
             ui.button("＋  New chat", on_click=self._new_conversation).props("flat no-caps").classes("ds-new")
 
-            with ui.row().classes("w-full items-center justify-between ds-manage"):
-                ui.button("Manage", on_click=self._toggle_manage).props("flat dense no-caps size=sm").classes("ds-foot")
-                self.delete_button = (
-                    ui.button("Delete", on_click=self._delete_selected)
-                    .props("flat dense no-caps size=sm color=negative")
-                    .classes("ds-foot")
+            # Only exists while selecting: the default sidebar is brand, new chat, list.
+            self.manage_bar = ui.row().classes("w-full items-center justify-between ds-manage")
+            with self.manage_bar:
+                ui.checkbox("Select all", on_change=self._toggle_all).props("dense size=sm").classes("ds-foot")
+                self.delete_button = ui.button("Delete", on_click=self._delete_selected).props(
+                    "flat dense no-caps size=sm color=negative"
                 )
-                self.delete_button.set_visibility(False)
+            self.manage_bar.set_visibility(False)
 
             self.list_container = ui.column().classes("w-full gap-0")
 
@@ -211,7 +233,7 @@ class Screen:
             # grows past the viewport.
             with ui.column().classes("w-full flex-1 overflow-y-auto").style("min-height: 0") as self.body:
                 self.welcome = ui.column().classes("ds-welcome w-full h-full")
-                self.transcript = ui.column().classes("ds-col w-full")
+                self.transcript = ui.column().classes("ds-col ds-transcript w-full")
 
             with ui.column().classes("w-full"):
                 with ui.row().classes("ds-col items-end gap-2 ds-composer"):
@@ -271,7 +293,8 @@ class Screen:
         self.manage = not self.manage
         if not self.manage:
             self.selected.clear()
-        self.delete_button.set_visibility(self.manage)
+        self.manage_bar.set_visibility(self.manage)
+        self.manage_button.props(f"color={'primary' if self.manage else 'grey-7'}")
         self._refresh_list()
 
     def _refresh_list(self) -> None:
@@ -317,6 +340,14 @@ class Screen:
         else:
             self.selected.discard(conversation_id)
         self.delete_button.text = f"Delete ({len(self.selected)})" if self.selected else "Delete"
+
+    def _toggle_all(self, event) -> None:
+        """Select-all lives in the manage bar, which only exists while selecting."""
+        if getattr(event, "value", False):
+            self.selected = {row["id"] for row in self.store.list(limit=200)}
+        else:
+            self.selected.clear()
+        self._refresh_list()
 
     def _row_menu(self, conversation_id: str) -> None:
         """Rename or delete one conversation.
