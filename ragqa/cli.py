@@ -121,6 +121,10 @@ def _serve(args: argparse.Namespace) -> int:
         from . import webapp
 
         return webapp.serve(args.config, host=args.host, port=args.port)
+    if getattr(args, "backend", "chainlit") == "nice":
+        from . import niceui
+
+        return niceui.serve(args.config, host=args.host, port=args.port)
     from . import demo
 
     return demo.main(["--config", args.config])
@@ -188,10 +192,10 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--config", required=True)
     serve.add_argument(
         "--backend",
-        choices=["chainlit", "web"],
+        choices=["chainlit", "web", "nice"],
         default="chainlit",
-        help="chainlit: the chat stream with clickable citation cards; "
-        "web: the conversation sidebar with multi-select delete (ragqa/webapp.py)",
+        help="chainlit: chat stream with citation cards; web: the hand-rolled sidebar "
+        "page (ragqa/webapp.py); nice: the same sidebar layout in NiceGUI (ragqa/niceui.py)",
     )
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8100)

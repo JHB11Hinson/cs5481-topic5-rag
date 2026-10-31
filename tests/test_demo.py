@@ -64,10 +64,13 @@ def test_near_miss_abstains_and_carries_the_best_chunk():
 
     screen = demo.render_answer(response)
     assert demo.ABSTAIN_MESSAGE.split(".")[0].lower() in screen.lower()
-    assert best["doc_title"] in screen, "the best chunk is named on screen"
-    assert f"{best['score']:.3f}" in screen, "its score is shown next to it"
-    assert engine.config_name in screen, "the footer states the configuration served"
-    assert f"{response['retrieval_ms']:.0f} ms" in screen
+    assert best["doc_title"] in screen, "the best chunk is still named on screen"
+    # The score, the chunk id and the configuration live in the payload now: a reader
+    # wants the answer and a pointer, and the machinery only ever belonged in a log.
+    assert f"{best['score']:.3f}" not in screen, "no score on screen"
+    assert engine.config_name not in screen, "no configuration footer on screen"
+    assert response["best_chunk"]["score"] == best["score"]
+    assert response["retrieval_ms"] >= 0, "the timing lives in the payload"
 
 
 def test_citation_panel_carries_title_heading_url_and_marked_span():
@@ -133,8 +136,10 @@ def test_claim_whose_quote_is_not_in_its_chunk_is_not_shown_as_verified():
     assert response["verified_claims"] == 0
 
     screen = demo.render_answer(response)
-    assert "quote_not_in_chunk" in screen
-    assert "[1]" not in screen
+    assert "[1]" not in screen, "a claim without a verified quote gets no marker"
+    assert claim["text"] not in screen, "the withheld claim is not presented as an answer"
+    assert "1 further claim(s) were withheld" in screen
+    assert "quote_not_in_chunk" not in screen, "the failure class stays in the payload"
     try:
         engine.citation_payload(claim)
     except (KeyError, ValueError):

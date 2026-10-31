@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import html
 import os
+import re
 import time
 from typing import Any, Dict, List, Optional
 
@@ -42,60 +43,75 @@ def _one_line(text: str, limit: int = 320) -> str:
     return flat if len(flat) <= limit else flat[: limit - 1] + "..."
 
 
+FENCE = re.compile(r"```.*?(?:```|\Z)", re.S)
+CODE_LINE = re.compile(r"^\s*[{|}\[\]<>#]|http[s]?://|^\s*[-*]\s+[`\"]")
+
+
+def _prose_excerpt(text: str, limit: int = 240) -> str:
+    """A readable window of a chunk, never a code or JSON dump.
+
+    A demo that answers "你好" by pasting an audit-log JSON blob is worse than one that
+    says nothing: the reader learns the system is confused *and* has to read a struct.
+    So fenced blocks are removed whole, structural lines (braces, table pipes, URLs,
+    quoted keys) are dropped, and what survives is measured in whole sentences. If
+    nothing survives, the caller prints no excerpt at all — an honest silence.
+    """
+    flat = FENCE.sub(" ", text or "")
+    kept = [line for line in flat.splitlines() if line.strip() and not CODE_LINE.match(line)]
+    candidate = " ".join(kept).strip()
+    candidate = re.sub(r"[`|]+", " ", candidate)
+    candidate = " ".join(candidate.split())
+    if not candidate:
+        return ""
+    if len(candidate) > limit:
+        cut = candidate[:limit]
+        stop = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
+        candidate = cut[: stop + 1] if stop > 60 else cut.rsplit(" ", 1)[0] + "…"
+    return candidate
+
+
 def _source_line(hit: Dict[str, Any]) -> str:
-    where = f" > {hit['heading_path']}" if hit.get("heading_path") else ""
-    url = f" - {hit['url']}" if hit.get("url") else ""
-    return f"**{hit.get('doc_title') or hit['doc_id']}**{where}{url}"
+    where = f" › {hit['heading_path']}" if hit.get("heading_path") else ""
+    return f"**{hit.get('doc_title') or hit['doc_id']}**{where}"
 
 
 def render_answer(response: Dict[str, Any]) -> str:
-    """Markdown for one answer: claims with markers, or the abstention case."""
-    footer = (
-        f"_Retrieval {response['retrieval_ms']:.0f} ms | generation "
-        f"{response['generation_ms']:.0f} ms | configuration "
-        f"`{response['config_name']}`_"
-    )
+    """Markdown for one answer, written for a reader and not for a log.
 
+    Deliberately free of identifiers: no chunk ids, no scores, no error classes, no
+    latency line. Those live in the payload (the citation panel and the stored
+    transcript use them), because a reader asking a question wants an answer and a
+    source, not the instrumentation that produced it.
+    """
     if response["abstained"]:
-        lines = [f"**Abstained.** {ABSTAIN_MESSAGE}", "", response["insufficiency"], ""]
+        lines = [f"**{ABSTAIN_MESSAGE}**"]
+        reason = _prose_excerpt(response.get("abstain_reason") or "", 300)
+        if reason and reason.lower() not in ("model_declined", "below_score_threshold"):
+            lines += ["", reason]
         best = response["best_chunk"]
         if best is not None:
-            lines.append(
-                f"Best retrieved chunk: {_source_line(best)} "
-                f"(chunk `{best['chunk_id']}`, score {best['score']:.3f})"
-            )
-            lines.extend(["", f"> {_one_line(best['text'])}"])
-        lines.extend(["", "---", footer])
+            lines += ["", f"The closest page is {_source_line(best)}."]
+            excerpt = _prose_excerpt(best.get("text") or "")
+            if excerpt:
+                lines += ["", f"> {excerpt}"]
         return "\n".join(lines)
 
     claims = response["claims"]
     verified = [claim for claim in claims if claim["verified"]]
     withheld = [claim for claim in claims if not claim["verified"]]
-    lines = [
-        f"**Answer** - {len(verified)} of {len(claims)} claims carry a verified "
-        f"citation."
-    ]
     if not claims:
-        lines.append("")
-        lines.append("_The generator returned no claim at all._")
-    for index, claim in enumerate(verified, start=1):
-        lines.append(f"{index}. {claim['text']} {claim['marker']}")
+        return f"**{ABSTAIN_MESSAGE}**\n\nThe generator returned no claim at all."
+    lines = [f"- {claim['text']} {claim['marker']}" for claim in verified]
     if withheld:
-        lines.append("")
-        lines.append("**Withheld - citation did not contain the claim:**")
-        for claim in withheld:
-            lines.append(
-                f"- {claim['text']} - `{claim['error_class']}`, citing "
-                f"`{claim['chunk_id']}` ({claim['detail']})"
-            )
+        lines += [
+            "",
+            f"_{len(withheld)} further claim(s) were withheld because the quoted text did "
+            "not support them._",
+        ]
     if response["hops"] > 1:
-        lines.append("")
-        lines.append(
-            f"_Retrieval took {response['hops']} hops "
-            f"({response['hop_stop_reason']})._"
-        )
-    lines.extend(["", "---", footer])
+        lines += ["", f"_Answered after {response['hops']} retrieval rounds._"]
     return "\n".join(lines)
+
 
 
 class ChatEngine:
