@@ -1,0 +1,76 @@
+{
+  "abstention": {
+    "abstained_answerable": 0,
+    "abstained_unanswerable": 0,
+    "abstention_recall_on_negatives": 0.0,
+    "over_abstain_rate": 0.0,
+    "under_abstain": 0
+  },
+  "citations": {
+    "citation_precision": 1.0,
+    "citation_recall": 1.0,
+    "claims": 71,
+    "containment_failures": {},
+    "span_hit_rate": 1.0,
+    "supported": 71
+  },
+  "grounding": {
+    "claims": 71,
+    "containment_pass": 71,
+    "containment_precision": 1.0,
+    "judge_judged": 0,
+    "judge_pass": 0,
+    "judge_precision": null,
+    "nli_judged": 0,
+    "nli_pass": 0,
+    "nli_precision": null,
+    "span_resolved": 71,
+    "span_resolved_rate": 1.0
+  },
+  "items": {
+    "answerable": 40,
+    "total": 40,
+    "unanswerable": 0
+  },
+  "retrieval": {
+    "hit_rate": 0.925,
+    "k": 10,
+    "misses": [
+      "A015",
+      "A030",
+      "A035"
+    ],
+    "mrr": 0.6185,
+    "ndcg_at_10": 0.6937,
+    "recall_at_k": 0.925
+  },
+  "system": {
+    "chunks_indexed": 2203,
+    "closed_book": false,
+    "context_mode": "plain",
+    "cost_cny": 0.400659,
+    "cost_components": {
+      "generation": {
+        "tokens_in": 278899,
+        "tokens_out": 30026,
+        "usd": 0.05985
+      },
+      "rewrite": {
+        "tokens_in": 644,
+        "tokens_out": 203,
+        "usd": 0.000218
+      }
+    },
+    "cost_per_1k_questions_cny": 10.0165,
+    "cost_usd": 0.060069,
+    "effective_rate": 1.0,
+    "embedding_model": "BAAI/bge-m3",
+    "generation_calls": 40,
+    "generator_model": "deepseek-v4.1-flash",
+    "hops": 2,
+    "index_backend": "qdrant",
+    "index_bytes": 22774324,
+    "judge_enabled": false,
+    "long_context": false
+  }
+}
