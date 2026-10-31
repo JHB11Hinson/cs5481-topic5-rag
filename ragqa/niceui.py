@@ -22,6 +22,7 @@ What the earlier attempts got wrong, and this file does not:
 from __future__ import annotations
 
 import os
+import re
 import threading
 from typing import Any, Dict, List, Optional
 
@@ -44,9 +45,9 @@ TEXT_2 = "#6A6B70"
 TEXT_3 = "#9A9BA0"
 
 WHALE = f"""
-<svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
-  <path fill="{BLUE}" d="M6.2 23.6c3.6 1.6 6.1-.4 9.4-1.6 3.6-1.3 6.4-.6 9.2 1.4 2.3 1.6 4.6 1.9 9.2.2.7-.2 1.3.3 1.2 1-.6 4.6-4.8 8.4-9.8 8.4-3.1 0-5.4-1.2-7.6-2.4-2-1.1-3.8-2-6.1-1.3-2.2.7-4.4 2.3-7 2.3-3.5 0-6.6-2.3-8.1-5.6-.3-.7.3-1.5 1-1.4 2.6.3 4.6-.3 8.6-1z"/>
-  <path fill="{BLUE}" d="M13.4 8.4c1.9-2.2 4.7-3.4 7.7-3.4 3.6 0 6.8 1.9 8.5 4.9.3.6-.1 1.3-.8 1.3-2.2.1-3.9.9-5.4 2.2-1.6 1.4-3.4 2.3-5.9 2.3-3.1 0-5.6-1.2-4.1-7.3z"/>
+<svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+  <path fill="{BLUE}" d="M7.5 27.5c0-6.4 5.6-11 12.4-11 4.4 0 8 1.9 10.4 5.1l6.2-4.6c.9-.7 1.9.1 1.7 1.1l-1.4 7.3 1.4 7.3c.2 1-.8 1.8-1.7 1.1l-6.2-4.6c-2.4 3.2-6 5.1-10.4 5.1-6.8 0-12.4-4.6-12.4-11z"/>
+  <circle cx="16.5" cy="24.5" r="1.9" fill="{CANVAS}"/>
 </svg>
 """
 
@@ -65,23 +66,42 @@ CSS = f"""
 body, .nicegui-content {{ background: var(--ds-canvas); color: var(--ds-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif; }}
 .nicegui-content {{ padding: 0 !important; gap: 0 !important; }}
-.q-drawer {{ background: var(--ds-canvas) !important; }}
+.q-drawer {{ background: var(--ds-canvas) !important; overflow-x: hidden; }}
 .q-drawer--left {{ border-right: 1px solid var(--ds-divider) !important; }}
 .q-drawer--right {{ border-left: 1px solid var(--ds-divider) !important; }}
-.ds-brand {{ display: flex; align-items: center; gap: 8px; padding: 14px 6px 10px; }}
+/* NiceGUI/Quasar give every column and row a flex gap; inside a 280 px sidebar that
+   gap is what pushed "Today" a visible distance below "Manage". Zero it here and pay
+   for spacing deliberately, with the paddings below. */
+.q-drawer .nicegui-column, .q-drawer .nicegui-row {{ gap: 0 !important; }}
+.ds-brand {{ display: flex; align-items: center; gap: 8px; padding: 12px 2px 8px; }}
 .ds-wordmark {{ font-size: 17px; font-weight: 700; letter-spacing: -.2px; }}
 .ds-wordmark span {{ color: var(--ds-blue); }}
 .ds-new {{ width: 100%; border: 1px solid var(--ds-divider) !important; border-radius: 999px !important;
   background: var(--ds-canvas) !important; color: var(--ds-text) !important; font-weight: 500;
-  padding: 9px 12px !important; box-shadow: none !important; }}
+  padding: 8px 12px !important; box-shadow: none !important; }}
 .ds-new:hover {{ background: var(--ds-surface) !important; }}
-.ds-group {{ font-size: 11px; color: var(--ds-text-3); padding: 12px 8px 4px; font-weight: 500; }}
-.ds-row {{ border-radius: 10px; padding: 7px 8px; cursor: pointer; }}
+.ds-manage {{ padding: 0 2px; margin: 2px 0 -2px; height: 22px; }}
+.ds-group {{ font-size: 11px; color: var(--ds-text-3); padding: 8px 8px 2px;
+  font-weight: 500; line-height: 16px; }}
+.ds-row {{ display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden;
+  border-radius: 10px; padding: 6px 8px; cursor: pointer; }}
 .ds-row:hover {{ background: var(--ds-surface); }}
 .ds-row.active {{ background: var(--ds-blue-soft); }}
 .ds-row.active .ds-title {{ color: var(--ds-blue-pressed); font-weight: 600; }}
-.ds-title {{ font-size: 13.5px; color: var(--ds-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
-.ds-meta {{ font-size: 11px; color: var(--ds-text-3); }}
+/* A long question becomes the title, and a fixed-width sidebar has to clip it rather
+   than let it run under the divider: `min-width: 0` on the flex child is what allows
+   the ellipsis to engage at all. */
+/* Only the outer flex item may take `width: 0` (that is what lets it shrink); the inner
+   block must be full width or the title clips itself to nothing. */
+.ds-row-text {{ display: block; width: 100%; min-width: 0; overflow: hidden; }}
+.ds-cite {{ color: var(--ds-blue-pressed); background: var(--ds-blue-soft); border-radius: 999px;
+  padding: 0 5px; margin-left: 2px; font-size: 11px; font-weight: 600; cursor: pointer;
+  vertical-align: super; line-height: 1; }}
+.ds-cite:hover {{ background: var(--ds-blue); color: #fff; }}
+.ds-title {{ display: block; max-width: 100%; font-size: 13.5px; color: var(--ds-text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+.ds-meta {{ display: block; max-width: 100%; font-size: 11px; color: var(--ds-text-3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
 .ds-col {{ max-width: 720px; width: 100%; margin: 0 auto; padding: 0 20px; }}
 .ds-welcome {{ height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }}
 .ds-welcome h1 {{ font-size: 24px; font-weight: 700; margin: 0; }}
@@ -101,12 +121,8 @@ body, .nicegui-content {{ background: var(--ds-canvas); color: var(--ds-text);
   font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; color: var(--ds-blue-pressed); }}
 .ds-assistant pre {{ background: var(--ds-surface); border: 1px solid var(--ds-divider); border-radius: 8px; padding: 12px; overflow-x: auto; }}
 .ds-assistant pre code {{ background: none; padding: 0; color: var(--ds-text); }}
-.ds-cites {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }}
-.ds-cite {{ border: 1px solid var(--ds-blue-soft); background: var(--ds-blue-soft); color: var(--ds-blue-pressed);
-  border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; cursor: pointer; }}
-.ds-cite:hover {{ background: var(--ds-blue); color: #fff; border-color: var(--ds-blue); }}
-.ds-badge {{ border: 1px solid #f0d9a8; background: #fffaf0; color: #8a6d1f; border-radius: 999px;
-  padding: 2px 10px; font-size: 12px; }}
+.ds-badge {{ display: inline-block; border: 1px solid #f0d9a8; background: #fffaf0; color: #8a6d1f;
+  border-radius: 999px; padding: 2px 10px; font-size: 12px; margin-top: 8px; }}
 .ds-composer {{ position: sticky; bottom: 0; background: var(--ds-canvas); padding: 12px 0 18px; }}
 .ds-input {{ background: var(--ds-surface) !important; border: 1px solid var(--ds-divider) !important;
   border-radius: 25px !important; padding: 8px 8px 8px 16px !important; box-shadow: none !important; }}
@@ -153,6 +169,10 @@ class Screen:
         self.selected: set = set()
         self.manage = False
         self.busy = False
+        # marker -> citation payload for the conversation on screen. Rebuilt on open and
+        # extended on every answer, so an inline superscript can be resolved without
+        # re-reading the transcript.
+        self.citation_index: Dict[str, Dict[str, Any]] = {}
         self._build()
 
     # ---- layout ----------------------------------------------------------
@@ -166,7 +186,7 @@ class Screen:
 
             ui.button("＋  New chat", on_click=self._new_conversation).props("flat no-caps").classes("ds-new")
 
-            with ui.row().classes("w-full items-center justify-between q-mt-sm q-px-xs"):
+            with ui.row().classes("w-full items-center justify-between ds-manage"):
                 ui.button("Manage", on_click=self._toggle_manage).props("flat dense no-caps size=sm").classes("ds-foot")
                 self.delete_button = (
                     ui.button("Delete", on_click=self._delete_selected)
@@ -175,7 +195,7 @@ class Screen:
                 )
                 self.delete_button.set_visibility(False)
 
-            self.list_container = ui.column().classes("w-full gap-0 q-mt-sm")
+            self.list_container = ui.column().classes("w-full gap-0")
 
         with ui.column().classes("w-full h-screen no-wrap gap-0 relative"):
             with ui.row().classes("w-full items-center justify-between q-px-md q-py-sm").style(
@@ -209,6 +229,22 @@ class Screen:
             self.drawer_meta = ui.label("").classes("ds-doc-meta q-mt-xs")
             self.drawer_body = html("").classes("ds-doc-text q-mt-md")
 
+        # Inline superscripts are plain DOM inside one HTML element, so a delegated
+        # listener plus NiceGUI's event bus is what lets them call back into Python
+        # without a component per marker.
+        ui.on("open_citation", lambda event: self._open_citation_marker(str(event.args.get("marker"))))
+        ui.add_body_html(
+            """
+            <script>
+            document.addEventListener('click', (event) => {
+              const node = event.target.closest('.ds-cite');
+              if (node && node.dataset.marker) {
+                emitEvent('open_citation', {marker: node.dataset.marker});
+              }
+            });
+            </script>
+            """
+        )
         self.question.on("keydown.enter", self._ask)
         self._render_welcome()
         self._refresh_list()
@@ -251,17 +287,26 @@ class Screen:
 
     def _row(self, row: Dict[str, Any]) -> None:
         active = " active" if row["id"] == self.conversation_id else ""
-        with ui.row().classes("ds-row w-full items-center gap-2 no-wrap" + active):
+        title = _escape(_display_title(row.get("title")))
+        turns = int(row["turns"])
+        # The text is one HTML block rather than two labels: a label is a block element
+        # with its own min-width, which is what let a long question overflow the sidebar
+        # instead of ellipsing. `.ds-row-text` carries `min-width: 0`, the property that
+        # actually permits the clip.
+        with ui.element("div").classes("ds-row" + active):
             if self.manage:
                 ui.checkbox(value=row["id"] in self.selected).props("dense").on(
                     "update:model-value",
                     lambda event, conversation=row["id"]: self._toggle(conversation, bool(event.args)),
                 )
-            with ui.column().classes("gap-0 flex-1 min-w-0").on(
-                "click", lambda conversation=row["id"]: self._open(conversation)
-            ):
-                ui.label(row["title"] or "New chat").classes("ds-title")
-                ui.label(f"{row['turns']} message(s)").classes("ds-meta")
+            html(
+                f'<div class="ds-row-text" data-conversation="{row["id"]}">'
+                f'<span class="ds-title">{title}</span>'
+                f'<span class="ds-meta">{turns} message(s)</span>'
+                "</div>"
+            ).style("flex: 1 1 auto; width: 0; min-width: 0; overflow: hidden").on(
+                "click", lambda _event, conversation=row["id"]: self._open(conversation)
+            )
             ui.button(
                 icon="more_horiz", on_click=lambda conversation=row["id"]: self._row_menu(conversation)
             ).props("flat round dense size=sm color=grey-6").classes("ds-row-menu")
@@ -282,7 +327,7 @@ class Screen:
         """
         record = self.store.get(conversation_id) or {}
         with ui.dialog() as dialog, ui.card().classes("q-pa-md"):
-            ui.label(record.get("title") or "New chat").classes("text-sm font-semibold")
+            ui.label(_display_title(record.get("title"))).classes("text-sm font-semibold")
             with ui.column().classes("w-full gap-1 q-mt-sm"):
                 ui.button(
                     "Rename",
@@ -350,8 +395,9 @@ class Screen:
     def _open(self, conversation_id: str) -> None:
         self.conversation_id = conversation_id
         record = self.store.get(conversation_id) or {}
-        self.title_label.text = record.get("title") or "New chat"
+        self.title_label.text = _display_title(record.get("title"))
         self.transcript.clear()
+        self.citation_index = {}
         turns = self.store.messages(conversation_id)
         self.welcome.set_visibility(not turns)
         with self.transcript:
@@ -382,19 +428,23 @@ class Screen:
     def _bubble_assistant(self, markdown: str, payload: Optional[Dict[str, Any]]) -> None:
         claims = (payload or {}).get("claims") or []
         abstained = bool((payload or {}).get("abstained"))
+        for claim in claims:
+            self.citation_index[claim["marker"]] = claim["citation"]
         with self.transcript:
             with ui.column().classes("ds-msg w-full gap-0"):
-                ui.markdown(markdown or "").classes("ds-assistant")
-                if claims or abstained:
-                    with ui.row().classes("ds-cites"):
-                        for claim in claims:
-                            html(
-                                f'<div class="ds-cite" data-marker="{claim["marker"]}">'
-                                f'{claim["marker"]}</div>'
-                            ).on("click", lambda _event, citation=claim["citation"]: self._open_citation(citation))
-                        if abstained:
-                            html('<div class="ds-badge">not in the documentation</div>')
+                html(_answer_html(markdown or "")).classes("ds-assistant")
+                if abstained:
+                    html('<div class="ds-badge">not in the documentation</div>')
         self.body.run_method("scrollTo", {"top": 10 ** 6, "behavior": "smooth"})
+
+    def _open_citation_marker(self, marker: str) -> None:
+        """A click on an inline superscript. The marker is resolved against the
+        conversation currently on screen, so a replayed answer stays clickable."""
+        citation = self.citation_index.get(marker)
+        if citation is None:
+            ui.notify(f"Source {marker} is not in this conversation", type="warning")
+            return
+        self._open_citation(citation)
 
     # ---- asking ----------------------------------------------------------
     async def _ask(self) -> None:
@@ -438,7 +488,7 @@ class Screen:
         }
         self.store.append(self.conversation_id, "assistant", rendered, payload=payload)
         record = self.store.get(self.conversation_id) or {}
-        self.title_label.text = record.get("title") or "New chat"
+        self.title_label.text = _display_title(record.get("title"))
         self._bubble_assistant(rendered, payload)
         self._refresh_list()
         self.busy = False
@@ -472,6 +522,38 @@ class Screen:
             ).classes("text-[13px]")
             ui.button("Close", on_click=dialog.close).props("flat no-caps")
         dialog.open()
+
+
+CITATION = re.compile(r"\[(\d+)\]")
+
+
+def _answer_html(markdown: str) -> str:
+    """Markdown to HTML with every `[n]` turned into a clickable superscript.
+
+    The marker stays where the sentence put it, which is what the text says and what a
+    reader expects; a separate row of buttons underneath duplicated it and read as a
+    stray control. Mistune is already a dependency of the environment and needs no
+    browser build step.
+    """
+    import mistune
+
+    body = mistune.html(markdown or "")
+    return CITATION.sub(
+        lambda match: (
+            f'<sup class="ds-cite" data-marker="[{match.group(1)}]">'
+            f'[{match.group(1)}]</sup>'
+        ),
+        body,
+    )
+
+
+def _display_title(title: Optional[str]) -> str:
+    """The store calls an unnamed conversation "Untitled conversation"; a chat product
+    says "New chat". One mapping, applied wherever a title is shown."""
+    text = (title or "").strip()
+    if not text or text == "Untitled conversation":
+        return "New chat"
+    return text
 
 
 def _escape(text: str) -> str:
