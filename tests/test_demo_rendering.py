@@ -89,3 +89,56 @@ def test_withheld_claims_are_counted_not_dumped():
     assert "Dropped." not in markdown
     assert "1 further claim(s) were withheld" in markdown
     assert "quote_not_in_chunk" not in markdown and "c-9" not in markdown
+
+
+# ---- the gap policy on screen (ADR-0020) --------------------------------------
+
+GENERAL_ANSWER = (
+    "Auto-unseal wraps the master key with a KMS key, so nobody has to hold a shard."
+)
+
+
+def test_an_ungrounded_answer_puts_the_label_before_the_paragraph():
+    markdown = render_answer(
+        _response(
+            abstained=True,
+            answer_mode="ungrounded_general",
+            general_answer=GENERAL_ANSWER,
+            notice=(
+                "The knowledge base does not contain an answer to this question. "
+                "What follows is general knowledge from the model, not from these "
+                "documents: it carries no citation and should be checked."
+            ),
+            caveat="Confirm the KMS integration is enabled on this deployment.",
+            abstain_reason="the context describes seal states, not auto-unseal",
+        )
+    )
+    assert markdown.index("The knowledge base does not contain an answer") < markdown.index(
+        GENERAL_ANSWER
+    )
+    assert "general knowledge" in markdown
+    assert "To check: Confirm the KMS integration" in markdown
+    # No marker, no identifier, no instrumentation: there is nothing to cite.
+    for banned in ("[1]", "[2]", "chunk", "c-1", "0.42", "configuration"):
+        assert banned not in markdown, banned
+
+
+def test_an_ungrounded_answer_still_points_at_the_closest_page():
+    markdown = render_answer(
+        _response(
+            abstained=True,
+            answer_mode="ungrounded_general",
+            general_answer=GENERAL_ANSWER,
+            notice="The knowledge base does not contain an answer to this question.",
+        )
+    )
+    assert "Seal › Overview" in markdown
+    assert "Vault starts sealed." in markdown
+
+
+def test_a_plain_abstention_is_unchanged_when_the_policy_is_off():
+    markdown = render_answer(
+        _response(abstained=True, answer_mode="abstained", general_answer="")
+    )
+    assert "does not contain an answer" in markdown
+    assert "general knowledge" not in markdown

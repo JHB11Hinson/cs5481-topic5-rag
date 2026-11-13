@@ -65,6 +65,12 @@ DEFAULTS: Dict[str, Any] = {
     "generate.abstain_score_threshold": 0.2,
     "generate.min_claim_overlap": 0.12,
     "generate.max_claims": 2,
+    # Gap policy (ADR-0020). "abstain" stops at the gap note; "assist" adds one more
+    # call that answers from general knowledge under that note, with no citation.
+    # Off everywhere a number is measured, so no reported metric buys a second call.
+    "generate.ungrounded_answer": "abstain",
+    "generate.ungrounded_model": "",
+    "generate.ungrounded_max_tokens": 400,
     "golden.items_path": None,
     "golden.limit": None,
     "llm.base_url": "",
@@ -108,6 +114,7 @@ VALID_VALUES = {
     "retrieval.mode": {"dense", "hybrid", "rerank"},
     "context.mode": {"plain", "contextual_prefix", "late_chunking"},
     "generate.provider": {"stub", "llm"},
+    "generate.ungrounded_answer": {"abstain", "assist"},
 }
 
 
@@ -208,5 +215,10 @@ def load(path: str) -> Config:
         raise ConfigError(
             f"{path}: context.mode=contextual_prefix needs context.prefix_model "
             "(the cheap model whose prefixes get cached)"
+        )
+    if values["generate.ungrounded_answer"] == "assist" and values["generate.provider"] != "llm":
+        raise ConfigError(
+            f"{path}: generate.ungrounded_answer=assist needs generate.provider=llm — "
+            "the stub generator has no model to answer from general knowledge"
         )
     return Config(values)

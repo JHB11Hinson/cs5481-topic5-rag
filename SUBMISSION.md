@@ -7,10 +7,10 @@ unless a step says *rebuild*. Measured facts are from `reports/submission.pdf` a
 
 ## 0. The four things that decide pass or desk-reject
 
-1. **`reports/submission.pdf`** is the report with the slides appended: 23 pages.
-2. **Page 9 is the contribution page** and page 10 is slide 1 — the required page sits
+1. **`reports/submission.pdf`** is the report with the slides appended: 26 pages.
+2. **Page 10 is the contribution page** and page 11 is slide 1 — the required page sits
    immediately before the slides, outside the 6-page main-content count.
-3. **Every member signs their own row on page 9.** Unsigned row = desk reject. The page is
+3. **Every member signs their own row on page 10.** Unsigned row = desk reject. The page is
    still a template (see §3); filling it is the only step here that no script can do.
 4. **The source code zip** goes up with the PDF. Python files only, no weights, no caches,
    no keys.
@@ -21,7 +21,7 @@ unless a step says *rebuild*. Measured facts are from `reports/submission.pdf` a
 
 | # | Upload | File / form | Notes |
 |---|---|---|---|
-| 1 | Report + slides (one PDF) | `reports/submission.pdf` | the graded artifact: 9 report pages, then the 14 slides |
+| 1 | Report + slides (one PDF) | `reports/submission.pdf` | the graded artifact: 10 report pages, then the 16 slides |
 | 2 | Slides (if Canvas has a separate slot) | `reports/slides.pptx` (or `reports/slides.pdf`) | already appended inside `submission.pdf`; this is a convenience upload |
 | 3 | Source code | `topic5-rag-code.zip` | build it with the command in §5; **`.py` files, not a notebook** — the brief allows either |
 | 4 | Nothing else | — | do not upload `data/`, `runs/`, `data/cache/*.sqlite`, `.env`, or `.scratch/` |
@@ -46,27 +46,29 @@ size allows, and never include `runs/` (6.9 MB of `chunks.jsonl` per cell) or `d
 
 | Check | Value | How it was measured |
 |---|---|---|
-| `reports/report.pdf` | 9 pages | PDF page count |
-| Main content | 6 pages | `5 References` heading starts on page 6 at y = 504 of 842 pt; §1–§4 fit above it |
-| Slack left on page 6 | ≈ 10.5 cm | the Discussion ends at y ≈ 490, the page ends at 816 |
-| `reports/slides.pdf` | 14 pages | PDF page count |
-| `reports/submission.pdf` | 23 pages = 9 + 14 | `merge_pdf.py` prints exactly this |
-| Contribution page | page 9 of the report, page 9 of the submission | page 9 holds only §6; page 10 is the slide title |
-| Limit | main content ≤ 6 pp; references and appendix unlimited | pages 6–7 references, pages 7–8 Appendix A |
+| `reports/report.pdf` | 10 pages | PDF page count |
+| Main content | 6 pages | `5 References` is the first block of page 7 (y = 53.7 of 842 pt); §1–§4 end at the bottom of page 6 |
+| Slack left on page 6 | under one line | the last Discussion line ends at y ≈ 781 of 816; a two-line addition spilled onto page 7 when tested by rebuilding |
+| `reports/slides.pdf` | 16 pages | PDF page count |
+| `reports/submission.pdf` | 26 pages = 10 + 16 | `merge_pdf.py` prints exactly this |
+| Contribution page | page 10 of the report, page 10 of the submission | page 10 holds only §6; page 11 is the slide title |
+| Limit | main content ≤ 6 pp; references and appendix unlimited | page 7 the start of references and Appendix A, pages 8–9 the rest of Appendix A |
 
 If a rebuild changes any of these numbers, `python .scratch/topic5-rag/merge_pdf.py` prints
 the report page count, the slide page count, the total, and the first line of the last page
-before the slides. Read those three lines; if the middle one is not `6 Individual
-Contributions`, stop and fix the pagination before uploading.
+before the slides. Read those three lines; if the total is not `26 pp`, or the text of the
+last page before the slides does not contain `6 Individual Contributions` (it starts with
+the page number, `10`, so read the second line), stop and fix the pagination before
+uploading.
 
 ---
 
 ## 3. The contribution page — fill this in, print it, sign it
 
-`reports/report.md` §6 renders to page 9. It is a template: `[MEMBER 1]` … `[MEMBER 8]`,
+`reports/report.md` §6 renders to page 10. It is a template: `[MEMBER 1]` … `[MEMBER 8]`,
 `[CONTRIBUTION]`, `[ %]`, a signature rule per row, and a `Total` row hard-coded to `100 %`.
 Replace the placeholders with the real table below, delete unused rows, make the ratios sum
-to exactly 100, then rebuild (§5) and confirm the page is still page 9.
+to exactly 100, then rebuild (§5) and confirm the page is still page 10.
 
 | # | Member | Contribution | Ratio | Signature |
 |---|---|---|---|---|
@@ -87,8 +89,8 @@ Rules the brief states, in its own terms:
 - that page does **not** count toward the 6-page main-content limit;
 - a submission without that page, or without every member's signature, is **desk rejected**.
 
-Practical order: fill the table → rebuild the PDF → print page 9 only → every member signs
-their own row in ink → scan or photograph the signed page → **replace page 9 of the PDF with
+Practical order: fill the table → rebuild the PDF → print page 10 only → every member signs
+their own row in ink → scan or photograph the signed page → **replace page 10 of the PDF with
 the scan** (keep the same page position) → re-check with `merge_pdf.py` that it is still the
 last page before the slides. Signatures are wet or scanned; a typed name is not a signature.
 
@@ -99,11 +101,11 @@ last page before the slides. Signatures are wet or scanned; a typed name is not 
 1. **People → Groups** — confirm the group is registered and the member list matches the
    contribution page. Registration closed 18 Oct; if the roster differs, tell the TA now.
 2. **Assignments → the CS5481 project submission** — upload `reports/submission.pdf` first and
-   wait for the preview to render, then confirm page 9 shows the signed contribution table.
+   wait for the preview to render, then confirm page 10 shows the signed contribution table.
 3. Upload `topic5-rag-code.zip` as the second file (or the second slot if the assignment has
    one). Do not paste code into the comment box.
-4. Comment box, one line: *"Report with slides appended (23 pp) + source code zip. Contribution
-   page is p. 9, signed by all members."*
+4. Comment box, one line: *"Report with slides appended (26 pp) + source code zip. Contribution
+   page is p. 10, signed by all members."*
 5. **Submit**, then re-open the submission and download both files back. A submission you have
    not re-opened is a submission you have not checked. Deadline **Tue 24 Nov 2026, 23:59**.
 

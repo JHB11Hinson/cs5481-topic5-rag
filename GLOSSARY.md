@@ -75,8 +75,16 @@ The share of emitted citations that really do support the claim they are attache
 _Avoid_: citation accuracy
 
 **Abstention**:
-The system's explicit statement that the knowledge base does not answer the question, produced instead of an answer.
+The system's explicit statement that the knowledge base does not answer the question, produced instead of a grounded answer.
 _Avoid_: refusal, no-answer, fallback
+
+**Gap Note**:
+The fixed sentence that opens an answer whose evidence is absent, stating that the knowledge base does not contain the answer and that what follows is not from these documents. Written by the code, never by the model.
+_Avoid_: disclaimer, warning banner, caveat sentence
+
+**Ungrounded Answer**:
+Prose the model produces from its own knowledge after a Gap Note, carrying no Citation because no chunk supports it. A state of the answer, not a second kind of retrieval.
+_Avoid_: fallback answer, open-book answer, hallucination
 
 **Faithfulness**:
 The degree to which an answer's claims follow from its retrieved context, independent of whether the context was the right context.

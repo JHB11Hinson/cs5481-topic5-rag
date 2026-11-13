@@ -35,6 +35,36 @@ OUTPUT_SCHEMA = (
     '"abstain_reason": "<why, when answerable is false>"}'
 )
 
+# The gap note opens every ungrounded answer, verbatim and in a fixed wording, so the
+# reader is told what they are reading before they read it and so a test can assert the
+# label is present rather than trusting a model to remember it (ADR-0020). The model
+# writes the paragraph under it; nobody, including the model, writes the label.
+GAP_NOTE = (
+    "The knowledge base does not contain an answer to this question. "
+    "What follows is general knowledge from the model, not from these documents: "
+    "it carries no citation and should be checked against a current source."
+)
+
+# Second call, only when the grounded call came back empty and the configuration
+# allows it. It is a separate prompt on purpose: the grounded prompt keeps "never use
+# outside knowledge" absolute, so enabling this never weakens the path that is graded.
+UNGROUNDED_SYSTEM_PROMPT = (
+    "A documentation question has been answered by a retrieval system that found no "
+    "supporting passage. You do not have that documentation. Answer the question from "
+    "your own general knowledge, in at most six sentences of prose, and be explicit "
+    "about uncertainty instead of confident where you are not. Do not invent citations, "
+    "chunk ids, document titles, section names, URLs, quotation marks, prices or version "
+    "numbers. Do not claim that any documentation says anything. If you do not know, "
+    "say so in one sentence. A fixed notice telling the reader the knowledge base does "
+    "not cover the question is printed above your text, so do not repeat it. "
+    "Reply with JSON only."
+)
+
+UNGROUNDED_SCHEMA = (
+    '{"known": true|false, "answer": "<prose, no citation markers>", '
+    '"caveat": "<one line: what a reader should verify>"}'
+)
+
 
 def _content_tokens(question: str) -> set:
     """Long, specific tokens the answer has to mention to be about the question."""
@@ -118,6 +148,10 @@ class StubGenerator:
                 {"chunk_id": claim["chunk_id"], "doc_id": claim["doc_id"]} for claim in claims
             ],
             "abstained": False,
+            "answer_mode": "grounded",
+            "notice": "",
+            "general_answer": "",
+            "caveat": "",
             "abstain_reason": "",
             "raw_response": "",
             "tokens_in": 0,
@@ -130,6 +164,10 @@ class StubGenerator:
             "claims": [],
             "citations": [],
             "abstained": True,
+            "answer_mode": "abstained",
+            "notice": "",
+            "general_answer": "",
+            "caveat": "",
             "abstain_reason": reason,
             "raw_response": "",
             "tokens_in": 0,
@@ -140,11 +178,25 @@ class StubGenerator:
 class LLMGenerator:
     provider = "llm"
 
-    def __init__(self, client, model: str, context_chunks: int = 8, max_tokens: int = 900):
+    def __init__(
+        self,
+        client,
+        model: str,
+        context_chunks: int = 8,
+        max_tokens: int = 900,
+        ungrounded: bool = False,
+        ungrounded_model: str = "",
+        ungrounded_max_tokens: int = 400,
+    ):
         self.client = client
         self.model_id = model
         self.context_chunks = int(context_chunks)
         self.max_tokens = int(max_tokens)
+        # Off by default: every measured configuration in this project runs the
+        # strict path, so a recorded number never depends on a second call (ADR-0020).
+        self.ungrounded = bool(ungrounded)
+        self.ungrounded_model = ungrounded_model or model
+        self.ungrounded_max_tokens = int(ungrounded_max_tokens)
         self.last_stats: Dict[str, int] = {"hits": 0, "misses": 0}
 
     def _messages(self, item: Dict[str, Any], retrieved: List[Dict[str, Any]],
@@ -216,6 +268,10 @@ class LLMGenerator:
                 "claims": [],
                 "citations": [],
                 "abstained": False,
+                "answer_mode": "parse_failure",
+                "notice": "",
+                "general_answer": "",
+                "caveat": "",
                 "abstain_reason": "parse_failure",
                 "raw_response": raw,
                 "tokens_in": result.get("tokens_in", 0),
@@ -243,17 +299,25 @@ class LLMGenerator:
 
         answerable = bool(payload.get("answerable", bool(claims)))
         if not answerable or not claims:
-            return {
+            reason = str(payload.get("abstain_reason") or "model_declined")
+            abstained = {
                 "answer_text": str(payload.get("abstain_reason") or
                                    "The documentation provided does not contain an answer."),
                 "claims": [],
                 "citations": [],
                 "abstained": True,
-                "abstain_reason": str(payload.get("abstain_reason") or "model_declined"),
+                "answer_mode": "abstained",
+                "notice": "",
+                "general_answer": "",
+                "caveat": "",
+                "abstain_reason": reason,
                 "raw_response": raw,
                 "tokens_in": result.get("tokens_in", 0),
                 "tokens_out": result.get("tokens_out", 0),
             }
+            if not self.ungrounded:
+                return abstained
+            return self._ungrounded(item, reason, abstained) or abstained
 
         return {
             "answer_text": normalize(" ".join(claim["text"] for claim in claims)),
@@ -262,10 +326,67 @@ class LLMGenerator:
                 {"chunk_id": claim["chunk_id"], "doc_id": claim["doc_id"]} for claim in claims
             ],
             "abstained": False,
+            "answer_mode": "grounded",
+            "notice": "",
+            "general_answer": "",
+            "caveat": "",
             "abstain_reason": "",
             "raw_response": raw,
             "tokens_in": result.get("tokens_in", 0),
             "tokens_out": result.get("tokens_out", 0),
+        }
+
+    def _ungrounded(
+        self, item: Dict[str, Any], reason: str, abstained: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Second call: the gap note, then the model's own answer, no citation.
+
+        Runs only after the grounded call found nothing. The returned record keeps
+        `abstained = True`, because the knowledge base still did not answer: a metric
+        or a screen that reads that flag must not start counting these as grounded
+        answers. What changes is that the reader gets prose instead of a dead end, and
+        the prose is labelled before it is read (ADR-0020).
+        """
+        messages = [
+            {"role": "system", "content": UNGROUNDED_SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": (
+                    f"Question: {item['question']}\n\n"
+                    f"The retrieval step's written reason for finding nothing: "
+                    f"{reason[:400]}\n\n"
+                    f"Reply with JSON only, matching exactly: {UNGROUNDED_SCHEMA}"
+                ),
+            },
+        ]
+        call = self.client.complete(
+            self.ungrounded_model, messages, max_tokens=self.ungrounded_max_tokens
+        )
+        payload = self._parse(call["text"])
+        answer = str((payload or {}).get("answer") or "").strip()
+        if not answer:
+            # A model that will not answer, or will not answer in JSON, leaves the
+            # honest abstention in place; a broken second call must not become a
+            # fabricated one. The tokens were still spent, so they are still counted.
+            abstained["tokens_in"] = abstained.get("tokens_in", 0) + call.get("tokens_in", 0)
+            abstained["tokens_out"] = abstained.get("tokens_out", 0) + call.get("tokens_out", 0)
+            return None
+        caveat = str((payload or {}).get("caveat") or "").strip()
+        known = bool((payload or {}).get("known", True))
+        return {
+            "answer_text": f"{GAP_NOTE}\n\n{answer}",
+            "claims": [],
+            "citations": [],
+            "abstained": True,
+            "answer_mode": "ungrounded_general",
+            "notice": GAP_NOTE,
+            "general_answer": answer,
+            "caveat": caveat,
+            "known": known,
+            "abstain_reason": reason,
+            "raw_response": call["text"],
+            "tokens_in": abstained.get("tokens_in", 0) + call.get("tokens_in", 0),
+            "tokens_out": abstained.get("tokens_out", 0) + call.get("tokens_out", 0),
         }
 
     @staticmethod
@@ -309,5 +430,8 @@ def make(cfg):
             model=cfg["llm.model_generate"],
             context_chunks=int(cfg["llm.context_chunks"]),
             max_tokens=int(cfg["llm.max_tokens"]),
+            ungrounded=str(cfg["generate.ungrounded_answer"]) == "assist",
+            ungrounded_model=str(cfg["generate.ungrounded_model"] or ""),
+            ungrounded_max_tokens=int(cfg["generate.ungrounded_max_tokens"]),
         )
     raise ValueError(f"unknown generate.provider {provider!r}")

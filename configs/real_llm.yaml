@@ -1,4 +1,4 @@
-﻿# Real generation (ticket 06) against the OpenCode Go route.
+# Real generation (ticket 06) against the OpenCode Go route.
 # The Go subscription is a different base path from the plain zen catalog:
 # /zen/go/v1, and requests must carry an x-opencode-session header or they route
 # to the unfunded catalog and fail upstream.
@@ -46,6 +46,11 @@ generate:
   abstain_score_threshold: -100.0   # the generator decides; see ADR-0011 note
   min_claim_overlap: 0.12
   max_claims: 3
+  # The demo serves people, and a person asking about something the corpus lacks
+  # should get the labelled general answer rather than a dead end (ADR-0020). Every
+  # measured configuration leaves this at "abstain".
+  ungrounded_answer: assist
+  ungrounded_max_tokens: 400
 
 llm:
   session_header: x-opencode-session

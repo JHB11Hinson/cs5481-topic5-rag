@@ -133,6 +133,7 @@ def api_ask(conversation_id: str, question: str) -> Dict[str, Any]:
     payload = {
         "config_name": response["config_name"],
         "abstained": response["abstained"],
+        "answer_mode": response.get("answer_mode", "abstained" if response["abstained"] else "grounded"),
         "abstain_reason": response["abstain_reason"],
         "retrieval_ms": response["retrieval_ms"],
         "generation_ms": response["generation_ms"],

@@ -459,12 +459,15 @@ class Screen:
     def _bubble_assistant(self, markdown: str, payload: Optional[Dict[str, Any]]) -> None:
         claims = (payload or {}).get("claims") or []
         abstained = bool((payload or {}).get("abstained"))
+        ungrounded = (payload or {}).get("answer_mode") == "ungrounded_general"
         for claim in claims:
             self.citation_index[claim["marker"]] = claim["citation"]
         with self.transcript:
             with ui.column().classes("ds-msg w-full gap-0"):
                 html(_answer_html(markdown or "")).classes("ds-assistant")
-                if abstained:
+                if ungrounded:
+                    html('<div class="ds-badge">not in the documentation · general knowledge</div>')
+                elif abstained:
                     html('<div class="ds-badge">not in the documentation</div>')
         self.body.run_method("scrollTo", {"top": 10 ** 6, "behavior": "smooth"})
 
@@ -510,6 +513,9 @@ class Screen:
         rendered = demo.render_answer(response)
         payload = {
             "abstained": response["abstained"],
+            "answer_mode": response.get(
+                "answer_mode", "abstained" if response["abstained"] else "grounded"
+            ),
             "abstain_reason": response["abstain_reason"],
             "claims": [
                 {"marker": claim["marker"], "citation": self.engine.citation_payload(claim)}

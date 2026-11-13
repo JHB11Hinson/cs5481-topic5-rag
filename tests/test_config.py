@@ -104,3 +104,29 @@ def test_llm_client_uses_the_environment_endpoint_when_the_config_is_empty():
                 os.environ.pop(name, None)
             else:
                 os.environ[name] = value
+
+
+def test_the_gap_policy_defaults_to_strict_abstention():
+    cfg = config_mod.load(_write(BASE))
+    assert cfg["generate.ungrounded_answer"] == "abstain"
+    assert cfg["generate.ungrounded_max_tokens"] == 400
+
+
+def test_the_gap_policy_needs_a_model_behind_it():
+    path = _write(BASE + "\ngenerate:\n  ungrounded_answer: assist\n")
+    try:
+        config_mod.load(path)
+    except config_mod.ConfigError as exc:
+        assert "ungrounded_answer=assist" in str(exc)
+    else:
+        raise AssertionError("assist was accepted with the stub generator")
+
+
+def test_an_unknown_gap_policy_is_rejected():
+    path = _write(BASE + "\ngenerate:\n  ungrounded_answer: sometimes\n")
+    try:
+        config_mod.load(path)
+    except config_mod.ConfigError as exc:
+        assert "sometimes" in str(exc)
+    else:
+        raise AssertionError("unknown gap policy was accepted")

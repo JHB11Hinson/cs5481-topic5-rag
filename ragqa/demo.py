@@ -82,8 +82,26 @@ def render_answer(response: Dict[str, Any]) -> str:
     latency line. Those live in the payload (the citation panel and the stored
     transcript use them), because a reader asking a question wants an answer and a
     source, not the instrumentation that produced it.
+
+    An ungrounded answer is rendered notice-first on purpose: the reader is told the
+    documentation does not cover the question *before* reading the paragraph that does,
+    and the paragraph carries no marker because there is nothing to mark (ADR-0020).
     """
     if response["abstained"]:
+        general = (response.get("general_answer") or "").strip()
+        if general:
+            lines = [f"**{response.get('notice') or generate.GAP_NOTE}**", "", general]
+            caveat = _prose_excerpt(response.get("caveat") or "", 200)
+            if caveat:
+                lines += ["", f"_To check: {caveat}_"]
+            best = response["best_chunk"]
+            if best is not None:
+                lines += ["", f"The closest page is {_source_line(best)}."]
+                excerpt = _prose_excerpt(best.get("text") or "")
+                if excerpt:
+                    lines += ["", f"> {excerpt}"]
+            return "\n".join(lines)
+
         lines = [f"**{ABSTAIN_MESSAGE}**"]
         reason = _prose_excerpt(response.get("abstain_reason") or "", 300)
         if reason and reason.lower() not in ("model_declined", "below_score_threshold"):
@@ -172,6 +190,7 @@ class ChatEngine:
 
         self.generator = generator if generator is not None else generate.make(cfg)
         self.threshold = float(cfg["generate.abstain_score_threshold"])
+        self.ungrounded = str(cfg["generate.ungrounded_answer"]) == "assist"
         self.max_claims = int(cfg["generate.max_claims"])
         self.min_claim_overlap = float(cfg["generate.min_claim_overlap"])
         self.k = int(cfg["retrieval.k"])
@@ -253,7 +272,11 @@ class ChatEngine:
             "config_name": self.config_name,
             "answer_text": generated["answer_text"],
             "abstained": bool(generated["abstained"]),
+            "answer_mode": str(generated.get("answer_mode") or "grounded"),
             "abstain_reason": str(generated.get("abstain_reason") or ""),
+            "notice": str(generated.get("notice") or ""),
+            "general_answer": str(generated.get("general_answer") or ""),
+            "caveat": str(generated.get("caveat") or ""),
             "claims": claims,
             "verified_claims": sum(1 for claim in claims if claim["verified"]),
             "retrieved": [self._hit_view(hit) for hit in shown],
@@ -328,6 +351,11 @@ class ChatEngine:
         """One line on why the answer was withheld, in the reader's terms."""
         if not response["abstained"]:
             return ""
+        if response.get("general_answer"):
+            return (
+                "The knowledge base does not answer this question; the paragraph above "
+                "comes from the model's general knowledge and is not a citation."
+            )
         best = response["best_chunk"]
         if best is None:
             return "Retrieval returned no chunk at all for this question."
@@ -407,8 +435,12 @@ class ChatEngine:
             f"`{getattr(self.generator, 'model_id', 'unknown')}`, index "
             f"`{self.index_backend}`. Loaded once in "
             f"{self.build_seconds:.1f}s. Ask a question; every claim comes with a "
-            f"citation you can open, and a question the corpus cannot answer is "
-            f"abstained with the best chunk shown."
+            f"citation you can open. A question the corpus cannot answer is labelled "
+            + (
+                "and answered from the model's general knowledge, with no citation."
+                if self.ungrounded
+                else "and shown with the best chunk it did retrieve."
+            )
         )
 
     def close(self) -> None:

@@ -115,6 +115,9 @@ def _answer_payload(response) -> dict:
     return {
         "config_name": response["config_name"],
         "abstained": response["abstained"],
+        "answer_mode": response.get(
+            "answer_mode", "abstained" if response["abstained"] else "grounded"
+        ),
         "retrieval_ms": response["retrieval_ms"],
         "claims": [
             {
