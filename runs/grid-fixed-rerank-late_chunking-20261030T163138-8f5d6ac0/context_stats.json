@@ -1,9 +1,0 @@
-{
-  "documents_over_window": 0,
-  "mode": "late_chunking",
-  "peak_vram_gb": 0.0,
-  "query_embedder": "BAAI/bge-m3",
-  "window_overlap": 256,
-  "window_tokens": 2048,
-  "windows": 0
-}

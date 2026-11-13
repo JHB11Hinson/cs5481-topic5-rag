@@ -1,2 +1,0 @@
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A002"}
-{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"A Vault server begins in a sealed state where it can reach physical storage but cannot decrypt any data on it.\", \"chunk_id\": \"c-2e02db0a352ce89c\", \"quote\": \"W", "item_id": "A009"}

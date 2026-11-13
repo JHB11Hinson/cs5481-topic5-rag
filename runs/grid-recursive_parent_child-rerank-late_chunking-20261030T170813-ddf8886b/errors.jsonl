@@ -1,5 +1,0 @@
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A026"}
-{"class": "parse_failure", "detail": "{\"answerable\":true,\"claims\":[{\"text\":\"During initialization, Vault splits the root key into a configured number of shards, and a threshold of those shards is required to reconstruct the root key.\",\"ch", "item_id": "A027"}
-{"class": "parse_failure", "detail": "", "item_id": "A031"}
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A038"}
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A040"}

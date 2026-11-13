@@ -1,4 +1,0 @@
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A004"}
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A011"}
-{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"A Vault server starts sealed; it can access physical storage but cannot decrypt data on it.\", \"chunk_id\": \"c-2e02db0a352ce89c\", \"quote\": \"When you start a Vau", "item_id": "A027"}
-{"class": "parse_failure", "detail": "{\"answerable\":true,\"claims\":[{\"text\":\"Vault uses the entity, not each separate authentication account, as the unit for counting Vault clients.\",\"chunk_id\":\"c-88bf28a4220c1980\",\"quote\":\"Vault Entity is", "item_id": "A032"}

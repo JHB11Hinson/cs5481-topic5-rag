@@ -1,9 +1,0 @@
-{
-  "max_hops": 1,
-  "mean_hops": 1.0,
-  "stop_reasons": {
-    "cap_reached": 6,
-    "hit_first_round": 34
-  },
-  "trigger_threshold": 0.426134
-}

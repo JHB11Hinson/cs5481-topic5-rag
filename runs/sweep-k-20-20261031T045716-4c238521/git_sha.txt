@@ -1,5 +1,0 @@
-{
-  "dirty": true,
-  "note": "",
-  "sha": "f33be2a"
-}

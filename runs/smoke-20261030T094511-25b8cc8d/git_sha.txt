@@ -1,5 +1,0 @@
-{
-  "dirty": null,
-  "note": "not a git repository",
-  "sha": "unversioned"
-}

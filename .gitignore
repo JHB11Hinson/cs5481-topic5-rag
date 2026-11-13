@@ -1,36 +1,143 @@
-# Large or regenerable artifacts — fetch or rebuild, do not commit (ADR-0003)
+# Repository hygiene for a remote origin.
+# Rule of thumb: commit what a reader needs to understand and rebuild the
+# result -- code, configs, prose, the small measured summaries under
+# reports/ -- and ignore everything that is fetched, generated, measured at
+# run time, or produced by local tooling.
+
+# ---------------------------------------------------------------------------
+# Corpus, vector index, embedding cache (ADR-0003: fetch or rebuild)
+# ---------------------------------------------------------------------------
+# data/raw/     cloned upstream documentation (nested .git, ~15 MB)
+# data/chunks/  chunker output (~18 MB)
+# data/corpus/  normalized documents
+# data/index/   Qdrant collections (~160 MB)
+# data/cache/   sqlite embedding cache (~85 MB)
 data/
-runs/*/vectors/
-runs/*/chunks.jsonl
-runs/*/corpus_snapshot.json
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.qdrant/
+qdrant_storage/
+
+# ---------------------------------------------------------------------------
+# Experiment outputs
+# ---------------------------------------------------------------------------
+# Every cell writes an immutable runs/<run_id>/ directory: answers, retrieved
+# chunks, per-item scores, vectors. Hundreds of MB, reproducible from
+# configs/ + scripts/. The numbers the report cites live in reports/.
+runs/
+
+# ---------------------------------------------------------------------------
+# Model weights and large binary blobs
+# ---------------------------------------------------------------------------
 *.gguf
 *.safetensors
 *.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.npz
+*.npy
+*.h5
+*.pkl
+*.joblib
 
-# Secrets
-.env
+# ---------------------------------------------------------------------------
+# AI coding agents / orchestration scratch
+# ---------------------------------------------------------------------------
+# Working state of the coding agents that drive this repository: one-off
+# probes, screenshots, session logs, the local ticket tracker. Not part of
+# the deliverable. (AGENTS.md and docs/agents/ are documentation and stay.)
+.scratch/
+.wt08-scratch/
+.agent/
+.agents/
+.claude/
+.codex/
+.cursor/
+.specstory/
+.aider*
+*.agent.md
+PROMPT.md
+agent-*.log
 
-# Local scratch from tooling and one-off measurement
-.scratch/corpus-measure/
-.scratch/**/clones/
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-.ipynb_checkpoints/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Chainlit runtime artifacts (regenerated on every import)
+# ---------------------------------------------------------------------------
+# Chainlit runtime
+# ---------------------------------------------------------------------------
+# Chainlit rewrites .files/ and .chainlit/translations/ on every import and
+# regenerates the welcome screen. .chainlit/config.toml is the theme and is
+# checked in.
 .files/
 .chainlit/translations/
+.chainlit/.files/
+.chainlit/*.log
 chainlit.md
 
-# Demo capture output (regenerate with .scratch/capture_demo.py)
-.scratch/demo-capture.json
-.scratch/capture.log
-.scratch/serve-*.out
-.scratch/serve-*.err
+# ---------------------------------------------------------------------------
+# Logs and local run output
+# ---------------------------------------------------------------------------
+*.log
+*.err
+*.out
+*.pid
+demo-capture.json
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+credentials.*
+
+# ---------------------------------------------------------------------------
+# OS and editor
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------------------
+# Archives and temporary files
+# ---------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.tmp
+*.bak
+*.orig
+*.rej

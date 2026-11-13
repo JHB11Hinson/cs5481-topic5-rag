@@ -1,7 +1,0 @@
-{
-  "embed_cache_hits": 0,
-  "embed_cache_misses": 11,
-  "llm_cache_hits": 0,
-  "llm_cache_misses": 0,
-  "note": "caches land in tickets 04 and 06; the stub path needs neither"
-}

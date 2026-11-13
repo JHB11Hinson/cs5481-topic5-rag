@@ -1,1 +1,0 @@
-{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"With Consul storage, the 512KB cap applies to the size of data Vault can write as a value to a single key in Consul's key/value store.\", \"chunk_id\": \"c-9549af", "item_id": "A031"}

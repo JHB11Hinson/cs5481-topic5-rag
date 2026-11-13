@@ -1,6 +1,0 @@
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A023"}
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A023"}
-{"class": "parse_failure", "detail": "", "item_id": "A027"}
-{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"A token is a root token because the `root` policy is attached to it, and root tokens can do anything in Vault.\", \"chunk_id\": \"c-8234ba53eb3e138c\", \"quote\": \"R", "item_id": "A029"}
-{"class": "parse_failure", "detail": "", "item_id": "A031"}
-{"class": "quote_not_in_chunk", "detail": "quoted text does not occur in the cited chunk", "item_id": "A040"}

@@ -1,1 +1,0 @@
-{"class": "parse_failure", "detail": "{\"answerable\": true, \"claims\": [{\"text\": \"On Consul, Vault's storage entry limit defaults to 512 KiB and is enforced by Consul, not Vault.\", \"chunk_id\": \"c-bca12f9ba03d2c84\", \"quote\": \"For Vault deplo", "item_id": "A031"}
