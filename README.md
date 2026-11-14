@@ -37,20 +37,68 @@ When retrieval cannot support an answer the system says so — and the flag `gen
 
 ## Run it
 
-Requires Python 3.9+ with `pyyaml` and `numpy` for the stub path; the real path adds `torch`, `sentence-transformers`, `transformers`, `qdrant-client`. Credentials come from `.env` (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_SESSION_HEADER`) — see `.env.example`.
+A fresh clone arrives with no environment, no `data/` and no `runs/`. Two of the commands
+below work before anything is fetched, and they are the two that prove the checkout is
+sound; everything after them needs data, models or credentials.
+
+### Install
 
 ```bash
-python -m ragqa.selftest                                 # unit tests, no network
-python -m ragqa.run --config configs/smoke.yaml          # offline stub path, ~10 s
-python -m ragqa.run --config configs/ctx-plain.yaml      # real models, needs .env
-python scripts/warm_prefixes.py --config configs/ctx-prefix.yaml
-python -m ragqa grid check configs/grid                  # the 18-cell declaration
-python scripts/run_matrix.py                             # resumable; skips finished cells
-python -m ragqa aggregate --runs runs --out reports      # every table and figure
-python -m ragqa serve --config configs/grid/cell-recursive_parent_child-rerank-plain.yaml
+python -m venv .venv
+source .venv/bin/activate          # Windows: .\.venv\Scripts\Activate.ps1
+python -m pip install -U pip
+pip install -e ".[dev]"
 ```
 
-Set `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` when the models are already cached: a hub check on `from_pretrained` can hang a run at 0% GPU, which looks exactly like a deadlock.
+Python 3.9+. `.[dev]` is `pyyaml`, `numpy` and `pytest`, which is all the stub path and
+`ragqa.selftest` need — `ragqa/config.py` imports `yaml` at module load, so nothing at all
+runs before this step. Real cells add `torch`, `sentence-transformers`, `transformers`,
+`qdrant-client` (`pip install -e ".[models,index]"`); the demo adds `chainlit` (`.[demo]`,
+the default backend) or NiceGUI for `--backend nice` (`.[demo-nice]`).
+
+Credentials come from `.env` in the working directory (`LLM_BASE_URL`, `LLM_API_KEY`,
+`LLM_SESSION_HEADER`) — `cp .env.example .env` and fill it in. `ragqa/llm.py` reads the file
+itself, so nothing is exported by hand.
+
+### What runs where
+
+| Step | Command | `data/` | models | `.env` |
+|---|---|---|---|---|
+| unit tests, no network | `python -m ragqa.selftest` | | | |
+| offline stub cell, ~10 s | `python -m ragqa.run --config configs/smoke.yaml` | | | |
+| the 18-cell declaration | `python -m ragqa grid check configs/grid` | | | |
+| one real cell | `python -m ragqa.run --config configs/ctx-plain.yaml` | ✔ | ✔ | ✔ |
+| prefix warm-up (hosted model only) | `python scripts/warm_prefixes.py --config configs/ctx-prefix.yaml` | ✔ | | ✔ |
+| the whole matrix | `python scripts/run_matrix.py` | ✔ | ✔ | ✔ |
+| every table and figure | `python -m ragqa aggregate --runs runs --out reports` | | | |
+| the demo | `python -m ragqa serve --config configs/grid/cell-recursive_parent_child-rerank-plain.yaml` | ✔ | ✔ | ✔ |
+
+`data/` is 322 MB of corpus, chunks, Qdrant index and embedding cache, git-ignored on
+purpose (ADR-0003). Rebuild it from the pinned upstream tree:
+
+```bash
+python -m ragqa.ingest --ref 1817bdfe --clone https://github.com/hashicorp/web-unified-docs
+```
+
+or copy `data/` from a machine that already has it. Without it a real cell stops at
+`data/corpus/vault-1.21.x-1817bdfe/docs_structured.jsonl` with a `FileNotFoundError`: that
+is the expected first failure on a fresh clone, not a bug. `aggregate` without `runs/`
+prints `PROBLEM no runs root at runs` and exits 1, while `reports/` is committed, so nobody
+needs `runs/` to read a number — only to regenerate one.
+
+### Offline flags
+
+Set `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` **after** both models are cached: a hub
+check on `from_pretrained` can hang a run at 0% GPU, which looks exactly like a deadlock.
+`scripts/run_matrix.py` sets both unconditionally (`setdefault`), so on a machine that has
+never downloaded `BAAI/bge-m3` and `BAAI/bge-reranker-v2-m3` the first cell dies in the
+embedder. Warm the cache once without them, then run the matrix:
+
+```bash
+unset HF_HUB_OFFLINE TRANSFORMERS_OFFLINE    # PowerShell: Remove-Item Env:HF_HUB_OFFLINE,Env:TRANSFORMERS_OFFLINE
+python -m ragqa.run --config configs/ctx-plain.yaml
+python scripts/run_matrix.py                 # resumable; skips finished cells
+```
 
 ## Where things live
 
@@ -63,7 +111,7 @@ Set `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` when the models are already 
 | `reports/` | generated only: `python -m ragqa aggregate` reproduces every table, figure and the report's inputs |
 | `notes/` | human-readable analyses: calibration, taxonomy, sweeps, audits |
 | `docs/adr/`, `docs/research/` | decisions; the 13-system RAG survey |
-| `.scratch/topic5-rag/` | spec and the ticket board |
+| `.scratch/topic5-rag/` | spec and the ticket board — local tooling, git-ignored, absent from a clone |
 
 ## Conventions worth knowing before editing
 

@@ -13,8 +13,10 @@ dependencies = [
 models = ["torch>=2.1", "sentence-transformers>=2.7", "transformers>=4.40"]
 # Ticket 05+: vector store
 index = ["qdrant-client>=1.9"]
-# Ticket 16: demo
+# Ticket 16: demo, Chainlit backend (the default)
 demo = ["chainlit>=1.1"]
+# Ticket 16: demo, NiceGUI backend (`--backend nice`); not a chainlit dependency
+demo-nice = ["nicegui>=3.0"]
 # Evaluation and reporting
 report = ["pandas>=2.0", "matplotlib>=3.8"]
 # Local issue-tracker workflow
